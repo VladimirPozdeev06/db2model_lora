@@ -24,6 +24,9 @@ class TokenTrackingClient:
                 completion = getattr(usage, "completion_tokens", 0)
                 total = getattr(usage, "total_tokens", 0)
 
+            # autogen's RequestUsage has no total_tokens field
+            total = total or prompt + completion
+
             self.total_usage["prompt_tokens"] += prompt
             self.total_usage["completion_tokens"] += completion
             self.total_usage["total_tokens"] += total
