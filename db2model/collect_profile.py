@@ -88,6 +88,10 @@ def _column_values(conn, table: str, column: str) -> dict[str, Any]:
             {"lim": LOW_CARDINALITY_MAX + 1},
         ).fetchall()
     except Exception as exc:
+        # A failed statement aborts the transaction, and every later query on this
+        # connection would fail with "current transaction is aborted" — silently
+        # producing a profile full of errors instead of one bad column.
+        conn.rollback()
         return {"error": str(exc)[:80]}
 
     values = [_truncate(r[0]) for r in distinct]
@@ -153,6 +157,7 @@ def _sample_rows(conn, table: str) -> list[dict]:
         cols = list(result.keys())
         return [{c: _truncate(v) for c, v in zip(cols, row)} for row in result.fetchall()]
     except Exception as exc:
+        conn.rollback()
         return [{"error": str(exc)[:80]}]
 
 

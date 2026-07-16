@@ -53,7 +53,13 @@ def filter_db(db_id: str) -> tuple[list[dict], list[dict], Counter]:
     pairs = json.loads((RAW_DIR / f"{db_id}.json").read_text(encoding="utf-8"))
     user, password = os.environ["DB_USER"], os.environ["DB_PASS"]
     host = os.getenv("BENCHMARK_DB_URL", "localhost:5444")
-    engine = create_engine(f"postgresql+psycopg://{user}:{password}@{host}/{db_id}")
+    engine = create_engine(
+        f"postgresql+psycopg://{user}:{password}@{host}/{db_id}",
+        # Set on the connection, not with a SET statement: every failed query needs
+        # a rollback, and a rollback would undo an in-transaction SET, leaving the
+        # rest of the run with no timeout at all.
+        connect_args={"options": f"-c statement_timeout={STATEMENT_TIMEOUT_MS}"},
+    )
 
     kept: list[dict] = []
     rejected: list[dict] = []
@@ -65,7 +71,6 @@ def filter_db(db_id: str) -> tuple[list[dict], list[dict], Counter]:
         rejected.append(pair | {"reject_reason": reason})
 
     with engine.connect() as conn:
-        conn.execute(text(f"SET statement_timeout = {STATEMENT_TIMEOUT_MS}"))
         for pair in pairs:
             sql = _normalize(pair["sql"])
 
@@ -109,6 +114,9 @@ def main() -> None:
     kept, rejected, reasons = filter_db(db_id)
     total = len(kept)
     raw_total = total + sum(reasons.values())
+    if not raw_total:
+        print(f"{db_id}: в {RAW_DIR / f'{db_id}.json'} нет пар — сначала generate_pairs.py")
+        return
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     out = OUT_DIR / f"{db_id}.json"
