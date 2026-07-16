@@ -24,8 +24,8 @@ def sqlite_to_postgres(query: str) -> str:
         print("SQLGlot parse error:", e)
         query_pg = query
 
-    # Fix division by zero
-    query_pg = re.sub(r"(\b\w+\b)\s*/\s*(\b\w+\b)", r"\1 / NULLIF(\2,0)", query_pg)
+    # Division by zero is already handled by sqlglot's sqlite->postgres transpile,
+    # which wraps every divisor in NULLIF(x, 0).
 
     return query_pg
 
