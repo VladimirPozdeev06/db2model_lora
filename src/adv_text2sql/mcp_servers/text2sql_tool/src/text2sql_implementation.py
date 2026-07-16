@@ -481,6 +481,7 @@ class Text2SQLGenerator:
         retries = 0
         success = False
         raw_sql = ""
+        final_result = {"status": "error"}
 
         while not success and retries < MAX_RETRIES:
             logger.info(
