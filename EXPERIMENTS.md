@@ -94,11 +94,18 @@ Qwen2.5-Coder-3B-Instruct, 4-bit, T4 (15.6 ГБ), toxicology, 16 пар (13 trai
 
 `db2model/generate_pairs.py` + `filter_pairs.py`, учитель Qwen2.5-Coder-7B.
 
-**toxicology: 134 чистых из 192 сырых — брак 30%** (n=192, это уже измерение, а не шум).
-По сложности: simple 43, moderate 73, challenging 18.
+| БД | сырых | чистых | брак |
+|---|---|---|---|
+| toxicology | 192 | 134 | **30%** |
+| financial | 200 | 136 | **32%** |
+| codebase_community | 200 | 138 | **31%** |
 
-Структура брака: `UndefinedColumn` 19, `GroupingError` 12, пустой результат 10, `SyntaxError` 9,
-не парсится 3, `DivisionByZero` 2, дубликат 2, `UndefinedTable` 1.
+**Брак 30–32% на трёх разных базах.** Разброс в 2 процентных пункта на 592 парах — это
+устойчивое свойство учителя, а не особенность одной базы. Вот это число и есть «качество teacher»,
+которое требует план.
+
+Структура брака (toxicology, n=58): `UndefinedColumn` 19, `GroupingError` 12, пустой результат 10,
+`SyntaxError` 9, не парсится 3, `DivisionByZero` 2, дубликат 2, `UndefinedTable` 1.
 
 Что дало добавление компактной выжимки схемы и явного запрета префикса в промпт учителя:
 
@@ -108,6 +115,17 @@ Qwen2.5-Coder-3B-Instruct, 4-bit, T4 (15.6 ГБ), toxicology, 16 пар (13 trai
 
 Осталось `UndefinedColumn`, в основном `t1.molecule_id`/`t2.molecule_id` на таблице `connected`,
 где такой колонки нет. Это предел учителя-7B; для того и нужен фильтр по исполнению.
+
+### Датасет
+
+`db2model/build_dataset.py` → `db2model/dataset/` (train 347 / val 61, сплит по каждой базе отдельно,
+seed 0). Состав и хеши входов — в `manifest.json`, чтобы прогон можно было привязать к данным.
+
+| | financial | toxicology | codebase_community |
+|---|---|---|---|
+| пар | 136 | 134 | 138 |
+
+По сложности суммарно: simple 148, moderate 218, challenging 42.
 
 Отдельная находка: базы **недо-объявляют FK**. У toxicology объявлено 3, а связи
 `atom.molecule_id → molecule.molecule_id` среди них нет. Правило «соединяй только по объявленным FK»
