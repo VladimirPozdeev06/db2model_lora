@@ -1,0 +1,546 @@
+[
+  {
+    "question": "Who created the post titled 'Understanding logistic regression'",
+    "sql": "SELECT T2.displayname FROM posts AS T1 INNER JOIN users AS T2 ON T1.owneruserid = T2.id WHERE T1.title = 'Understanding logistic regression'",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "Count the number of unique users who have voted on posts and the number of unique users who have posted questions.",
+    "sql": "SELECT COUNT(DISTINCT userid) AS Voters, COUNT(DISTINCT CASE WHEN posttypeid = 1 THEN id END) AS Posters FROM votes AS T1 LEFT JOIN posts AS T2 ON T1.postid = T2.id",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.AmbiguousColumn) column reference \"id\" is ambiguous",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Which user earned the 'Scholar' badge and what was their reputation?",
+    "sql": "SELECT T2.DisplayName, T1.Reputation FROM users AS T1 INNER JOIN badges AS T2 ON T1.Id = T2.UserId WHERE T2.Name = 'Scholar'",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.displayname does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many posts with the tag 'python' have received more than 100 votes?",
+    "sql": "SELECT COUNT(DISTINCT T1.PostId) FROM votes AS T1 INNER JOIN posts AS T2 ON T1.PostId = T2.Id INNER JOIN posthistory AS T3 ON T2.Id = T3.PostId INNER JOIN tags AS T4 ON T3.Tags LIKE '%python%' WHERE T1.VoteTypeId > 1 AND T2.Score > 100",
+    "difficulty": "challenging",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedColumn) column t3.tags does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What are the top 5 most active users based on the number of badges they have received?",
+    "sql": "SELECT T1.DisplayName, COUNT(T2.BadgeId) AS BadgeCount FROM users AS T1 LEFT JOIN badges AS T2 ON T1.Id = T2.UserId GROUP BY T1.DisplayName ORDER BY BadgeCount DESC LIMIT 5",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.badgeid does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many questions have been created since the beginning of 2020?",
+    "sql": "SELECT COUNT(*) FROM posts WHERE PostTypeId = 1 AND CreationDate >= '2020-01-01'",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedColumn) column \"creationdate\" does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Find the titles of all posts that contain both 'regression' and 'machine-learning' tags",
+    "sql": "SELECT T1.Title FROM posts AS T1 INNER JOIN posthistory AS T2 ON T1.Id = T2.PostId INNER JOIN tags AS T3 ON T3.Id = ANY(string_to_array(T2.Tags, '|')) WHERE T3.TagName IN ('regression', 'machine-learning') GROUP BY T1.Title HAVING COUNT(DISTINCT T3.TagName) = 2",
+    "difficulty": "challenging",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.tags does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "List the display names of users who have voted on posts tagged with 'data-science'",
+    "sql": "SELECT DISTINCT T1.DisplayName FROM users AS T1 INNER JOIN votes AS T2 ON T1.Id = T2.UserId INNER JOIN posts AS T3 ON T2.PostId = T3.Id INNER JOIN posthistory AS T4 ON T3.Id = T4.PostId INNER JOIN tags AS T5 ON T5.Id = ANY(string_to_array(T4.Tags, '|')) WHERE T5.TagName = 'data-science'",
+    "difficulty": "challenging",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedColumn) column t4.tags does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Which 5 posts with the most upvotes are tagged with 'Python'?",
+    "sql": "SELECT P.Title, P.Body, P.Score FROM posts AS P JOIN posthistory AS PH ON P.Id = PH.PostId JOIN tags AS T ON P.Tags LIKE '%<python>%' ORDER BY P.UpVotes DESC LIMIT 5",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column p.upvotes does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "List the 10 most recent posts that have been commented on.",
+    "sql": "SELECT P.Title, P.Body, P.CreationDate FROM posts AS P JOIN comments AS C ON P.Id = C.PostId ORDER BY C.CreationDate DESC LIMIT 10",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column p.creationdate does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many posts have more than 100 upvotes and less than 200 views?",
+    "sql": "SELECT COUNT(*) FROM posts WHERE UpVotes > 100 AND ViewCount < 200",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column \"upvotes\" does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Which 5 posts with the highest score are tagged with both 'Machine Learning' and 'Deep Learning'?",
+    "sql": "SELECT P.Title, P.Body, P.Score FROM posts AS P JOIN posthistory AS PH ON P.Id = PH.PostId JOIN tags AS T1 ON P.Tags LIKE '%<machine learning>%' JOIN tags AS T2 ON P.Tags LIKE '%<deep learning>%' ORDER BY P.Score DESC LIMIT 5",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "How many posts have been active in the past month?",
+    "sql": "SELECT COUNT(*) FROM posts WHERE CreationDate >= NOW() - INTERVAL '1 month'",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column \"creationdate\" does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Identify the average score of posts that have received more than 100 votes.",
+    "sql": "SELECT AVG(score) FROM posts AS T1 INNER JOIN votes AS T2 ON T1.id = T2.postid WHERE T2.votetypeid = 2 GROUP BY T1.id HAVING COUNT(*) > 100",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "Identify the total number of unique badges awarded to users who have posted more than 100 answers.",
+    "sql": "SELECT COUNT(DISTINCT T2.badgeid) FROM users AS T1 INNER JOIN badges AS T2 ON T1.id = T2.userid INNER JOIN posts AS T3 ON T3.owneruserid = T1.id WHERE T3.answercount > 100",
+    "difficulty": "challenging",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.badgeid does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the ratio of questions to answers in the posts tagged with '<machine-learning>'?",
+    "sql": "SELECT CAST(SUM(CASE WHEN posttypeid = 1 THEN 1 ELSE 0 END) AS FLOAT) / SUM(CASE WHEN posttypeid = 2 THEN 1 ELSE 0 END) AS ratio FROM posts WHERE tags LIKE '%<machine-learning>%'",
+    "difficulty": "challenging",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.DivisionByZero) division by zero",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What percentage of posts were created in 2014?",
+    "sql": "SELECT CAST(SUM(CASE WHEN EXTRACT(YEAR FROM creationdate) = 2014 THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM posts",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.UndefinedColumn) column \"creationdate\" does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the total number of votes cast on questions?",
+    "sql": "SELECT SUM(CASE WHEN posttypeid = 1 THEN 1 ELSE 0 END) AS total_votes FROM votes",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "error": "(psycopg.errors.UndefinedColumn) column \"posttypeid\" does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many unique tags are associated with posts created after January 1, 2014?",
+    "sql": "SELECT COUNT(DISTINCT TagName) FROM tags WHERE PostId IN (SELECT Id FROM posts WHERE CreationDate > '2014-01-01')",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.UndefinedColumn) column \"creationdate\" does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Find the average reputation of users who have received more than 1000 votes.",
+    "sql": "SELECT AVG(users.Reputation) FROM users JOIN votes ON users.Id = votes.UserId WHERE votes.VoteTypeId = 2 GROUP BY users.Id HAVING COUNT(votes.Id) > 1000",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "How many distinct post history entries were made by users who have posted more than 10 answers?",
+    "sql": "SELECT COUNT(DISTINCT PostHistoryId) FROM posthistory WHERE UserId IN (SELECT OwnerUserId FROM posts WHERE AcceptedAnswerId IS NOT NULL GROUP BY OwnerUserId HAVING COUNT(AcceptedAnswerId) > 10)",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.UndefinedColumn) column \"posthistoryid\" does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What are the tags associated with posts that have received the most upvotes?",
+    "sql": "SELECT t.tagname FROM tags AS t JOIN posts AS p ON t.id = ANY(p.tags) WHERE p.score = (SELECT MAX(score) FROM posts);",
+    "difficulty": "challenging",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.WrongObjectType) op ANY/ALL (array) requires array on right side",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Find the titles of posts that contain both 'machine-learning' and 'python' tags.",
+    "sql": "SELECT p.title FROM posts AS p JOIN posttags AS pt ON p.id = pt.postid JOIN tags AS t ON pt.tagid = t.id WHERE t.tagname = 'machine-learning' INTERSECT SELECT p.title FROM posts AS p JOIN posttags AS pt ON p.id = pt.postid JOIN tags AS t ON pt.tagid = t.id WHERE t.tagname = 'python';",
+    "difficulty": "challenging",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedTable) relation \"posttags\" does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Find the 10 most popular tags based on the number of associated badges.",
+    "sql": "SELECT T1.TagName, COUNT(T2.BadgeId) AS BadgeCount FROM tags AS T1 INNER JOIN badges AS T2 ON T1.Id = T2.TagId GROUP BY T1.TagName ORDER BY BadgeCount DESC LIMIT 10",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.tagid does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many unique badges were awarded to users who have more than 1000 points?",
+    "sql": "SELECT COUNT(DISTINCT BadgeId) FROM badges WHERE UserId IN (SELECT Id FROM users WHERE Reputation > 1000)",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column \"badgeid\" does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Identify the top 5 most active users based on the number of comments they have made.",
+    "sql": "SELECT T1.DisplayName, COUNT(T2.Comment) AS CommentCount FROM users AS T1 INNER JOIN comments AS T2 ON T1.Id = T2.UserId GROUP BY T1.DisplayName ORDER BY CommentCount DESC LIMIT 5",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.comment does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Find the 10 tags that receive the most votes combined across all badges.",
+    "sql": "SELECT T1.TagName, SUM(T2.BountyAmount) AS TotalVotes FROM tags AS T1 INNER JOIN badges AS T2 ON T1.Id = T2.TagId GROUP BY T1.TagName ORDER BY TotalVotes DESC LIMIT 10",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.tagid does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "List the top 10 users with the highest number of badges they have received.",
+    "sql": "SELECT T1.DisplayName, COUNT(DISTINCT T2.BadgeId) AS BadgeCount FROM users AS T1 INNER JOIN badges AS T2 ON T1.Id = T2.UserId GROUP BY T1.DisplayName ORDER BY BadgeCount DESC LIMIT 10",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.badgeid does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many unique posts were created by users with more than 1000 reputation points?",
+    "sql": "SELECT COUNT(DISTINCT postid) FROM posts AS T1 INNER JOIN users AS T2 ON T1.owneruserid = T2.id WHERE T2.reputation > 1000;",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.UndefinedColumn) column \"postid\" does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "List all posts created by user with ID 67890.",
+    "sql": "SELECT Title FROM posts WHERE OwnerUserId = 67890",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "Retrieve the body of the most recent post.",
+    "sql": "SELECT Body FROM posts ORDER BY CreationDate DESC LIMIT 1",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "error": "(psycopg.errors.UndefinedColumn) column \"creationdate\" does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the average reputation of users who have received more than 100 upvotes?",
+    "sql": "SELECT AVG(reputation) FROM users WHERE upvotes > 100",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "Which tag has received the most votes?",
+    "sql": "SELECT T1.TagName FROM tags AS T1 INNER JOIN posthistory AS T2 ON T1.Id = T2.PostId WHERE T2.VoteTypeId = 2 GROUP BY T1.TagName ORDER BY SUM(T2.VoteTypeId) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.votetypeid does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Identify the users who have linked their accounts the most times.",
+    "sql": "SELECT T1.DisplayName, COUNT(T2.Id) AS LinkCount FROM users AS T1 INNER JOIN postlinks AS T2 ON T1.Id = T2.UserId GROUP BY T1.DisplayName ORDER BY LinkCount DESC LIMIT 10",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.userid does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Which tags are associated with the most popular questions?",
+    "sql": "SELECT T1.TagName, COUNT(DISTINCT T2.PostId) AS QuestionCount FROM tags AS T1 INNER JOIN posts AS T2 ON T1.Id = ANY(T2.Tags::int[]) WHERE T2.PostTypeId = 1 GROUP BY T1.TagName ORDER BY QuestionCount DESC LIMIT 5",
+    "difficulty": "challenging",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.postid does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Which badges have been awarded the most frequently?",
+    "sql": "SELECT T1.Name, COUNT(T2.Id) AS AwardCount FROM badges AS T1 INNER JOIN posthistory AS T2 ON T1.Id = T2.BadgeId WHERE T2.PostHistoryTypeId = 5 GROUP BY T1.Name ORDER BY AwardCount DESC LIMIT 5",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.badgeid does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Find the total number of badges awarded to users who have more than 1000 reputation points.",
+    "sql": "SELECT COUNT(*) FROM badges AS T1 INNER JOIN users AS T2 ON T1.userid = T2.id WHERE T2.reputation > 1000",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "Calculate the average score of posts created in the year 2013.",
+    "sql": "SELECT AVG(Score) FROM posts WHERE EXTRACT(YEAR FROM creaciondate) = 2013",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.UndefinedColumn) column \"creaciondate\" does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Calculate the average number of votes per post for users who have more than 1000 reputation points.",
+    "sql": "SELECT AVG(COUNT(*)) FROM users AS T1 INNER JOIN posts AS T2 ON T1.id = T2.owneruserid INNER JOIN votes AS T3 ON T2.id = T3.postid WHERE T1.reputation > 1000",
+    "difficulty": "challenging",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What percentage of posts are tagged with the 'python' tag?",
+    "sql": "SELECT CAST(SUM(CASE WHEN EXISTS(SELECT 1 FROM posts AS T1 JOIN postTags AS T2 ON T1.Id = T2.PostId WHERE T2.TagName = 'python') THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM posts",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.UndefinedTable) relation \"posttags\" does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the ratio of upvotes to downvotes for posts with the most upvotes?",
+    "sql": "SELECT CAST((SELECT SUM(CASE WHEN V.VoteTypeId = 1 THEN 1 ELSE 0 END) FROM votes AS V WHERE V.PostId = (SELECT Id FROM posts ORDER BY UpVotes DESC LIMIT 1)) AS FLOAT) / (SELECT SUM(CASE WHEN V.VoteTypeId = 2 THEN 1 ELSE 0 END) FROM votes AS V WHERE V.PostId = (SELECT Id FROM posts ORDER BY UpVotes DESC LIMIT 1))",
+    "difficulty": "challenging",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.UndefinedColumn) column \"upvotes\" does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the ratio of new badges awarded per day?",
+    "sql": "SELECT AVG(DATEDIFF(day, MIN(Date), MAX(Date))) / COUNT(DISTINCT Date) AS RatioPerDay FROM badges GROUP BY Date",
+    "difficulty": "challenging",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.UndefinedColumn) column \"day\" does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the ratio of posts created in the last year to total posts?",
+    "sql": "SELECT CAST(COUNT(CASE WHEN CreationDate >= NOW() - INTERVAL '1 YEAR' THEN 1 ELSE 0 END) AS FLOAT) / COUNT(*) FROM posts",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.UndefinedColumn) column \"creationdate\" does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Find the number of unique badges awarded to users who have more than 1000 reputation points.",
+    "sql": "SELECT COUNT(DISTINCT T1.badgeid) FROM badges AS T1 INNER JOIN users AS T2 ON T1.userid = T2.id WHERE T2.reputation > 1000",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t1.badgeid does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many unique tags are associated with posts that have more than 50 answers?",
+    "sql": "SELECT COUNT(DISTINCT tagid) FROM tags AS T1 INNER JOIN posts AS T2 ON T1.postid = T2.id WHERE T2.answercount > 50",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.UndefinedColumn) column t1.postid does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Calculate the sum of upvotes for all posts tagged with 'python'",
+    "sql": "SELECT SUM(T2.upvotes) FROM tags AS T1 INNER JOIN posts AS T2 ON T1.postid = T2.id WHERE T1.tagname = 'python'",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.UndefinedColumn) column t1.postid does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many unique users have voted on posts and what is the average number of votes per user?",
+    "sql": "SELECT COUNT(DISTINCT userid), AVG(votes) FROM votes;",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedFunction) function avg(votes) does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Identify the top 5 users with the highest number of votes received and list their display names and total votes.",
+    "sql": "SELECT u.displayname, SUM(v.votes) as TotalVotes FROM users u JOIN votes v ON u.id = v.userid GROUP BY u.id ORDER BY TotalVotes DESC LIMIT 5;",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedColumn) column v.votes does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many distinct tags are associated with posts owned by users who have posted more than 10 questions?",
+    "sql": "SELECT COUNT(DISTINCT t.tagname) FROM tags t JOIN posts p ON t.id = p.tags WHERE p.owneruserid IN (SELECT owneruserid FROM posts GROUP BY owneruserid HAVING COUNT(owneruserid) > 10);",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedFunction) operator does not exist: bigint = text",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What are the titles of posts with the most votes?",
+    "sql": "SELECT Title FROM posts ORDER BY VoteCount DESC LIMIT 1",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column \"votecount\" does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Find the display names of users who have voted on the most answers.",
+    "sql": "SELECT T3.DisplayName FROM posts AS T1 JOIN votes AS T2 ON T1.Id = T2.PostId JOIN users AS T3 ON T2.UserId = T3.Id WHERE T1.PostTypeId = 2 GROUP BY T3.DisplayName ORDER BY COUNT(T2.Id) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "Calculate the average score of comments made on posts created before January 1, 2012.",
+    "sql": "SELECT AVG(T1.score) FROM comments AS T1 INNER JOIN posts AS T2 ON T1.postid = T2.id WHERE T2.creationdate < '2012-01-01'",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.creationdate does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many distinct users have voted on posts tagged with 'python'?",
+    "sql": "SELECT COUNT(DISTINCT T2.userid) FROM postlinks AS T1 INNER JOIN posts AS T2 ON T1.postid = T2.id WHERE T2.tags LIKE '%python%'",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.userid does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Sum the reputation points of users who have received votes of type 1 (upvote) more than 5 times.",
+    "sql": "SELECT SUM(T2.reputation) FROM votes AS T1 INNER JOIN users AS T2 ON T1.userid = T2.id WHERE T1.votetypeid = 1 GROUP BY T1.userid HAVING COUNT(*) > 5",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "Find the maximum number of votes received by any single post in the year 2013.",
+    "sql": "SELECT MAX(COUNT(*)) FROM votes AS T1 INNER JOIN posts AS T2 ON T1.postid = T2.id WHERE EXTRACT(YEAR FROM T1.creationdate) = 2013 GROUP BY T1.postid",
+    "difficulty": "challenging",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "List the display names of users who have posted answers on at least 3 questions tagged with 'machine-learning'.",
+    "sql": "SELECT DISTINCT T1.displayname FROM users AS T1 INNER JOIN posts AS T2 ON T1.id = T2.owneruserid WHERE T2.posttypeid = 2 AND T2.tags LIKE '%machine-learning%' GROUP BY T1.displayname HAVING COUNT(DISTINCT T2.acceptedanswerid) >= 3",
+    "difficulty": "challenging",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "Find the number of unique badges awarded to users who have commented more than 100 times.",
+    "sql": "SELECT COUNT(DISTINCT T2.badgeid) FROM comments AS T1 INNER JOIN badges AS T2 ON T1.userid = T2.userid WHERE T1.id IN (SELECT T3.id FROM comments AS T3 WHERE T3.userid = T1.userid GROUP BY T3.userid HAVING COUNT(*) > 100)",
+    "difficulty": "challenging",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.badgeid does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What percentage of users have more than 1000 reputation points?",
+    "sql": "SELECT CAST(SUM(CASE WHEN reputation > 1000 THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM users;",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "What is the ratio of posts that have been answered versus those that haven't?",
+    "sql": "SELECT CAST(SUM(CASE WHEN acceptedanswerid IS NOT NULL THEN 1 ELSE 0 END) AS FLOAT) / COUNT(*) FROM posts;",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "Find the titles of posts created by user with ID 123.",
+    "sql": "SELECT title FROM posts WHERE owneruserid = 123",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "Find the most recent comment posted by user with ID 789.",
+    "sql": "SELECT text FROM comments WHERE userid = 789 ORDER BY creationdate DESC LIMIT 1",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "Calculate the total number of votes on posts made by user with ID 1011.",
+    "sql": "SELECT SUM(votes) FROM posthistory AS ph JOIN posts AS p ON ph.postid = p.id WHERE p.owneruserid = 1011",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "error": "(psycopg.errors.UndefinedColumn) column \"votes\" does not exist",
+    "reject_reason": "не исполняется"
+  }
+]

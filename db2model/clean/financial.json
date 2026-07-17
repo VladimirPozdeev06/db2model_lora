@@ -1,0 +1,1090 @@
+[
+  {
+    "question": "How many transactions were made on the account with ID 123?",
+    "sql": "SELECT COUNT(*) FROM trans WHERE account_id = 123",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "What is the total amount of money transferred out (VYDAJ) on account number 456?",
+    "sql": "SELECT SUM(amount) FROM trans WHERE account_id = 456 AND type = 'VYDAJ'",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "How many different banks are involved in transactions on account number 789?",
+    "sql": "SELECT COUNT(DISTINCT bank) FROM trans WHERE account_id = 789",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "What is the average transaction amount for the account with ID 202?",
+    "sql": "SELECT AVG(amount) FROM trans WHERE account_id = 202",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "How many cards were issued to the owner of account number 303?",
+    "sql": "SELECT COUNT(*) FROM card AS T1 INNER JOIN disp AS T2 ON T1.disp_id = T2.disp_id WHERE T2.account_id = 303 AND T2.type = 'OWNER'",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "How many unique bank codes are associated with transactions on account number 404?",
+    "sql": "SELECT COUNT(DISTINCT bank) FROM trans WHERE account_id = 404",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "What is the maximum transaction amount for account number 505?",
+    "sql": "SELECT MAX(amount) FROM trans WHERE account_id = 505",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "What is the average transaction amount for all transactions?",
+    "sql": "SELECT AVG(amount) FROM trans",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "What is the total amount of money transferred by each client, grouped by their district?",
+    "sql": "SELECT T3.a3, SUM(T1.amount) as total_transferred FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN district AS T3 ON T2.district_id = T3.district_id GROUP BY T3.a3",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 8
+  },
+  {
+    "question": "Which month had the highest number of transactions?",
+    "sql": "SELECT EXTRACT(MONTH FROM date) AS month, COUNT(*) as num_transactions FROM trans GROUP BY month ORDER BY num_transactions DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "How many different types of cards do clients have, broken down by district?",
+    "sql": "SELECT T3.a3, COUNT(DISTINCT T1.type) as num_card_types FROM card AS T1 INNER JOIN disp AS T2 ON T1.disp_id = T2.disp_id INNER JOIN account AS T4 ON T2.account_id = T4.account_id INNER JOIN district AS T3 ON T4.district_id = T3.district_id GROUP BY T3.a3",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 8
+  },
+  {
+    "question": "What is the total value of all loans taken out by clients in the district of Karlovy Vary?",
+    "sql": "SELECT SUM(T1.amount) as total_loans FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN district AS T3 ON T2.district_id = T3.district_id WHERE T3.a2 = 'Karlovy Vary'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "How many transactions over $1000 occurred in each year?",
+    "sql": "SELECT EXTRACT(YEAR FROM date) AS year, COUNT(*) as num_large_transactions FROM trans WHERE amount > 1000 GROUP BY year",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 6
+  },
+  {
+    "question": "How many accounts were opened by clients from districts with more than 100,000 inhabitants?",
+    "sql": "SELECT COUNT(*) FROM account AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id WHERE T2.a11 > 100000",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 1
+  },
+  {
+    "question": "What is the total amount of money transferred between accounts in the month of October 1998?",
+    "sql": "SELECT SUM(T3.amount) FROM account AS T1 INNER JOIN trans AS T3 ON T1.account_id = T3.account_id WHERE EXTRACT(MONTH FROM T3.date) = 10 AND EXTRACT(YEAR FROM T3.date) = 1998",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 1
+  },
+  {
+    "question": "What is the most common type of card issued to clients who have opened accounts in the year 1997?",
+    "sql": "SELECT T2.type FROM client AS T1 INNER JOIN disp AS T2 ON T1.client_id = T2.client_id INNER JOIN account AS T3 ON T2.account_id = T3.account_id WHERE EXTRACT(YEAR FROM T3.date) = 1997 GROUP BY T2.type ORDER BY COUNT(*) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 1
+  },
+  {
+    "question": "What is the total amount of money paid in loans with a status of 'A'?",
+    "sql": "SELECT SUM(payments) FROM loan WHERE status = 'A'",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 1
+  },
+  {
+    "question": "Which district has the most number of loans approved?",
+    "sql": "SELECT T3.a2, COUNT(*) as loan_count FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN district AS T3 ON T2.district_id = T3.district_id WHERE T1.status = 'A' GROUP BY T3.a2 ORDER BY loan_count DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 1
+  },
+  {
+    "question": "List the top 3 most frequent types of transactions by amount.",
+    "sql": "SELECT type, SUM(amount) as total_amount FROM trans GROUP BY type ORDER BY total_amount DESC LIMIT 3",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 3
+  },
+  {
+    "question": "Identify the top 5 districts with the highest average loan amount.",
+    "sql": "SELECT T3.a2, AVG(T1.amount) as avg_loan_amount FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN district AS T3 ON T2.district_id = T3.district_id GROUP BY T3.a2 ORDER BY avg_loan_amount DESC LIMIT 5",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 5
+  },
+  {
+    "question": "How many transactions occurred between June and August 1998?",
+    "sql": "SELECT COUNT(*) FROM trans WHERE date BETWEEN '1998-06-01' AND '1998-08-31'",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 1
+  },
+  {
+    "question": "Which districts have had more than 100 accounts opened with a monthly statement fee?",
+    "sql": "SELECT T3.a2 FROM account AS T1 INNER JOIN district AS T3 ON T1.district_id = T3.district_id WHERE T1.frequency = 'POPLATEK MESICNE' GROUP BY T3.district_id HAVING COUNT(*) > 100",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 4
+  },
+  {
+    "question": "How many accounts have been opened in each district with a weekly statement fee?",
+    "sql": "SELECT T3.a2, COUNT(*) FROM account AS T1 INNER JOIN district AS T3 ON T1.district_id = T3.district_id WHERE T1.frequency = 'POPLATEK TYDNE' GROUP BY T3.district_id",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 75
+  },
+  {
+    "question": "What is the total number of loans with a duration of 12 months that were made after January 1, 1998?",
+    "sql": "SELECT COUNT(*) FROM loan AS T1 WHERE T1.date > '1998-01-01' AND T1.duration = 12",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 1
+  },
+  {
+    "question": "How many distinct accounts have had transactions involving the keyword 'PREVOD NA UCET'?",
+    "sql": "SELECT COUNT(DISTINCT T2.account_id) FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id WHERE T1.operation = 'PREVOD NA UCET'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 1
+  },
+  {
+    "question": "What is the percentage of accounts with a monthly fee compared to all accounts?",
+    "sql": "SELECT (COUNT(*) FILTER (WHERE frequency = 'POPLATEK MESICNE') * 100.0 / COUNT(*)) AS percentage_monthly_fee_accounts FROM account",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What is the ratio of junior credit cards to total credit cards issued by the bank?",
+    "sql": "SELECT (COUNT(*) FILTER (WHERE type = 'junior')::float / COUNT(*)) AS junior_card_ratio FROM card",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What percentage of clients are female owners of accounts?",
+    "sql": "SELECT (COUNT(*) FILTER (WHERE T1.gender = 'F' AND T2.type = 'OWNER') * 100.0 / COUNT(DISTINCT T1.client_id)) AS percentage_female_owners FROM client AS T1 INNER JOIN disp AS T2 ON T1.client_id = T2.client_id",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What is the proportion of accounts with a frequency of weekly statements among all accounts?",
+    "sql": "SELECT (COUNT(*) FILTER (WHERE frequency = 'POPLATEK TYDNE')::float / COUNT(*)) AS proportion_weekly_statements FROM account",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What percentage of clients who own accounts are male?",
+    "sql": "SELECT (COUNT(*) FILTER (WHERE T1.gender = 'M' AND T2.type = 'OWNER') * 100.0 / COUNT(DISTINCT T1.client_id)) AS percentage_male_owners FROM client AS T1 INNER JOIN disp AS T2 ON T1.client_id = T2.client_id",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What is the ratio of accounts with a monthly statement frequency to those with a weekly statement frequency?",
+    "sql": "SELECT (COUNT(*) FILTER (WHERE frequency = 'POPLATEK MESICNE')::float / COUNT(*) FILTER (WHERE frequency = 'POPLATEK TYDNE')) AS ratio_monthly_to_weekly FROM account",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What percentage of accounts have a frequency of bi-weekly statements compared to all accounts?",
+    "sql": "SELECT (COUNT(*) FILTER (WHERE frequency = 'BI-WEEKLY') * 100.0 / COUNT(*)) AS percentage_bi_weekly_fee_accounts FROM account",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What is the ratio of accounts owned by females to those owned by males?",
+    "sql": "SELECT (COUNT(*) FILTER (WHERE T1.gender = 'F' AND T2.type = 'OWNER')::float / COUNT(*) FILTER (WHERE T1.gender = 'M' AND T2.type = 'OWNER')) AS ratio_female_to_male_owners FROM client AS T1 INNER JOIN disp AS T2 ON T1.client_id = T2.client_id",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What is the total number of transactions made by female clients?",
+    "sql": "SELECT SUM(CASE WHEN T1.gender = 'F' THEN 1 ELSE 0 END) as total_transactions FROM client AS T1 INNER JOIN disp AS T2 ON T1.client_id = T2.client_id INNER JOIN account AS T3 ON T2.account_id = T3.account_id INNER JOIN trans AS T4 ON T3.account_id = T4.account_id",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "How many accounts were opened between 1995 and 1996?",
+    "sql": "SELECT COUNT(*) FROM account WHERE date BETWEEN '1995-01-01' AND '1996-12-31'",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "What is the most common type of card issued?",
+    "sql": "SELECT type FROM card GROUP BY type ORDER BY count(*) DESC LIMIT 1",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "How many loans were taken out in the year 1997?",
+    "sql": "SELECT COUNT(*) FROM loan WHERE EXTRACT(YEAR FROM date) = 1997",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "What is the maximum transaction amount involving 'PREVOD NA UCET' operations?",
+    "sql": "SELECT MAX(amount) FROM trans WHERE operation = 'PREVOD NA UCET'",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "What is the average payment amount per loan?",
+    "sql": "SELECT AVG(payments) FROM loan",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "What is the average age of clients in the 'central Bohemia' region?",
+    "sql": "SELECT AVG(EXTRACT(YEAR FROM AGE(CURRENT_DATE, T2.birth_date))) AS avg_age FROM district AS T1 INNER JOIN client AS T2 ON T1.district_id = T2.district_id WHERE T1.a3 = 'central Bohemia'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "Find the total number of transactions for each month.",
+    "sql": "SELECT EXTRACT(MONTH FROM T2.date) AS month, COUNT(*) AS total_transactions FROM trans AS T2 GROUP BY month ORDER BY month",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 12
+  },
+  {
+    "question": "Calculate the sum of amounts for all transactions made in 'QR' bank.",
+    "sql": "SELECT SUM(amount) AS total_amount FROM trans AS T2 WHERE T2.bank = 'QR'",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "List the number of accounts per district, excluding those without any accounts.",
+    "sql": "SELECT T1.a2, COUNT(*) AS num_accounts FROM district AS T1 LEFT JOIN account AS T2 ON T1.district_id = T2.district_id GROUP BY T1.district_id HAVING COUNT(*) > 0",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 77
+  },
+  {
+    "question": "Find the maximum amount paid in loans for each year.",
+    "sql": "SELECT EXTRACT(YEAR FROM T2.date) AS year, MAX(T2.amount) AS max_loan_amount FROM loan AS T2 GROUP BY year ORDER BY year",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 6
+  },
+  {
+    "question": "Calculate the average transaction amount for each quarter of the year.",
+    "sql": "SELECT CASE WHEN EXTRACT(MONTH FROM T2.date) BETWEEN 1 AND 3 THEN 'Q1' WHEN EXTRACT(MONTH FROM T2.date) BETWEEN 4 AND 6 THEN 'Q2' WHEN EXTRACT(MONTH FROM T2.date) BETWEEN 7 AND 9 THEN 'Q3' ELSE 'Q4' END AS quarter, AVG(T2.amount) AS avg_transaction_amount FROM trans AS T2 GROUP BY quarter",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 4
+  },
+  {
+    "question": "Which clients have issued cards?",
+    "sql": "SELECT DISTINCT T2.client_id FROM card AS T1 INNER JOIN disp AS T2 ON T1.disp_id = T2.disp_id",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 892
+  },
+  {
+    "question": "Find the total number of transactions per district in 1997.",
+    "sql": "SELECT T3.a2, COUNT(*) as total_transactions FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN district AS T3 ON T2.district_id = T3.district_id WHERE EXTRACT(YEAR FROM T1.date) = 1997 GROUP BY T3.a2",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 77
+  },
+  {
+    "question": "Which districts have had more than 1000 transactions in 1998?",
+    "sql": "SELECT T3.a2 FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN district AS T3 ON T2.district_id = T3.district_id WHERE EXTRACT(YEAR FROM T1.date) = 1998 GROUP BY T3.a2 HAVING COUNT(*) > 1000",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 77
+  },
+  {
+    "question": "List the top 5 most frequently issued card types by district.",
+    "sql": "SELECT T3.a2, T1.type, COUNT(*) as count FROM card AS T1 INNER JOIN disp AS T2 ON T1.disp_id = T2.disp_id INNER JOIN account AS T4 ON T2.account_id = T4.account_id INNER JOIN district AS T3 ON T4.district_id = T3.district_id GROUP BY T3.a2, T1.type ORDER BY count DESC LIMIT 5",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 5
+  },
+  {
+    "question": "Find the average transaction amount per month for each district in 1997.",
+    "sql": "SELECT T3.a2, EXTRACT(MONTH FROM T1.date) as month, AVG(T1.amount) as avg_amount FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN district AS T3 ON T2.district_id = T3.district_id WHERE EXTRACT(YEAR FROM T1.date) = 1997 GROUP BY T3.a2, month ORDER BY month",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 924
+  },
+  {
+    "question": "Which districts have had the highest number of loan applications in 1996?",
+    "sql": "SELECT T3.a2, COUNT(*) as loan_count FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN district AS T3 ON T2.district_id = T3.district_id WHERE EXTRACT(YEAR FROM T1.date) = 1996 GROUP BY T3.a2 ORDER BY loan_count DESC LIMIT 1",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 1
+  },
+  {
+    "question": "Which client has made the most transactions?",
+    "sql": "SELECT T4.client_id, COUNT(*) as transaction_count FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN disp AS T3 ON T2.account_id = T3.account_id INNER JOIN client AS T4 ON T3.client_id = T4.client_id GROUP BY T4.client_id ORDER BY transaction_count DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 1
+  },
+  {
+    "question": "List the top 5 districts by the total number of accounts.",
+    "sql": "SELECT T2.a2, COUNT(*) as account_count FROM account AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id GROUP BY T2.a2 ORDER BY account_count DESC LIMIT 5",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 5
+  },
+  {
+    "question": "Find the clients who have received more than 100000 transactions.",
+    "sql": "SELECT T4.client_id FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN disp AS T3 ON T2.account_id = T3.account_id INNER JOIN client AS T4 ON T3.client_id = T4.client_id GROUP BY T4.client_id HAVING SUM(T1.amount) > 100000",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 5242
+  },
+  {
+    "question": "What is the average balance of accounts that have been active for over 10 years?",
+    "sql": "SELECT AVG(T1.balance) FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id WHERE EXTRACT(YEAR FROM AGE(CURRENT_DATE, T2.date)) > 10",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 1
+  },
+  {
+    "question": "List the top 3 districts with the highest total loan amounts.",
+    "sql": "SELECT T2.a2, SUM(T3.amount) as total_loan_amount FROM loan AS T3 INNER JOIN account AS T1 ON T3.account_id = T1.account_id INNER JOIN district AS T2 ON T1.district_id = T2.district_id GROUP BY T2.a2 ORDER BY total_loan_amount DESC LIMIT 3",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 3
+  },
+  {
+    "question": "List the top 5 accounts with the highest total transaction amounts.",
+    "sql": "SELECT T1.account_id, SUM(T1.amount) as total_transaction_amount FROM trans AS T1 GROUP BY T1.account_id ORDER BY total_transaction_amount DESC LIMIT 5",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 5
+  },
+  {
+    "question": "What is the total number of transactions over $5000 in each district?",
+    "sql": "SELECT T2.a2, SUM(T3.amount) as total_transactions FROM district AS T2 INNER JOIN account AS T1 ON T2.district_id = T1.district_id INNER JOIN trans AS T3 ON T1.account_id = T3.account_id WHERE T3.amount > 5000 GROUP BY T2.a2",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 77
+  },
+  {
+    "question": "Calculate the average transaction amount for each district where the transaction date was in 1998.",
+    "sql": "SELECT T2.a2, AVG(T3.amount) as avg_transaction FROM district AS T2 INNER JOIN account AS T1 ON T2.district_id = T1.district_id INNER JOIN trans AS T3 ON T1.account_id = T3.account_id WHERE EXTRACT(YEAR FROM T3.date) = 1998 GROUP BY T2.a2",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 77
+  },
+  {
+    "question": "Find the count of distinct accounts that made transactions with amounts between $1000 and $2000 in the year 1996.",
+    "sql": "SELECT COUNT(DISTINCT T1.account_id) FROM account AS T1 INNER JOIN trans AS T3 ON T1.account_id = T3.account_id WHERE EXTRACT(YEAR FROM T3.date) = 1996 AND T3.amount BETWEEN 1000 AND 2000",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 1
+  },
+  {
+    "question": "Calculate the total sum of transactions for each district where the transaction type was 'VYDAJ' (withdrawal).",
+    "sql": "SELECT T2.a2, SUM(T3.amount) as total_withdrawals FROM district AS T2 INNER JOIN account AS T1 ON T2.district_id = T1.district_id INNER JOIN trans AS T3 ON T1.account_id = T3.account_id WHERE T3.type = 'VYDAJ' GROUP BY T2.a2",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 77
+  },
+  {
+    "question": "How many transactions of type 'VYBER' (cash withdrawal) were made by accounts in districts with more than 100 accounts?",
+    "sql": "SELECT COUNT(*) FROM district AS T2 INNER JOIN account AS T1 ON T2.district_id = T1.district_id INNER JOIN trans AS T3 ON T1.account_id = T3.account_id WHERE T3.type = 'VYBER' GROUP BY T2.district_id HAVING COUNT(T1.account_id) > 100",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 69
+  },
+  {
+    "question": "Find the districts where the total amount of transactions involving the keyword 'POJISTNE' (insurance) exceeds $500,000 in 1998.",
+    "sql": "SELECT T2.a2 FROM district AS T2 INNER JOIN account AS T1 ON T2.district_id = T1.district_id INNER JOIN trans AS T3 ON T1.account_id = T3.account_id WHERE TO_CHAR(CAST(T3.date AS TIMESTAMP), 'YYYY') = '1998' AND T3.k_symbol LIKE '%POJISTNE%' GROUP BY T2.a2 HAVING SUM(T3.amount) > 500000",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 1
+  },
+  {
+    "question": "What is the percentage of female clients compared to total clients?",
+    "sql": "SELECT CAST(SUM(CASE WHEN gender = 'F' THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM client",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What is the ratio of accounts with monthly fees to those with weekly fees?",
+    "sql": "SELECT SUM(CASE WHEN frequency = 'POPLATEK MESICNE' THEN 1 ELSE 0 END) * 1.0 / SUM(CASE WHEN frequency = 'POPLATEK TYDNE' THEN 1 ELSE 0 END) AS ratio FROM account",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What is the percentage of accounts that have been active for over 10 years?",
+    "sql": "SELECT CAST(SUM(CASE WHEN EXTRACT(YEAR FROM AGE(date)) > 10 THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM account",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What is the ratio of clients who have issued cards to those who haven't?",
+    "sql": "SELECT SUM(CASE WHEN T1.disp_id IS NOT NULL THEN 1 ELSE 0 END) * 1.0 / COUNT(*) AS ratio FROM disp AS T1 LEFT JOIN card AS T2 ON T1.disp_id = T2.disp_id",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What is the ratio of accounts with a high balance to those with a low balance?",
+    "sql": "SELECT SUM(CASE WHEN balance > 100000 THEN 1 ELSE 0 END) * 1.0 / SUM(CASE WHEN balance <= 100000 THEN 1 ELSE 0 END) AS ratio FROM trans",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What is the total amount of money loaned out to clients in Prague?",
+    "sql": "SELECT SUM(amount) FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN district AS T3 ON T2.district_id = T3.district_id WHERE T3.a3 = 'Prague'",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "Find the number of clients who are female and were born in 1960.",
+    "sql": "SELECT COUNT(client_id) FROM client WHERE EXTRACT(YEAR FROM birth_date) = 1960 AND gender = 'F'",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "How many loans have been made to accounts in the district of Litomerice?",
+    "sql": "SELECT COUNT(*) FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN district AS T3 ON T2.district_id = T3.district_id WHERE T3.a2 = 'Litomerice'",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "Find the total amount of money transferred between accounts on dates between January 1, 1998, and March 31, 1998.",
+    "sql": "SELECT SUM(amount) FROM trans WHERE date BETWEEN '1998-01-01' AND '1998-03-31'",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "Count how many accounts were opened in the first quarter of 1997.",
+    "sql": "SELECT COUNT(account_id) FROM account WHERE EXTRACT(QUARTER FROM date) = 1 AND EXTRACT(YEAR FROM date) = 1997",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "List the account IDs and their respective frequencies for accounts in the district of Ceska Lipa.",
+    "sql": "SELECT T1.account_id, T1.frequency FROM account AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id WHERE T2.a2 = 'Ceska Lipa'",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 48
+  },
+  {
+    "question": "How many cards were issued by female clients?",
+    "sql": "SELECT COUNT(T2.card_id) FROM client AS T1 INNER JOIN card AS T2 ON T1.client_id = T2.disp_id WHERE T1.gender = 'F'",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "Which districts had the highest total transaction amounts in 1997?",
+    "sql": "SELECT T2.a2, SUM(T3.amount) AS total_amount FROM account AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id INNER JOIN trans AS T3 ON T1.account_id = T3.account_id WHERE EXTRACT(YEAR FROM T3.date) = 1997 GROUP BY T2.a2 ORDER BY total_amount DESC LIMIT 5",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 5
+  },
+  {
+    "question": "What is the total number of loans given out per month in 1998?",
+    "sql": "SELECT EXTRACT(MONTH FROM T1.date) AS month, COUNT(*) AS total_loans FROM loan AS T1 WHERE EXTRACT(YEAR FROM T1.date) = 1998 GROUP BY month",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 12
+  },
+  {
+    "question": "Which districts have the most transactions involving the keyword 'SIPO'?",
+    "sql": "SELECT T2.a2, COUNT(*) AS transaction_count FROM trans AS T1 INNER JOIN district AS T2 ON T1.account_id = T2.district_id WHERE T1.k_symbol = 'SIPO' GROUP BY T2.a2 ORDER BY transaction_count DESC LIMIT 3",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 3
+  },
+  {
+    "question": "What is the maximum amount of money spent by each client in a single transaction?",
+    "sql": "SELECT T1.client_id, MAX(T2.amount) AS max_transaction_amount FROM client AS T1 INNER JOIN trans AS T2 ON T1.client_id = T2.account_id GROUP BY T1.client_id",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 3829
+  },
+  {
+    "question": "What is the total number of accounts owned by clients who were born after 1950?",
+    "sql": "SELECT COUNT(DISTINCT T1.account_id) FROM account AS T1 INNER JOIN disp AS T2 ON T1.account_id = T2.account_id INNER JOIN client AS T3 ON T2.client_id = T3.client_id WHERE T3.birth_date > '1950-01-01'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 1
+  },
+  {
+    "question": "How many different types of cards were issued to clients from the central Bohemia region?",
+    "sql": "SELECT COUNT(DISTINCT T1.type) FROM card AS T1 INNER JOIN disp AS T2 ON T1.disp_id = T2.disp_id INNER JOIN account AS T3 ON T2.account_id = T3.account_id INNER JOIN district AS T4 ON T3.district_id = T4.district_id WHERE T4.a3 = 'central Bohemia'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 1
+  },
+  {
+    "question": "What is the average payment amount for loans that have been fully paid (status 'A')?",
+    "sql": "SELECT AVG(payments) FROM loan WHERE status = 'A'",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 1
+  },
+  {
+    "question": "How many distinct accounts have at least one transaction made by the owner of the account?",
+    "sql": "SELECT COUNT(DISTINCT T1.account_id) FROM account AS T1 INNER JOIN disp AS T2 ON T1.account_id = T2.account_id INNER JOIN trans AS T3 ON T1.account_id = T3.account_id WHERE T2.type = 'OWNER'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 1
+  },
+  {
+    "question": "What is the total amount of money transferred between accounts with IDs greater than 10000 and less than 20000?",
+    "sql": "SELECT SUM(amount) FROM trans WHERE account_id BETWEEN 10000 AND 20000",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 1
+  },
+  {
+    "question": "How many unique clients have at least one loan and at least one transaction?",
+    "sql": "SELECT COUNT(DISTINCT T3.client_id) FROM account AS T1 INNER JOIN loan AS T2 ON T1.account_id = T2.account_id INNER JOIN disp AS T3 ON T1.account_id = T3.account_id INNER JOIN trans AS T4 ON T1.account_id = T4.account_id",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 1
+  },
+  {
+    "question": "What is the most common type of card issued to clients from districts with more than 10000 records?",
+    "sql": "SELECT T1.type FROM card AS T1 INNER JOIN disp AS T2 ON T1.disp_id = T2.disp_id INNER JOIN account AS T3 ON T2.account_id = T3.account_id INNER JOIN district AS T4 ON T3.district_id = T4.district_id GROUP BY T1.type HAVING COUNT(*) = (SELECT MAX(count) FROM (SELECT COUNT(*) as count FROM card AS T1 INNER JOIN disp AS T2 ON T1.disp_id = T2.disp_id INNER JOIN account AS T3 ON T2.account_id = T3.account_id INNER JOIN district AS T4 ON T3.district_id = T4.district_id GROUP BY T1.type) AS T)",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 1
+  },
+  {
+    "question": "What is the total number of loans taken out by clients in the city of Prague?",
+    "sql": "SELECT SUM(CASE WHEN T5.a3 = 'Prague' THEN 1 ELSE 0 END) AS total_loans FROM client AS T4 INNER JOIN disp AS T3 ON T4.client_id = T3.client_id INNER JOIN account AS T2 ON T3.account_id = T2.account_id INNER JOIN loan AS T1 ON T2.account_id = T1.account_id INNER JOIN district AS T5 ON T2.district_id = T5.district_id",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 1
+  },
+  {
+    "question": "Which district had the highest total transaction amount in 1998?",
+    "sql": "SELECT T5.a2, SUM(T1.amount) AS total_amount FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN district AS T5 ON T2.district_id = T5.district_id WHERE EXTRACT(YEAR FROM T1.date) = 1998 GROUP BY T5.a2 ORDER BY total_amount DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 1
+  },
+  {
+    "question": "How many distinct clients used gold cards issued after 1998?",
+    "sql": "SELECT COUNT(DISTINCT T4.client_id) AS distinct_clients FROM card AS T1 INNER JOIN disp AS T3 ON T1.disp_id = T3.disp_id INNER JOIN account AS T2 ON T3.account_id = T2.account_id INNER JOIN client AS T4 ON T3.client_id = T4.client_id WHERE T1.type = 'gold' AND T1.issued > '1998-12-31'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 1
+  },
+  {
+    "question": "Find the top 3 districts with the highest average loan amount.",
+    "sql": "SELECT T5.a2, AVG(T1.amount) AS avg_loan_amount FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN district AS T5 ON T2.district_id = T5.district_id GROUP BY T5.a2 ORDER BY avg_loan_amount DESC LIMIT 3",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 3
+  },
+  {
+    "question": "What is the sum of all transaction amounts from the year 1998?",
+    "sql": "SELECT SUM(amount) AS total_transactions FROM trans WHERE EXTRACT(YEAR FROM date) = 1998",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 1
+  },
+  {
+    "question": "How many loans were taken out in 1998 by clients who have at least 5 accounts?",
+    "sql": "SELECT COUNT(DISTINCT loan_id) FROM loan WHERE EXTRACT(YEAR FROM date) = 1998 AND account_id IN (SELECT account_id FROM account GROUP BY account_id HAVING COUNT(*) >= 5)",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 1
+  },
+  {
+    "question": "What is the percentage of transactions that are deposits?",
+    "sql": "SELECT CAST(SUM(CASE WHEN type = 'PRIJEM' THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM trans",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What is the ratio of loans that are in the 'A' status to those in the 'B' status?",
+    "sql": "SELECT SUM(CASE WHEN status = 'A' THEN 1 ELSE 0 END) * 1.0 / SUM(CASE WHEN status = 'B' THEN 1 ELSE 0 END) AS ratio FROM loan",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "In what year did the highest number of loans occur?",
+    "sql": "SELECT EXTRACT(YEAR FROM date) AS year, COUNT(*) AS count FROM loan GROUP BY year ORDER BY count DESC LIMIT 1",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What is the average payment per loan based on its duration?",
+    "sql": "SELECT AVG(payments) AS avg_payment, duration FROM loan GROUP BY duration ORDER BY avg_payment DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "Which district has the highest total transaction volume?",
+    "sql": "SELECT T1.district_id, SUM(T2.amount) AS total_volume FROM district AS T1 JOIN trans AS T2 ON T1.district_id = T2.account_id GROUP BY T1.district_id ORDER BY total_volume DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What is the total amount of money transferred out of account 123?",
+    "sql": "SELECT SUM(amount) FROM trans WHERE account_id = 123 AND type = 'VYDAJ'",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "How many loans have been taken out by clients over the age of 50?",
+    "sql": "SELECT COUNT(*) FROM client AS C JOIN disp AS D ON C.client_id = D.client_id JOIN account AS A ON D.account_id = A.account_id JOIN loan AS L ON A.account_id = L.account_id WHERE EXTRACT(YEAR FROM AGE(NOW(), C.birth_date)) > 50",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "Which card was issued first, gold or junior?",
+    "sql": "SELECT MIN(issued) FROM card WHERE type IN ('gold', 'junior')",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "How many female clients have a savings account?",
+    "sql": "SELECT COUNT(*) FROM client AS C JOIN disp AS D ON C.client_id = D.client_id JOIN account AS A ON D.account_id = A.account_id WHERE C.gender = 'F' AND D.type = 'OWNER'",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "What is the maximum amount paid in a single loan?",
+    "sql": "SELECT MAX(payments) FROM loan",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "What is the total value of all transactions involving account 123?",
+    "sql": "SELECT SUM(amount) FROM trans WHERE account_id = 123",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "What is the total number of transactions per month?",
+    "sql": "SELECT EXTRACT(YEAR FROM date) AS year, EXTRACT(MONTH FROM date) AS month, COUNT(*) AS total_transactions FROM trans GROUP BY year, month ORDER BY year, month",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 72
+  },
+  {
+    "question": "Which districts have the highest average number of transactions?",
+    "sql": "SELECT T1.a2 AS district_name, COUNT(*) AS total_transactions FROM district AS T1 INNER JOIN account AS T2 ON T1.district_id = T2.district_id INNER JOIN trans AS T3 ON T2.account_id = T3.account_id GROUP BY T1.a2 ORDER BY total_transactions DESC LIMIT 5",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 5
+  },
+  {
+    "question": "What is the average loan amount for loans that were issued in 2018?",
+    "sql": "SELECT AVG(amount) AS avg_loan_amount FROM loan WHERE EXTRACT(YEAR FROM date) = 2018",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "What is the maximum amount of money transferred in a single transaction?",
+    "sql": "SELECT MAX(amount) AS max_transaction_amount FROM trans",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "How many distinct types of cards are available?",
+    "sql": "SELECT COUNT(DISTINCT type) AS distinct_card_types FROM card",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "What is the total amount of money borrowed through loans?",
+    "sql": "SELECT SUM(amount) AS total_borrowed FROM loan",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "Which months had the highest number of transactions involving credit cards?",
+    "sql": "SELECT EXTRACT(YEAR FROM T3.date) AS year, EXTRACT(MONTH FROM T3.date) AS month, COUNT(*) AS total_transactions FROM card AS T1 INNER JOIN disp AS T2 ON T1.disp_id = T2.disp_id INNER JOIN account AS T4 ON T2.account_id = T4.account_id INNER JOIN trans AS T3 ON T4.account_id = T3.account_id GROUP BY year, month ORDER BY total_transactions DESC LIMIT 3",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 3
+  },
+  {
+    "question": "What is the total amount of money transferred by female clients?",
+    "sql": "SELECT SUM(T1.amount) FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN disp AS T4 ON T2.account_id = T4.account_id INNER JOIN client AS T3 ON T4.client_id = T3.client_id WHERE T3.gender = 'F'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 1
+  },
+  {
+    "question": "How many distinct accounts have been associated with loans over 500,000 dollars?",
+    "sql": "SELECT COUNT(DISTINCT T2.account_id) FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id WHERE T1.amount > 500000",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 1
+  },
+  {
+    "question": "List all transactions made by accounts located in the 'Karlovy Vary' district.",
+    "sql": "SELECT T3.trans_id FROM district AS T1 INNER JOIN account AS T2 ON T1.district_id = T2.district_id INNER JOIN trans AS T3 ON T2.account_id = T3.account_id WHERE T1.a2 = 'Karlovy Vary'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 11622
+  },
+  {
+    "question": "Find the average amount paid on loans for each district.",
+    "sql": "SELECT AVG(T1.amount), T2.a2 FROM loan AS T1 INNER JOIN district AS T2 ON T1.account_id = T2.district_id GROUP BY T2.a2",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 6
+  },
+  {
+    "question": "List all unique bank names used in transactions made by female clients.",
+    "sql": "SELECT DISTINCT T1.bank FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN disp AS T4 ON T2.account_id = T4.account_id INNER JOIN client AS T3 ON T4.client_id = T3.client_id WHERE T3.gender = 'F'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 14
+  },
+  {
+    "question": "How many transactions of type 'VYDAJ' (withdrawal) were made by accounts in the 'Prague' district?",
+    "sql": "SELECT COUNT(T3.trans_id) FROM district AS T1 INNER JOIN account AS T2 ON T1.district_id = T2.district_id INNER JOIN trans AS T3 ON T2.account_id = T3.account_id WHERE T1.a2 = 'Prague' AND T3.type = 'VYDAJ'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 1
+  },
+  {
+    "question": "Which accounts had the highest loan amounts in 1998?",
+    "sql": "SELECT account_id FROM loan WHERE EXTRACT(YEAR FROM date) = 1998 ORDER BY amount DESC LIMIT 5",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 5
+  },
+  {
+    "question": "Find the 5 districts with the highest number of accounts.",
+    "sql": "SELECT T2.district_id, T2.a2 FROM account AS T1 JOIN district AS T2 ON T1.district_id = T2.district_id GROUP BY T2.district_id, T2.a2 ORDER BY COUNT(*) DESC LIMIT 5",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 5
+  },
+  {
+    "question": "Identify the top 2 accounts with the largest balance difference between deposits and withdrawals.",
+    "sql": "SELECT account_id, (MAX(balance) - MIN(balance)) AS balance_difference FROM trans GROUP BY account_id ORDER BY balance_difference DESC LIMIT 2",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 2
+  },
+  {
+    "question": "List the top 3 months with the highest number of loans approved in 1997.",
+    "sql": "SELECT EXTRACT(MONTH FROM date) AS month, COUNT(*) AS loan_count FROM loan WHERE EXTRACT(YEAR FROM date) = 1997 AND status = 'A' GROUP BY month ORDER BY loan_count DESC LIMIT 3",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 3
+  },
+  {
+    "question": "Find the 5 accounts with the highest average transaction amounts in 1997.",
+    "sql": "SELECT T1.account_id, AVG(T3.amount) AS avg_transaction_amount FROM account AS T1 JOIN trans AS T3 ON T1.account_id = T3.account_id WHERE EXTRACT(YEAR FROM T3.date) = 1997 GROUP BY T1.account_id ORDER BY avg_transaction_amount DESC LIMIT 5",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 5
+  },
+  {
+    "question": "What is the total amount of loans issued in the year 2019?",
+    "sql": "SELECT SUM(amount) FROM loan WHERE EXTRACT(YEAR FROM date) = 2019",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 1
+  },
+  {
+    "question": "What is the sum of all transactions made by accounts located in the 'Central Bohemia' region?",
+    "sql": "SELECT SUM(T3.amount) FROM district AS T1 INNER JOIN account AS T2 ON T1.district_id = T2.district_id INNER JOIN trans AS T3 ON T2.account_id = T3.account_id WHERE T1.a3 = 'central Bohemia'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 1
+  },
+  {
+    "question": "Find the top 5 districts with the highest number of accounts that have taken out loans.",
+    "sql": "SELECT T1.a2, COUNT(*) as account_count FROM district AS T1 INNER JOIN account AS T2 ON T1.district_id = T2.district_id INNER JOIN loan AS T3 ON T2.account_id = T3.account_id GROUP BY T1.a2 ORDER BY account_count DESC LIMIT 5",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 5
+  },
+  {
+    "question": "Find the most common k_symbol used in transactions involving accounts from the 'West Bohemia' district.",
+    "sql": "SELECT T3.k_symbol FROM district AS T1 INNER JOIN account AS T2 ON T1.district_id = T2.district_id INNER JOIN trans AS T3 ON T2.account_id = T3.account_id WHERE T1.a3 = 'west Bohemia' GROUP BY T3.k_symbol ORDER BY COUNT(*) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 1
+  },
+  {
+    "question": "What is the proportion of transactions classified as 'PREVOD NA UCET' (transfer to another account)?",
+    "sql": "SELECT (SUM(CASE WHEN T1.operation = 'PREVOD NA UCET' THEN 1 ELSE 0 END)::FLOAT / COUNT(*)) * 100 AS transfer_percentage FROM trans AS T1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What percentage of loans have a duration of more than 3 years?",
+    "sql": "SELECT (COUNT(*) FILTER (WHERE T1.duration > 36)::FLOAT * 100 / COUNT(*)) AS long_term_loans_percentage FROM loan AS T1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What is the ratio of accounts opened in Prague compared to other districts?",
+    "sql": "SELECT SUM(CASE WHEN T1.a3 = 'Prague' THEN 1 ELSE 0 END)::FLOAT / SUM(1) AS prague_ratio FROM district AS T1 INNER JOIN account AS T2 ON T1.district_id = T2.district_id",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What percentage of transactions are of type 'VYBER' (withdrawal) and what percentage are of type 'VYDAJ' (payment)?",
+    "sql": "SELECT SUM(CASE WHEN T1.type = 'VYBER' THEN 1 ELSE 0 END)::FLOAT / COUNT(*) * 100 AS withdrawal_percentage, SUM(CASE WHEN T1.type = 'VYDAJ' THEN 1 ELSE 0 END)::FLOAT / COUNT(*) * 100 AS payment_percentage FROM trans AS T1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What is the ratio of transactions with a negative balance compared to those with a positive balance?",
+    "sql": "SELECT SUM(CASE WHEN T1.balance < 0 THEN 1 ELSE 0 END)::FLOAT / SUM(CASE WHEN T1.balance >= 0 THEN 1 ELSE 0 END) AS negative_positive_ratio FROM trans AS T1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "How many clients are there in the city of Prague?",
+    "sql": "SELECT COUNT(*) FROM client AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id WHERE T2.a2 = 'Prague'",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "What is the total number of accounts opened in 1997?",
+    "sql": "SELECT COUNT(account_id) FROM account WHERE EXTRACT(YEAR FROM date) = 1997",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "What is the average amount paid by clients from Brno?",
+    "sql": "SELECT AVG(T2.payments) FROM client AS T1 INNER JOIN loan AS T2 ON T2.account_id IN (SELECT account_id FROM account WHERE district_id = (SELECT district_id FROM district WHERE a2 = 'Brno'))",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "How many accounts were opened in districts with more than 1000 accounts?",
+    "sql": "SELECT COUNT(account_id) FROM account WHERE district_id IN (SELECT district_id FROM account GROUP BY district_id HAVING COUNT(account_id) > 1000)",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "What is the total balance of transactions for accounts opened in the year 1996?",
+    "sql": "SELECT SUM(amount) FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id WHERE EXTRACT(YEAR FROM T2.date) = 1996",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "How many clients who are owners of accounts have a birth date before 1960?",
+    "sql": "SELECT COUNT(DISTINCT T1.client_id) FROM client AS T1 INNER JOIN disp AS T2 ON T1.client_id = T2.client_id INNER JOIN account AS T3 ON T2.account_id = T3.account_id WHERE T2.type = 'OWNER' AND T1.birth_date < '1960-01-01'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  }
+]

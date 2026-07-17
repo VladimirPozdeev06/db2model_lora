@@ -1,0 +1,1106 @@
+[
+  {
+    "question": "How many comments were made by users who have more than 1000 reputation points?",
+    "sql": "SELECT COUNT(*) FROM comments AS T1 INNER JOIN users AS T2 ON T1.userid = T2.id WHERE T2.reputation > 1000",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "How many votes were cast on posts by users under the age of 25?",
+    "sql": "SELECT COUNT(*) FROM votes AS T1 INNER JOIN users AS T2 ON T1.userid = T2.id WHERE T2.age < 25",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "What was the total reputation gained by users who posted questions?",
+    "sql": "SELECT SUM(T1.reputation) FROM users AS T1 INNER JOIN posts AS T2 ON T1.id = T2.owneruserid WHERE T2.posttypeid = 1",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "How many answers were posted by users with less than 50 reputation points?",
+    "sql": "SELECT COUNT(*) FROM posts AS T1 INNER JOIN users AS T2 ON T1.owneruserid = T2.id WHERE T2.reputation < 50 AND T1.posttypeid = 2",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "What is the average reputation of users who have posted more than 10 posts?",
+    "sql": "SELECT AVG(reputation) FROM users WHERE id IN (SELECT owneruserid FROM posts GROUP BY owneruserid HAVING COUNT(owneruserid) > 10)",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "How many times did the user 'John Doe' edit their posts in 2011?",
+    "sql": "SELECT COUNT(*) FROM posthistory AS T1 INNER JOIN users AS T2 ON T1.userid = T2.id WHERE T2.displayname = 'John Doe' AND EXTRACT(YEAR FROM T1.creationdate) = 2011",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "What is the most common type of vote (votetypeid) cast by users with more than 1000 reputation points?",
+    "sql": "SELECT votetypeid FROM votes AS T1 INNER JOIN users AS T2 ON T1.userid = T2.id WHERE T2.reputation > 1000 GROUP BY votetypeid ORDER BY COUNT(votetypeid) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "What is the average reputation of users who have received more than 100 upvotes?",
+    "sql": "SELECT AVG(reputation) FROM users WHERE upvotes > 100",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "How many distinct users have made comments on posts tagged with '<python>'?",
+    "sql": "SELECT COUNT(DISTINCT userid) FROM comments AS T1 INNER JOIN posts AS T2 ON T1.postid = T2.id WHERE T2.tags LIKE '%<python>%'",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "Find the total number of votes cast by each user, grouped by their reputation level.",
+    "sql": "SELECT T2.reputation, COUNT(*) AS TotalVotes FROM votes AS T1 INNER JOIN users AS T2 ON T1.userid = T2.id GROUP BY T2.reputation",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 277
+  },
+  {
+    "question": "Calculate the maximum score of posts that have been answered.",
+    "sql": "SELECT MAX(score) FROM posts WHERE acceptedanswerid IS NOT NULL",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "How many comments were created before the year 2012?",
+    "sql": "SELECT COUNT(*) FROM comments WHERE EXTRACT(YEAR FROM creationdate) < 2012",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "Find the sum of all bounty amounts for votes with a creation date in the month of October 2012.",
+    "sql": "SELECT SUM(bountyamount) FROM votes WHERE creationdate BETWEEN '2012-10-01' AND '2012-10-31'",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "What is the average score of posts that have received exactly 2 comments?",
+    "sql": "SELECT AVG(score) FROM posts WHERE id IN (SELECT postid FROM comments GROUP BY postid HAVING COUNT(*) = 2)",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "Find the display names of users who have edited posts with the tag 'machine-learning'",
+    "sql": "SELECT DISTINCT T1.DisplayName FROM users AS T1 INNER JOIN posthistory AS T2 ON T1.Id = T2.UserId INNER JOIN posts AS T3 ON T2.PostId = T3.Id INNER JOIN tags AS T4 ON T3.Tags LIKE '%machine-learning%' WHERE T2.Comment LIKE '%edited%'",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 260
+  },
+  {
+    "question": "What is the average reputation of users who have posted more than 50 answers?",
+    "sql": "SELECT AVG(T1.Reputation) FROM users AS T1 INNER JOIN posts AS T2 ON T1.Id = T2.OwnerUserId WHERE T2.PostTypeId = 2 GROUP BY T1.Id HAVING COUNT(T2.PostTypeId) > 50",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 147
+  },
+  {
+    "question": "Find the top 3 users who have received the most votes on their answers.",
+    "sql": "SELECT U.DisplayName, SUM(V.VoteTypeId) AS TotalVotes FROM users AS U JOIN posts AS P ON U.Id = P.OwnerUserId JOIN votes AS V ON P.Id = V.PostId WHERE P.PostTypeId = 2 GROUP BY U.Id ORDER BY TotalVotes DESC LIMIT 3",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 3
+  },
+  {
+    "question": "Identify the top 4 users who have asked the most questions.",
+    "sql": "SELECT U.DisplayName, COUNT(P.Id) AS QuestionCount FROM users AS U JOIN posts AS P ON U.Id = P.OwnerUserId WHERE P.PostTypeId = 1 GROUP BY U.Id ORDER BY QuestionCount DESC LIMIT 4",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 4
+  },
+  {
+    "question": "List the top 20 users with the most badges.",
+    "sql": "SELECT U.DisplayName, COUNT(B.Id) AS BadgeCount FROM users AS U JOIN badges AS B ON U.Id = B.UserId GROUP BY U.Id ORDER BY BadgeCount DESC LIMIT 20",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 20
+  },
+  {
+    "question": "How many badges were awarded to users who have more than 1000 points?",
+    "sql": "SELECT COUNT(*) FROM badges AS T1 INNER JOIN users AS T2 ON T1.userid = T2.id WHERE T2.reputation > 1000",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 1
+  },
+  {
+    "question": "Find the total score of posts linked to by more than 100 other posts.",
+    "sql": "SELECT SUM(T1.score) FROM posts AS T1 INNER JOIN postlinks AS T2 ON T1.id = T2.postid WHERE T2.relatedpostid IN (SELECT id FROM posts GROUP BY id HAVING COUNT(*) > 100)",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 1
+  },
+  {
+    "question": "Calculate the total number of posts that have been linked to and have more than 500 views.",
+    "sql": "SELECT COUNT(DISTINCT T1.id) FROM posts AS T1 INNER JOIN postlinks AS T2 ON T1.id = T2.postid WHERE T1.viewcount > 500",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 1
+  },
+  {
+    "question": "Find the maximum view count among posts that have been linked to by exactly 5 other posts.",
+    "sql": "SELECT MAX(viewcount) FROM posts AS T1 INNER JOIN postlinks AS T2 ON T1.id = T2.postid WHERE T2.relatedpostid IN (SELECT id FROM posts GROUP BY id HAVING COUNT(*) = 5)",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 1
+  },
+  {
+    "question": "Calculate the average reputation of users who have received more than 100 badges.",
+    "sql": "SELECT AVG(reputation) FROM users AS T1 INNER JOIN badges AS T2 ON T1.id = T2.userid GROUP BY T1.id HAVING COUNT(*) > 100",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 18
+  },
+  {
+    "question": "Find the total score of posts that have been linked to by posts older than 1 year.",
+    "sql": "SELECT SUM(T1.score) FROM posts AS T1 INNER JOIN postlinks AS T2 ON T1.id = T2.postid INNER JOIN posts AS T3 ON T3.id = T2.relatedpostid WHERE T3.creaiondate <= NOW() - INTERVAL '1 year'",
+    "difficulty": "challenging",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 1
+  },
+  {
+    "question": "What percentage of users have received the 'Teacher' badge?",
+    "sql": "SELECT CAST(SUM(CASE WHEN name = 'Teacher' THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM badges",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What fraction of comments have a score greater than 5?",
+    "sql": "SELECT CAST(SUM(CASE WHEN score > 5 THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM comments",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What is the ratio of posts with more than 100 views to posts with less than 100 views?",
+    "sql": "SELECT CAST(SUM(CASE WHEN viewcount > 100 THEN 1 ELSE 0 END) AS FLOAT) / SUM(CASE WHEN viewcount <= 100 THEN 1 ELSE 0 END) AS ratio FROM posts",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What fraction of users have posted at least one comment?",
+    "sql": "SELECT CAST(SUM(CASE WHEN userid IS NOT NULL THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM comments",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What is the ratio of posts with more than 5000 votes to posts with fewer than 5000 votes?",
+    "sql": "SELECT CAST(SUM(CASE WHEN score > 5000 THEN 1 ELSE 0 END) AS FLOAT) / SUM(CASE WHEN score <= 5000 THEN 1 ELSE 0 END) AS ratio FROM posts",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What percentage of users have a reputation greater than 1000?",
+    "sql": "SELECT CAST(SUM(CASE WHEN reputation > 1000 THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM users",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "How many users have more than 1000 reputation points?",
+    "sql": "SELECT COUNT(id) FROM users WHERE reputation > 1000",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "How many times has the tag 'python' been used?",
+    "sql": "SELECT COUNT(id) FROM tags WHERE tagname = 'python'",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "What is the average reputation of users who have posted more than 10 answers?",
+    "sql": "SELECT AVG(reputation) FROM users WHERE id IN (SELECT owneruserid FROM posts WHERE answercount > 10)",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "How many users have a profile picture URL starting with 'https://www.gravatar.com/avatar/'?",
+    "sql": "SELECT COUNT(id) FROM users WHERE profileimageurl LIKE 'https://www.gravatar.com/avatar/%'",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "What is the total number of votes on posts created after January 1, 2014?",
+    "sql": "SELECT COUNT(*) FROM votes AS T1 JOIN posts AS T2 ON T1.postid = T2.id WHERE T2.creaiondate > '2014-01-01'",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "How many users have more than 5000 upvotes and less than 1000 downvotes?",
+    "sql": "SELECT COUNT(id) FROM users WHERE upvotes > 5000 AND downvotes < 1000",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "What is the most common post type ID among posts with a score greater than 10?",
+    "sql": "SELECT posttypeid FROM posts WHERE score > 10 GROUP BY posttypeid ORDER BY COUNT(*) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "What is the total number of post links pointing to posts created before February 1, 2013?",
+    "sql": "SELECT COUNT(*) FROM postlinks WHERE RelatedPostId IN (SELECT Id FROM posts WHERE CreationDate < '2013-02-01')",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "Calculate the maximum view count of posts owned by users with a reputation greater than 1000.",
+    "sql": "SELECT MAX(posts.ViewCount) FROM posts JOIN users ON posts.OwnerUserId = users.Id WHERE users.Reputation > 1000",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "Find the sum of bounty amounts for all votes cast by users under the age of 20.",
+    "sql": "SELECT SUM(votes.BountyAmount) FROM votes JOIN users ON votes.UserId = users.Id WHERE users.Age < 20",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "What is the average score of posts that have received exactly 3 votes?",
+    "sql": "SELECT AVG(posts.Score) FROM posts JOIN votes ON posts.Id = votes.PostId WHERE votes.VoteTypeId = 2 GROUP BY posts.Id HAVING COUNT(votes.Id) = 3",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1472
+  },
+  {
+    "question": "Find the minimum creation date of posts linked to other posts with a view count greater than 1000.",
+    "sql": "SELECT MIN(postlinks.CreationDate) FROM postlinks WHERE RelatedPostId IN (SELECT Id FROM posts WHERE ViewCount > 1000)",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "Which posts have been linked to by other posts?",
+    "sql": "SELECT p1.id, p1.title FROM posts AS p1 JOIN postlinks AS pl ON p1.id = pl.postid WHERE pl.relatedpostid IS NOT NULL",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 11101
+  },
+  {
+    "question": "Who are the users who have edited the most posts?",
+    "sql": "SELECT u.displayname, COUNT(ph.id) AS edit_count FROM users AS u JOIN posthistory AS ph ON u.id = ph.userid WHERE ph.posthistorytypeid = 3 GROUP BY u.displayname ORDER BY edit_count DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 1
+  },
+  {
+    "question": "Which users have created badges and also posted questions?",
+    "sql": "SELECT u.id, u.displayname FROM users AS u JOIN badges AS b ON u.id = b.userid JOIN posts AS p ON u.id = p.owneruserid WHERE p.posttypeid = 1",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 452611
+  },
+  {
+    "question": "List the titles of posts that were edited more than once.",
+    "sql": "SELECT p.title FROM posts AS p JOIN posthistory AS ph ON p.id = ph.postid WHERE ph.posthistorytypeid IN (1, 2) GROUP BY p.id HAVING COUNT(*) > 1",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 42908
+  },
+  {
+    "question": "Which users have posted comments and also voted on posts?",
+    "sql": "SELECT u.id, u.displayname FROM users AS u JOIN comments AS c ON u.id = c.userid JOIN votes AS v ON u.id = v.userid",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 918762
+  },
+  {
+    "question": "Find the titles of posts that have received both upvotes and downvotes.",
+    "sql": "SELECT p.title FROM posts AS p JOIN votes AS v ON p.id = v.postid WHERE v.votetypeid = 2 AND EXISTS (SELECT 1 FROM votes AS v2 WHERE v2.postid = p.id AND v2.votetypeid = 1)",
+    "difficulty": "challenging",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 6766
+  },
+  {
+    "question": "What are the top 5 users with the most votes?",
+    "sql": "SELECT T1.DisplayName, COUNT(T2.VoteTypeId) AS TotalVotes FROM users AS T1 INNER JOIN votes AS T2 ON T1.Id = T2.UserId GROUP BY T1.DisplayName ORDER BY TotalVotes DESC LIMIT 5",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 5
+  },
+  {
+    "question": "Which users have received both 'Student' and 'Teacher' badges?",
+    "sql": "SELECT T1.DisplayName FROM users AS T1 INNER JOIN badges AS T2 ON T1.Id = T2.UserId WHERE T2.Name = 'Student' INTERSECT SELECT T1.DisplayName FROM users AS T1 INNER JOIN badges AS T2 ON T1.Id = T2.UserId WHERE T2.Name = 'Teacher'",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 2224
+  },
+  {
+    "question": "List the top 10 users with the highest reputation who have received the 'Teacher' badge.",
+    "sql": "SELECT T1.DisplayName, T1.Reputation FROM users AS T1 INNER JOIN badges AS T2 ON T1.Id = T2.UserId WHERE T2.Name = 'Teacher' ORDER BY T1.Reputation DESC LIMIT 10",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 10
+  },
+  {
+    "question": "Which users have received the most upvotes in 2010?",
+    "sql": "SELECT T2.displayname, SUM(CASE WHEN T1.votetypeid = 2 THEN 1 ELSE 0 END) AS total_upvotes FROM votes AS T1 INNER JOIN users AS T2 ON T1.userid = T2.id WHERE EXTRACT(YEAR FROM T1.creationdate) = 2010 GROUP BY T2.displayname ORDER BY total_upvotes DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 1
+  },
+  {
+    "question": "How many distinct users have posted answers?",
+    "sql": "SELECT COUNT(DISTINCT owneruserid) FROM posts WHERE posttypeid = 2",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 1
+  },
+  {
+    "question": "Which users have both received more than 1000 upvotes and have more than 5000 views?",
+    "sql": "SELECT id, displayname FROM users WHERE reputation > 2000 AND views > 1000",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 44
+  },
+  {
+    "question": "What is the average number of votes per post in 2010?",
+    "sql": "SELECT AVG(vote_count) AS avg_votes_per_post FROM (SELECT COUNT(*) AS vote_count FROM votes WHERE EXTRACT(YEAR FROM creationdate) = 2010) AS subquery",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 1
+  },
+  {
+    "question": "Which users have the highest number of downvotes in 2010?",
+    "sql": "SELECT T2.displayname, SUM(CASE WHEN T1.votetypeid = 3 THEN 1 ELSE 0 END) AS total_downvotes FROM votes AS T1 INNER JOIN users AS T2 ON T1.userid = T2.id WHERE EXTRACT(YEAR FROM T1.creationdate) = 2010 GROUP BY T2.displayname ORDER BY total_downvotes DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 1
+  },
+  {
+    "question": "How many users have both more than 500 upvotes and more than 2000 views?",
+    "sql": "SELECT COUNT(id) FROM users WHERE reputation > 2000 AND views > 1000",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 1
+  },
+  {
+    "question": "What is the total number of votes cast by users who have more than 1000 reputation points?",
+    "sql": "SELECT SUM(CASE WHEN T2.reputation > 1000 THEN 1 ELSE 0 END) AS total_votes_by_high_reputation_users FROM votes AS T1 INNER JOIN users AS T2 ON T1.userid = T2.id",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 1
+  },
+  {
+    "question": "What percentage of users have a reputation greater than 1000?",
+    "sql": "SELECT CAST(COUNT(*) FILTER (WHERE reputation > 1000) AS FLOAT) * 100 / COUNT(*) FROM users",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What proportion of comments have a score greater than 5?",
+    "sql": "SELECT CAST(COUNT(*) FILTER (WHERE score > 5) AS FLOAT) * 100 / COUNT(*) FROM comments",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What is the ratio of posts that have an accepted answer to the total number of posts?",
+    "sql": "SELECT CAST(SUM(CASE WHEN acceptedanswerid IS NOT NULL THEN 1 ELSE 0 END) AS FLOAT) / COUNT(*) FROM posts",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What percentage of users have more than 1000 upvotes?",
+    "sql": "SELECT CAST(COUNT(*) FILTER (WHERE upvotes > 1000) AS FLOAT) * 100 / COUNT(*) FROM users",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What proportion of posts have a score less than -5?",
+    "sql": "SELECT CAST(COUNT(*) FILTER (WHERE score < -5) AS FLOAT) * 100 / COUNT(*) FROM posts",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What is the ratio of users with more than 1000 followers to the total number of users?",
+    "sql": "SELECT CAST(COUNT(*) FILTER (WHERE reputation > 1000) AS FLOAT) / COUNT(*) FROM users",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What percentage of comments have a score between 3 and 5?",
+    "sql": "SELECT CAST(COUNT(*) FILTER (WHERE score BETWEEN 3 AND 5) AS FLOAT) * 100 / COUNT(*) FROM comments",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What proportion of badges named 'Teacher' are awarded to users with more than 1000 reputation?",
+    "sql": "SELECT CAST(COUNT(*) FILTER (WHERE name = 'Teacher') AS FLOAT) * 100 / COUNT(*) FROM badges WHERE userid IN (SELECT id FROM users WHERE reputation > 1000)",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "Find the title of the post with ID 12345.",
+    "sql": "SELECT Title FROM posts WHERE Id = 12345",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "Get the total number of posts tagged with 'python'.",
+    "sql": "SELECT COUNT(*) FROM posts WHERE Tags LIKE '%<python>%'",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "Find the display name of the user with ID 11111.",
+    "sql": "SELECT DisplayName FROM users WHERE Id = 11111",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "List all tags used in posts with more than 100 views.",
+    "sql": "SELECT DISTINCT TagName FROM posts INNER JOIN tags ON posts.Tags LIKE '%' || '<' || tags.TagName || '>' WHERE posts.ViewCount > 100",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 940
+  },
+  {
+    "question": "Get the score of the comment with the highest score on a post.",
+    "sql": "SELECT MAX(Score) FROM comments",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "Find the display name of the user who posted the most answers.",
+    "sql": "SELECT u.DisplayName FROM users AS u JOIN posts AS p ON u.Id = p.OwnerUserId WHERE p.PostTypeId = 2 GROUP BY u.DisplayName ORDER BY COUNT(p.Id) DESC LIMIT 1",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "Which tags have the most associated questions and how many questions are there for each tag?",
+    "sql": "SELECT T1.tagname, COUNT(T2.id) AS question_count FROM tags AS T1 INNER JOIN posts AS T2 ON T2.tags LIKE '%' || T1.tagname || '%' GROUP BY T1.tagname ORDER BY question_count DESC",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1032
+  },
+  {
+    "question": "How many comments were made on posts created after January 1, 2012?",
+    "sql": "SELECT COUNT(*) FROM comments AS T1 INNER JOIN posts AS T2 ON T1.postid = T2.id WHERE T2.creaiondate > '2012-01-01'",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "What is the total number of votes cast on posts by users who have more than 1000 reputation points?",
+    "sql": "SELECT SUM(CASE WHEN T2.reputation > 1000 THEN 1 ELSE 0 END) FROM votes AS T1 INNER JOIN users AS T2 ON T1.userid = T2.id",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "Find the maximum number of answers per post among posts with a score greater than 50.",
+    "sql": "SELECT MAX(answercount) FROM posts WHERE score > 50",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "How many unique users have participated in editing posts that have been viewed more than 1000 times?",
+    "sql": "SELECT COUNT(DISTINCT T1.userid) FROM posthistory AS T1 INNER JOIN posts AS T2 ON T1.postid = T2.id WHERE T2.viewcount > 1000",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "What is the sum of reputation points of all users who have badges named 'Teacher'?",
+    "sql": "SELECT SUM(T2.reputation) FROM badges AS T1 INNER JOIN users AS T2 ON T1.userid = T2.id WHERE T1.name = 'Teacher'",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "Find the average score of posts that have been voted up by users who have more than 1000 reputation points.",
+    "sql": "SELECT AVG(T2.score) FROM votes AS T1 INNER JOIN posts AS T2 ON T1.postid = T2.id INNER JOIN users AS T3 ON T1.userid = T3.id WHERE T3.reputation > 1000",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "Which badges were awarded to users who made edits to posts tagged with '<r>'?",
+    "sql": "SELECT DISTINCT T3.Name FROM posthistory AS T1 INNER JOIN posts AS T2 ON T1.PostId = T2.Id INNER JOIN badges AS T3 ON T1.UserId = T3.UserId WHERE T2.Tags LIKE '%<r>%'",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 150
+  },
+  {
+    "question": "Find the top 5 users with the highest reputation who have received the 'Teacher' badge.",
+    "sql": "SELECT U.DisplayName, U.Reputation FROM users AS U JOIN badges AS B ON U.Id = B.UserId WHERE B.Name = 'Teacher' ORDER BY U.Reputation DESC LIMIT 5",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 5
+  },
+  {
+    "question": "List all the unique tags used in posts that have been commented on by users who have more than 1000 reputation points.",
+    "sql": "SELECT DISTINCT T3.TagName FROM comments AS T1 INNER JOIN posts AS T2 ON T1.PostId = T2.Id INNER JOIN tags AS T3 ON T2.Tags LIKE '%' || T3.TagName || '%' INNER JOIN users AS U ON T1.UserId = U.Id WHERE U.Reputation > 1000",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 988
+  },
+  {
+    "question": "How many distinct users have commented on posts created after January 1, 2012?",
+    "sql": "SELECT COUNT(DISTINCT T1.UserId) FROM comments AS T1 INNER JOIN posts AS T2 ON T1.PostId = T2.Id WHERE T2.CreaionDate > '2012-01-01'",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 1
+  },
+  {
+    "question": "Find the total number of votes cast on posts that were edited by users who have less than 100 reputation points.",
+    "sql": "SELECT SUM(T4.VoteTypeId) FROM posthistory AS T1 INNER JOIN posts AS T2 ON T1.PostId = T2.Id INNER JOIN votes AS T4 ON T2.Id = T4.PostId INNER JOIN users AS U ON T1.UserId = U.Id WHERE U.Reputation < 100",
+    "difficulty": "challenging",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 1
+  },
+  {
+    "question": "List the titles of posts that have been edited by users who have won the 'Teacher' badge and have more than 500 reputation points.",
+    "sql": "SELECT T2.Title FROM posthistory AS T1 INNER JOIN posts AS T2 ON T1.PostId = T2.Id INNER JOIN users AS U ON T1.UserId = U.Id INNER JOIN badges AS B ON U.Id = B.UserId WHERE B.Name = 'Teacher' AND U.Reputation > 500",
+    "difficulty": "challenging",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 129830
+  },
+  {
+    "question": "Count the number of times the tag '<machine-learning>' appears in posts that have received positive votes.",
+    "sql": "SELECT COUNT(*) FROM posts AS T1 INNER JOIN tags AS T2 ON T1.Tags LIKE '%' || T2.TagName || '%' INNER JOIN votes AS T3 ON T1.Id = T3.PostId WHERE T3.VoteTypeId = 2",
+    "difficulty": "challenging",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 1
+  },
+  {
+    "question": "Find the average reputation of users who have both the 'Teacher' and 'Editor' badges.",
+    "sql": "SELECT AVG(U.Reputation) FROM users AS U WHERE EXISTS (SELECT 1 FROM badges AS B1 WHERE B1.UserId = U.Id AND B1.Name = 'Teacher') AND EXISTS (SELECT 1 FROM badges AS B2 WHERE B2.UserId = U.Id AND B2.Name = 'Editor')",
+    "difficulty": "challenging",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 1
+  },
+  {
+    "question": "Find the 5 users who have made the most edits to posts.",
+    "sql": "SELECT T1.DisplayName, COUNT(T2.PostId) AS EditCount FROM users AS T1 INNER JOIN posthistory AS T2 ON T1.Id = T2.UserId WHERE T2.PostHistoryTypeId = 3 GROUP BY T1.DisplayName ORDER BY EditCount DESC LIMIT 5",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 5
+  },
+  {
+    "question": "List the top 10 questions with the highest number of answers.",
+    "sql": "SELECT T1.Title, COUNT(T2.AnswerCount) AS AnswerCount FROM posts AS T1 LEFT JOIN posts AS T2 ON T1.ParentId = T2.Id WHERE T1.PostTypeId = 1 GROUP BY T1.Title ORDER BY AnswerCount DESC LIMIT 10",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 10
+  },
+  {
+    "question": "Find the top 10 users with the highest reputation who have posted the most answers.",
+    "sql": "SELECT T1.DisplayName, COUNT(T2.Id) AS AnswerCount, T1.Reputation FROM users AS T1 INNER JOIN posts AS T2 ON T1.Id = T2.OwnerUserId WHERE T2.PostTypeId = 2 GROUP BY T1.DisplayName, T1.Reputation ORDER BY AnswerCount DESC, Reputation DESC LIMIT 10",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 10
+  },
+  {
+    "question": "Rank the users based on the total number of votes they have received.",
+    "sql": "SELECT T1.DisplayName, SUM(T2.VoteTypeId) AS TotalVotes FROM users AS T1 INNER JOIN votes AS T2 ON T1.Id = T2.UserId GROUP BY T1.DisplayName ORDER BY TotalVotes DESC LIMIT 10",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 10
+  },
+  {
+    "question": "List the display names of users who have received at least 50 votes on their posts.",
+    "sql": "SELECT DISTINCT T1.displayname FROM users AS T1 INNER JOIN posts AS T2 ON T1.id = T2.owneruserid INNER JOIN votes AS T3 ON T2.id = T3.postid GROUP BY T1.displayname HAVING COUNT(T3.id) >= 50",
+    "difficulty": "challenging",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 136
+  },
+  {
+    "question": "Find the sum of reputation points of users who have posted more than 10 answers.",
+    "sql": "SELECT SUM(reputation) FROM users AS T1 INNER JOIN posts AS T2 ON T1.id = T2.owneruserid WHERE answercount > 10",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 1
+  },
+  {
+    "question": "What is the maximum score among posts made by users who have less than 500 reputation points?",
+    "sql": "SELECT MAX(score) FROM posts AS T1 INNER JOIN users AS T2 ON T1.owneruserid = T2.id WHERE T2.reputation < 500",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 1
+  },
+  {
+    "question": "List the display names of users who have both asked and answered posts.",
+    "sql": "SELECT T1.displayname FROM users AS T1 INNER JOIN posts AS T2 ON T1.id = T2.owneruserid INTERSECT SELECT T1.displayname FROM users AS T1 INNER JOIN posts AS T2 ON T1.id = T2.acceptedanswerid",
+    "difficulty": "challenging",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 3119
+  },
+  {
+    "question": "Find the display names of users who have received exactly 10 votes on their posts.",
+    "sql": "SELECT DISTINCT T1.displayname FROM users AS T1 INNER JOIN posts AS T2 ON T1.id = T2.owneruserid INNER JOIN votes AS T3 ON T2.id = T3.postid GROUP BY T1.displayname HAVING COUNT(T3.id) = 10",
+    "difficulty": "challenging",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 35
+  },
+  {
+    "question": "What percentage of badges are awarded to users with more than 1000 reputation points?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T1.Reputation > 1000 THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM users AS T1 JOIN badges AS T2 ON T1.Id = T2.UserId",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What is the ratio of questions to answers among posts with a score greater than 5?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T1.PostTypeId = 1 THEN 1 ELSE 0 END) AS FLOAT) / SUM(CASE WHEN T1.PostTypeId = 2 THEN 1 ELSE 0 END) FROM posts AS T1 WHERE T1.Score > 5",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What percentage of comments have a positive score?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T1.Score > 0 THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM comments AS T1",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What percentage of users have more than 1000 reputation points and have received at least one badge?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T1.Reputation > 1000 AND EXISTS(SELECT 1 FROM badges AS T2 WHERE T2.UserId = T1.Id) THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM users AS T1",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What is the username of the user who received the most upvotes?",
+    "sql": "SELECT T1.displayname FROM users AS T1 JOIN posts AS T2 ON T1.id = T2.owneruserid ORDER BY T2.score DESC LIMIT 1",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "When was the last time a user named 'Alice' made a comment?",
+    "sql": "SELECT MAX(T1.creationdate) FROM comments AS T1 INNER JOIN users AS T2 ON T1.userid = T2.id WHERE T2.displayname = 'Alice'",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "What is the total number of votes on posts created after January 1, 2014?",
+    "sql": "SELECT SUM(CASE WHEN T2.creaiondate > '2014-01-01' THEN 1 ELSE 0 END) AS total_votes FROM votes AS T1 INNER JOIN posts AS T2 ON T1.postid = T2.id",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "List the usernames of users who have posted questions with more than 1000 views.",
+    "sql": "SELECT T2.displayname FROM posts AS T1 INNER JOIN users AS T2 ON T1.owneruserid = T2.id WHERE T1.viewcount > 1000 AND T1.posttypeid = 1",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 4518
+  },
+  {
+    "question": "How many times did the user with ID 1000 comment on posts?",
+    "sql": "SELECT COUNT(*) FROM comments WHERE userid = 1000",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "What is the average score of posts that have been edited at least once?",
+    "sql": "SELECT AVG(score) FROM posts WHERE id IN (SELECT DISTINCT postid FROM posthistory)",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "Find the latest activity date of users who have posted answers to questions.",
+    "sql": "SELECT MAX(lasactivitydate) FROM posts WHERE posttypeid = 2",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "Find the average score of posts that have been viewed more than 10,000 times.",
+    "sql": "SELECT AVG(score) FROM posts WHERE viewcount > 10000",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "What is the total number of votes cast on posts created before January 1, 2014?",
+    "sql": "SELECT SUM(CASE WHEN creationdate::date < '2014-01-01' THEN 1 ELSE 0 END) AS total_votes FROM votes",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "How many users have posted questions and received at least one answer?",
+    "sql": "SELECT COUNT(DISTINCT owneruserid) FROM posts WHERE posttypeid = 1 AND acceptedanswerid IS NOT NULL",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "Find the maximum score among posts that have more than 10 comments and less than 500 views.",
+    "sql": "SELECT MAX(score) FROM posts WHERE commentcount > 10 AND viewcount < 500",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "How many distinct users have interacted with posts linked by 'Related Posts' feature?",
+    "sql": "SELECT COUNT(DISTINCT userid) FROM postlinks AS T1 INNER JOIN votes AS T2 ON T1.id = T2.id",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "What is the average reputation of users who have posted at least 10 questions?",
+    "sql": "SELECT AVG(reputation) FROM users WHERE id IN (SELECT owneruserid FROM posts WHERE posttypeid = 1 GROUP BY owneruserid HAVING COUNT(owneruserid) >= 10)",
+    "difficulty": "challenging",
+    "db_id": "codebase_community",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "row_count": 1
+  },
+  {
+    "question": "How many users have both the 'Teacher' and 'Student' badges?",
+    "sql": "SELECT COUNT(DISTINCT u.id) FROM users u JOIN badges b ON u.id = b.userid WHERE b.name IN ('Teacher', 'Student') GROUP BY u.id HAVING COUNT(DISTINCT b.name) = 2",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 2142
+  },
+  {
+    "question": "Find the titles of all posts owned by users who have more than 1000 reputation points.",
+    "sql": "SELECT p.Title FROM posts p JOIN users u ON p.owneruserid = u.id WHERE u.reputation > 1000",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 35303
+  },
+  {
+    "question": "List the usernames and their corresponding badge names for users who have received the 'Teacher' badge.",
+    "sql": "SELECT u.displayname, b.name FROM users u JOIN badges b ON u.id = b.userid WHERE b.name = 'Teacher'",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 4679
+  },
+  {
+    "question": "Find the total number of posts that have received at least one vote and the average score of these posts.",
+    "sql": "SELECT COUNT(*), AVG(score) FROM posts WHERE id IN (SELECT DISTINCT postid FROM votes)",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 1
+  },
+  {
+    "question": "List the display names of users who have received at least 5 votes on their posts and the number of such votes they have received.",
+    "sql": "SELECT u.displayname, COUNT(*) as VoteCount FROM users u JOIN posts p ON u.id = p.owneruserid JOIN votes v ON p.id = v.postid GROUP BY u.id HAVING COUNT(*) >= 5",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "row_count": 884
+  },
+  {
+    "question": "Which user has received the most badges?",
+    "sql": "SELECT T2.DisplayName FROM badges AS T1 INNER JOIN users AS T2 ON T1.UserId = T2.Id GROUP BY T2.DisplayName ORDER BY COUNT(T1.Id) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 1
+  },
+  {
+    "question": "Find the titles of the top 5 highest-voted posts.",
+    "sql": "SELECT Title FROM posts ORDER BY Score DESC LIMIT 5",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 5
+  },
+  {
+    "question": "List the display names of users who have more than 1000 reputation points.",
+    "sql": "SELECT DisplayName FROM users WHERE Reputation > 1000",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 305
+  },
+  {
+    "question": "List the titles of posts with more than 1000 views.",
+    "sql": "SELECT Title FROM posts WHERE ViewCount > 1000",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 4675
+  },
+  {
+    "question": "Who are the top 3 users with the most reputation points?",
+    "sql": "SELECT DisplayName, Reputation FROM users ORDER BY Reputation DESC LIMIT 3",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 3
+  },
+  {
+    "question": "Find the display names of users who have commented on the most posts.",
+    "sql": "SELECT T4.DisplayName FROM comments AS T1 JOIN posts AS T2 ON T1.PostId = T2.Id JOIN users AS T4 ON T1.UserId = T4.Id GROUP BY T4.DisplayName ORDER BY COUNT(T1.Id) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "row_count": 1
+  },
+  {
+    "question": "Find the total number of comments made by users who have more than 100 reputation points.",
+    "sql": "SELECT COUNT(*) FROM comments AS T1 INNER JOIN users AS T2 ON T1.userid = T2.id WHERE T2.reputation > 100",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 1
+  },
+  {
+    "question": "Calculate the total score of all comments that were upvoted by users who have more than 1000 reputation points.",
+    "sql": "SELECT SUM(T1.score) FROM comments AS T1 INNER JOIN votes AS T2 ON T1.id = T2.postid INNER JOIN users AS T3 ON T2.userid = T3.id WHERE T2.votetypeid = 2 AND T3.reputation > 1000",
+    "difficulty": "challenging",
+    "db_id": "codebase_community",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "row_count": 1
+  },
+  {
+    "question": "What percentage of posts were created in the year 2013?",
+    "sql": "SELECT CAST(SUM(CASE WHEN EXTRACT(YEAR FROM creaiondate) = 2013 THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM posts",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What is the ratio of comments with a score greater than 0 to comments with a score less than or equal to 0?",
+    "sql": "SELECT CAST(SUM(CASE WHEN score > 0 THEN 1 ELSE 0 END) AS FLOAT) / SUM(CASE WHEN score <= 0 THEN 1 ELSE 0 END) FROM comments",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What percentage of post links have a link type ID of 1 compared to those with a link type ID of 3?",
+    "sql": "SELECT CAST(SUM(CASE WHEN linktypeid = 1 THEN 1 ELSE 0 END) AS FLOAT) * 100 / SUM(CASE WHEN linktypeid = 3 THEN 1 ELSE 0 END) FROM postlinks",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "Among posts with between 50 and 100 answers, what is the average view count per post?",
+    "sql": "SELECT AVG(viewcount) FROM posts WHERE answercount BETWEEN 50 AND 100",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What percentage of tags have a count greater than 50 compared to those with a count less than or equal to 50?",
+    "sql": "SELECT CAST(SUM(CASE WHEN count > 50 THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM tags",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "What is the ratio of comments made by users who have more than 1000 reputation points to comments made by users with 1000 or fewer reputation points?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T1.reputation > 1000 THEN 1 ELSE 0 END) AS FLOAT) / SUM(CASE WHEN T1.reputation <= 1000 THEN 1 ELSE 0 END) FROM users AS T1 INNER JOIN comments AS T2 ON T1.id = T2.userid",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "row_count": 1
+  },
+  {
+    "question": "Which users have earned the 'Scholar' badge in 2012?",
+    "sql": "SELECT u.displayname FROM users AS u JOIN badges AS b ON u.id = b.userid WHERE b.name = 'Scholar' AND EXTRACT(YEAR FROM b.date) = 2012",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1480
+  },
+  {
+    "question": "How many links are associated with the post having ID 456?",
+    "sql": "SELECT COUNT(*) FROM postlinks WHERE postid = 456",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  },
+  {
+    "question": "Get the usernames of users who have received more than 50 upvotes.",
+    "sql": "SELECT displayname FROM users WHERE upvotes > 50",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 577
+  },
+  {
+    "question": "List all badges awarded to users who have more than 1000 reputation points.",
+    "sql": "SELECT DISTINCT b.name FROM badges AS b JOIN users AS u ON b.userid = u.id WHERE u.reputation > 1000",
+    "difficulty": "moderate",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 152
+  },
+  {
+    "question": "How many posts were active in 2013?",
+    "sql": "SELECT COUNT(*) FROM posts WHERE EXTRACT(YEAR FROM lasactivitydate) = 2013",
+    "difficulty": "simple",
+    "db_id": "codebase_community",
+    "flavour": "simple lookups with a WHERE filter",
+    "row_count": 1
+  }
+]

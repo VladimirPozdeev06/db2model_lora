@@ -1,0 +1,333 @@
+{
+  "db_id": "toxicology",
+  "tables": {
+    "molecule": {
+      "columns": [
+        {
+          "name": "molecule_id",
+          "type": "TEXT",
+          "nullable": false,
+          "n_distinct": -1.0,
+          "range": "{TR000,TR004,TR008,TR012,TR017,TR022,TR025,TR030,TR034,TR039,TR046,TR049,TR054,TR058,TR061,TR068,TR073,TR078,TR082,TR085...",
+          "sample_values": [
+            "TR000",
+            "TR001",
+            "TR002",
+            "TR004",
+            "TR006"
+          ]
+        },
+        {
+          "name": "label",
+          "type": "TEXT",
+          "nullable": true,
+          "n_distinct": 2.0,
+          "most_common_vals": "{-,+}",
+          "all_values": [
+            "-",
+            "+"
+          ]
+        }
+      ],
+      "primary_key": [
+        "molecule_id"
+      ],
+      "row_estimate": 343,
+      "comment": null,
+      "sample_rows": [
+        {
+          "molecule_id": "TR000",
+          "label": "+"
+        },
+        {
+          "molecule_id": "TR001",
+          "label": "+"
+        },
+        {
+          "molecule_id": "TR002",
+          "label": "-"
+        },
+        {
+          "molecule_id": "TR004",
+          "label": "-"
+        },
+        {
+          "molecule_id": "TR006",
+          "label": "+"
+        }
+      ]
+    },
+    "bond": {
+      "columns": [
+        {
+          "name": "bond_id",
+          "type": "TEXT",
+          "nullable": false,
+          "n_distinct": -1.0,
+          "range": "{TR000_1_2,TR006_33_35,TR011_34_36,TR016_2_22,TR020_12_24,TR023_4_6,TR029_4_6,TR032_11_26,TR035_4_10,TR041_5_6,TR045_14_...",
+          "sample_values": [
+            "TR000_1_2",
+            "TR000_2_3",
+            "TR000_2_4",
+            "TR000_2_5",
+            "TR001_10_11"
+          ]
+        },
+        {
+          "name": "molecule_id",
+          "type": "TEXT",
+          "nullable": true,
+          "n_distinct": 444.0,
+          "most_common_vals": "{TR338,TR496,TR059,TR060,TR193,TR397,TR405,TR131,TR430,TR426,TR043,TR274,TR225,TR152,TR030,TR438,TR067,TR327,TR175,TR305...",
+          "range": "{TR000,TR005,TR008,TR012,TR016,TR018,TR019,TR023,TR028,TR031,TR036,TR042,TR047,TR054,TR058,TR064,TR069,TR073,TR076,TR078...",
+          "sample_values": [
+            "TR239",
+            "TR424",
+            "TR165",
+            "TR254",
+            "TR478"
+          ]
+        },
+        {
+          "name": "bond_type",
+          "type": "TEXT",
+          "nullable": true,
+          "n_distinct": 3.0,
+          "null_frac": 0.0,
+          "most_common_vals": "{-,=,#}",
+          "all_values": [
+            "#",
+            "=",
+            "-"
+          ]
+        }
+      ],
+      "primary_key": [
+        "bond_id"
+      ],
+      "row_estimate": 12379,
+      "comment": null,
+      "sample_rows": [
+        {
+          "bond_id": "TR000_1_2",
+          "molecule_id": "TR000",
+          "bond_type": "-"
+        },
+        {
+          "bond_id": "TR000_2_3",
+          "molecule_id": "TR000",
+          "bond_type": "-"
+        },
+        {
+          "bond_id": "TR000_2_4",
+          "molecule_id": "TR000",
+          "bond_type": "-"
+        },
+        {
+          "bond_id": "TR000_2_5",
+          "molecule_id": "TR000",
+          "bond_type": "-"
+        },
+        {
+          "bond_id": "TR001_10_11",
+          "molecule_id": "TR001",
+          "bond_type": "="
+        }
+      ]
+    },
+    "connected": {
+      "columns": [
+        {
+          "name": "atom_id",
+          "type": "TEXT",
+          "nullable": false,
+          "n_distinct": -0.49616286,
+          "most_common_vals": "{TR000_2,TR001_1,TR001_2,TR001_3,TR001_4,TR001_5,TR001_6,TR001_7,TR001_8,TR001_9,TR003_1,TR003_2,TR004_12,TR004_2,TR004_...",
+          "range": "{TR000_1,TR008_2,TR018_21,TR021_44,TR026_14,TR030_48,TR034_17,TR039_33,TR043_22,TR047_3,TR051_15,TR056_8,TR059_43,TR060_...",
+          "sample_values": [
+            "TR000_1",
+            "TR000_2",
+            "TR000_3",
+            "TR000_4",
+            "TR000_5"
+          ]
+        },
+        {
+          "name": "atom_id2",
+          "type": "TEXT",
+          "nullable": false,
+          "n_distinct": -0.49616286,
+          "most_common_vals": "{TR000_2,TR001_1,TR001_2,TR001_3,TR001_4,TR001_5,TR001_6,TR001_7,TR001_8,TR001_9,TR003_1,TR003_2,TR004_12,TR004_2,TR004_...",
+          "range": "{TR000_1,TR008_2,TR018_21,TR021_44,TR026_14,TR030_48,TR034_17,TR039_33,TR043_22,TR047_3,TR051_15,TR056_8,TR059_43,TR060_...",
+          "sample_values": [
+            "TR124_3",
+            "TR204_10",
+            "TR210_2",
+            "TR017_10",
+            "TR358_39"
+          ]
+        },
+        {
+          "name": "bond_id",
+          "type": "TEXT",
+          "nullable": true,
+          "n_distinct": -0.5,
+          "most_common_vals": "{TR000_1_2,TR000_2_3,TR000_2_4,TR000_2_5,TR001_10_11,TR001_1_12,TR001_1_2,TR001_1_7,TR001_1_8,TR001_2_14,TR001_2_4,TR001...",
+          "range": "{TR006_2_14,TR010_2_6,TR015_7_10,TR019_16_33,TR022_3_19,TR028_1_2,TR031_16_17,TR035_10_14,TR040_1_3,TR043_33_68,TR049_1_...",
+          "sample_values": [
+            "TR330_9_25",
+            "TR362_7_19",
+            "TR023_6_9",
+            "TR485_4_7",
+            "TR111_13_23"
+          ]
+        }
+      ],
+      "primary_key": [
+        "atom_id",
+        "atom_id2"
+      ],
+      "row_estimate": 24758,
+      "comment": null,
+      "sample_rows": [
+        {
+          "atom_id": "TR000_1",
+          "atom_id2": "TR000_2",
+          "bond_id": "TR000_1_2"
+        },
+        {
+          "atom_id": "TR000_2",
+          "atom_id2": "TR000_1",
+          "bond_id": "TR000_1_2"
+        },
+        {
+          "atom_id": "TR000_2",
+          "atom_id2": "TR000_3",
+          "bond_id": "TR000_2_3"
+        },
+        {
+          "atom_id": "TR000_3",
+          "atom_id2": "TR000_2",
+          "bond_id": "TR000_2_3"
+        },
+        {
+          "atom_id": "TR000_2",
+          "atom_id2": "TR000_4",
+          "bond_id": "TR000_2_4"
+        }
+      ]
+    },
+    "atom": {
+      "columns": [
+        {
+          "name": "atom_id",
+          "type": "TEXT",
+          "nullable": false,
+          "n_distinct": -1.0,
+          "range": "{TR000_1,TR006_37,TR011_20,TR016_23,TR020_1,TR023_8,TR029_3,TR032_2,TR036_11,TR042_14,TR045_5,TR050_21,TR056_1,TR059_33,...",
+          "sample_values": [
+            "TR000_1",
+            "TR000_2",
+            "TR000_3",
+            "TR000_4",
+            "TR000_5"
+          ]
+        },
+        {
+          "name": "molecule_id",
+          "type": "TEXT",
+          "nullable": true,
+          "n_distinct": 444.0,
+          "most_common_vals": "{TR338,TR496,TR060,TR059,TR397,TR430,TR193,TR405,TR426,TR131,TR274,TR152,TR043,TR225,TR438,TR327,TR067,TR305,TR030,TR252...",
+          "range": "{TR000,TR005,TR008,TR012,TR017,TR020,TR025,TR029,TR032,TR035,TR042,TR046,TR053,TR058,TR063,TR069,TR073,TR076,TR078,TR082...",
+          "sample_values": [
+            "TR239",
+            "TR424",
+            "TR165",
+            "TR254",
+            "TR478"
+          ]
+        },
+        {
+          "name": "element",
+          "type": "TEXT",
+          "nullable": true,
+          "n_distinct": 21.0,
+          "most_common_vals": "{h,c,o,n,cl,s,br,na,p,f,i,si,cu,sn}",
+          "range": "{b,ca,k,pb,te,y,zn}",
+          "sample_values": [
+            "sn",
+            "si",
+            "k",
+            "ca",
+            "cu"
+          ]
+        }
+      ],
+      "primary_key": [
+        "atom_id"
+      ],
+      "row_estimate": 12333,
+      "comment": null,
+      "sample_rows": [
+        {
+          "atom_id": "TR000_1",
+          "molecule_id": "TR000",
+          "element": "cl"
+        },
+        {
+          "atom_id": "TR000_2",
+          "molecule_id": "TR000",
+          "element": "c"
+        },
+        {
+          "atom_id": "TR000_3",
+          "molecule_id": "TR000",
+          "element": "cl"
+        },
+        {
+          "atom_id": "TR000_4",
+          "molecule_id": "TR000",
+          "element": "cl"
+        },
+        {
+          "atom_id": "TR000_5",
+          "molecule_id": "TR000",
+          "element": "h"
+        }
+      ]
+    }
+  },
+  "foreign_keys": [
+    {
+      "from_table": "connected",
+      "from_columns": [
+        "atom_id2"
+      ],
+      "to_table": "atom",
+      "to_columns": [
+        "atom_id"
+      ]
+    },
+    {
+      "from_table": "connected",
+      "from_columns": [
+        "atom_id"
+      ],
+      "to_table": "atom",
+      "to_columns": [
+        "atom_id"
+      ]
+    },
+    {
+      "from_table": "connected",
+      "from_columns": [
+        "bond_id"
+      ],
+      "to_table": "bond",
+      "to_columns": [
+        "bond_id"
+      ]
+    }
+  ]
+}
