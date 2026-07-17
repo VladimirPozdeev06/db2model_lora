@@ -48,7 +48,14 @@ def _engine(db_id: str) -> Engine:
 def _row_estimate(conn, table: str) -> int:
     """reltuples is an estimate, but COUNT(*) on every table is too slow."""
     n = conn.execute(
-        text("SELECT reltuples::bigint FROM pg_class WHERE relname = :t"),
+        text(
+            """
+            SELECT c.reltuples::bigint
+            FROM pg_class c
+            JOIN pg_namespace n ON n.oid = c.relnamespace
+            WHERE c.relname = :t AND n.nspname = 'public' AND c.relkind = 'r'
+            """
+        ),
         {"t": table},
     ).scalar()
     return max(int(n or 0), 0)

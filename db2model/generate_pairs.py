@@ -88,17 +88,21 @@ def _fewshot(db_id: str) -> str:
 
 
 def _parse(text: str) -> list[dict]:
-    match = re.search(r"\[.*\]", text, flags=re.DOTALL)
-    if not match:
-        return []
-    try:
-        items = json.loads(match.group(0))
-    except json.JSONDecodeError:
-        return []
-    return [
-        it for it in items
-        if isinstance(it, dict) and it.get("question") and it.get("sql")
-    ]
+    """Decode the first JSON array in the reply. A greedy regex would run from the
+    first '[' to the last ']' anywhere in the text, swallowing prose or a second
+    array; raw_decode stops at the end of the first well-formed value instead."""
+    decoder = json.JSONDecoder()
+    for start in (i for i, ch in enumerate(text) if ch == "["):
+        try:
+            items, _ = decoder.raw_decode(text[start:])
+        except json.JSONDecodeError:
+            continue
+        if isinstance(items, list):
+            return [
+                it for it in items
+                if isinstance(it, dict) and it.get("question") and it.get("sql")
+            ]
+    return []
 
 
 async def generate(db_id: str, target: int) -> list[dict]:
