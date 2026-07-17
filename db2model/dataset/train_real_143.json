@@ -1,0 +1,1003 @@
+[
+  {
+    "db_id": "codebase_community",
+    "question": "Under the vote type of 8, provide the display names and websites URLs of the user who got the highest bounty amount.",
+    "sql": "SELECT DisplayName, WebsiteUrl FROM users WHERE Id = (SELECT UserId FROM votes WHERE VoteTypeId = 8 ORDER BY BountyAmount DESC NULLS LAST LIMIT 1)",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "Which molecule does the atom TR001_10 belong to? Please state whether this molecule is carcinogenic or not.",
+    "sql": "SELECT T2.molecule_id, CASE WHEN T2.label = '+' THEN 'YES' ELSE 'NO' END AS flag_carcinogenic FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.atom_id = 'TR001_10'",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "How many posts did Jay Stevens have in 2010?",
+    "sql": "SELECT COUNT(T1.Id) FROM users AS T1 INNER JOIN posts AS T2 ON T1.Id = T2.OwnerUserId WHERE TO_CHAR(CAST(T2.CreaionDate AS TIMESTAMP), 'YYYY') = '2010' AND T1.DisplayName = 'Jay Stevens'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "What atoms comprise TR186?",
+    "sql": "SELECT T.atom_id FROM atom AS T WHERE T.molecule_id = 'TR186'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "How many clients who were born in 1920 stay in east Bohemia?",
+    "sql": "SELECT COUNT(T1.client_id) FROM client AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id WHERE TO_CHAR(CAST(T1.birth_date AS TIMESTAMP), 'YYYY') = '1920' AND T2.A3 = 'east Bohemia'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "What is the percentage of element chlorine in carcinogenic molecules?",
+    "sql": "SELECT CAST(COUNT(CASE WHEN T1.element = 'cl' THEN T1.element ELSE NULL END) AS REAL) * 100 / NULLIF(COUNT(T1.element), 0) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+'",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "Which districts have transactions greater than USS$10,000 in 1997?",
+    "sql": "SELECT T1.district_id FROM account AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id INNER JOIN trans AS T3 ON T1.account_id = T3.account_id WHERE TO_CHAR(CAST(T3.date AS TIMESTAMP), 'YYYY') = '1997' GROUP BY T1.district_id HAVING SUM(T3.amount) > 10000",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "What are the toxicology elements associated with bond ID TR000_1_2?",
+    "sql": "SELECT T1.element FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id WHERE T2.bond_id = 'TR000_1_2'",
+    "difficulty": "challenging",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "How many loan accounts are for pre-payment of duration of 24 months with weekly issuance of statement.",
+    "sql": "SELECT COUNT(T2.account_id) FROM account AS T1 INNER JOIN loan AS T2 ON T1.account_id = T2.account_id WHERE T2.duration = 24 AND T1.frequency = 'POPLATEK TYDNE'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "What is the disposition id of the client who made 5100 USD transaction in 1998/9/2?",
+    "sql": "SELECT T1.disp_id FROM disp AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN trans AS T3 ON T2.account_id = T3.account_id WHERE T3.date = '1997-08-20' AND T3.amount = 5100",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "Name the account numbers of female clients who are oldest and have lowest average salary?",
+    "sql": "SELECT T3.account_id FROM client AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id INNER JOIN account AS T3 ON T2.district_id = T3.district_id INNER JOIN disp AS T4 ON T1.client_id = T4.client_id AND T4.account_id = T3.account_id WHERE T1.gender = 'F' ORDER BY T1.birth_date ASC NULLS FIRST, T2.A11 ASC NULLS FIRST LIMIT 1",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "How many positive comments are there on the list?",
+    "sql": "SELECT COUNT(id) FROM comments WHERE score > 60",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "List down two molecule id of triple bond non carcinogenic molecules with element carbon.",
+    "sql": "SELECT DISTINCT T2.molecule_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id INNER JOIN bond AS T3 ON T2.molecule_id = T3.molecule_id WHERE T3.bond_type = '#' AND T1.element = 'c' AND T2.label = '-'",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "What is the bond type of TR007_4_19?",
+    "sql": "SELECT T.bond_type FROM bond AS T WHERE T.bond_id = 'TR007_4_19'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "List out the accounts who have the earliest trading date in 1995 ?",
+    "sql": "SELECT account_id FROM trans WHERE TO_CHAR(CAST(date AS TIMESTAMP), 'YYYY') = '1995' ORDER BY date ASC NULLS FIRST LIMIT 1",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "How many users were adult?",
+    "sql": "SELECT COUNT(id) FROM users WHERE Age BETWEEN 19 AND 65",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "Calculate the average number of oxygen atoms in single-bonded molecules.",
+    "sql": "SELECT AVG(oxygen_count) FROM (SELECT T1.molecule_id, COUNT(T1.element) AS oxygen_count FROM atom AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.bond_type = '-' AND T1.element = 'o' GROUP BY T1.molecule_id) AS oxygen_counts",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "Name the user that commented 'thank you user93!'",
+    "sql": "SELECT T1.DisplayName FROM users AS T1 INNER JOIN comments AS T2 ON T1.Id = T2.UserId WHERE T2.Text = 'thank you user93!'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "Name all bonds with single bond types and what atoms are connected to the molecules.",
+    "sql": "SELECT T1.bond_id, T2.atom_id, T2.atom_id2 FROM bond AS T1 INNER JOIN connected AS T2 ON T1.bond_id = T2.bond_id WHERE T1.bond_type = '-'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "What is the least common element of all carcinogenic molecules?",
+    "sql": "SELECT T.element FROM (SELECT T2.element, COUNT(DISTINCT T2.molecule_id) FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.label = '+' GROUP BY T2.element ORDER BY COUNT(DISTINCT T2.molecule_id) NULLS FIRST LIMIT 1) AS t",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "Provide the last edit date and last edit user ID for the post \"Detecting a given face in a database of facial images\".",
+    "sql": "SELECT LastEditDate, LastEditorUserId FROM posts WHERE Title = 'Detecting a given face in a database of facial images'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "How many customers who choose statement of weekly issuance are Owner?",
+    "sql": "SELECT COUNT(T1.account_id) FROM account AS T1 INNER JOIN disp AS T2 ON T1.account_id = T2.account_id WHERE T2.type = 'OWNER' AND T1.frequency = 'POPLATEK TYDNE'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "How many posts does the user csgillespie own?",
+    "sql": "SELECT COUNT(T1.id) FROM posts AS T1 INNER JOIN users AS T2 ON T1.OwnerUserId = T2.Id WHERE T2.DisplayName = 'csgillespie'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "Give me the molecule ID of the double bond type.",
+    "sql": "SELECT DISTINCT T.molecule_id FROM bond AS T WHERE T.bond_type = '='",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "How many credit card withdrawals were recorded after 1995?",
+    "sql": "SELECT COUNT(account_id) FROM trans WHERE TO_CHAR(CAST(date AS TIMESTAMP), 'YYYY') > '1995' AND operation = 'VYBER KARTOU'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "How many atoms belong to the molecule labeled with carcinogenic compounds?",
+    "sql": "SELECT COUNT(T1.atom_id) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "List all carcinogenic molecules and their elements.",
+    "sql": "SELECT DISTINCT T2.molecule_id, T1.element FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+'",
+    "difficulty": "challenging",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "What is the average score of Stephen Turner's posts?",
+    "sql": "SELECT AVG(T2.Score) FROM users AS T1 INNER JOIN posts AS T2 ON T1.Id = T2.OwnerUserId WHERE T1.DisplayName = 'Stephen Turner'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "Which carcinogenic molecule have the highest number of atoms consisted in it?",
+    "sql": "SELECT T.molecule_id FROM (SELECT T2.molecule_id, COUNT(T1.atom_id) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+' GROUP BY T2.molecule_id ORDER BY COUNT(T1.atom_id) DESC NULLS LAST LIMIT 1) AS t",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "How many of the single bond type molecules are non-carcinogenic?",
+    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '-' AND T1.bond_type = '-'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "Identify the total number of posts with views above average.",
+    "sql": "SELECT Id FROM posts WHERE ViewCount > (SELECT AVG(ViewCount) FROM posts)",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "What are the bond IDs that have the same atom ID 2 of TR000_2?",
+    "sql": "SELECT T.bond_id FROM connected AS T WHERE T.atom_id2 = 'TR000_2'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "What are the accounts that have gold credit cards?",
+    "sql": "SELECT T2.account_id FROM disp AS T2 INNER JOIN card AS T1 ON T1.disp_id = T2.disp_id WHERE T1.type = 'gold'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "What is the title of the post with the oldest post link?",
+    "sql": "SELECT T1.Title FROM posts AS T1 INNER JOIN postLinks AS T2 ON T2.PostId = T1.Id ORDER BY T1.CreaionDate NULLS FIRST LIMIT 1",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "Determine the bond type that is formed in the chemical compound containing element Carbon.",
+    "sql": "SELECT DISTINCT T2.bond_type FROM atom AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'c'",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "Which users have the highest number of views?",
+    "sql": "SELECT Id, DisplayName FROM users WHERE Views = (SELECT MAX(Views) FROM users)",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "Identify all connected atoms with a triple bond.",
+    "sql": "SELECT T2.atom_id, T2.atom_id2 FROM bond AS T1 INNER JOIN connected AS T2 ON T1.bond_id = T2.bond_id WHERE T1.bond_type = '#'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "Among the account opened, how many female customers who were born before 1950 and stayed in Sokolov?",
+    "sql": "SELECT COUNT(T2.client_id) FROM district AS T1 INNER JOIN client AS T2 ON T1.district_id = T2.district_id WHERE T2.gender = 'F' AND TO_CHAR(CAST(T2.birth_date AS TIMESTAMP), 'YYYY') < '1950' AND T1.A2 = 'Sokolov'",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "How many users whose reputations are higher than 2000 and the number of views is higher than 1000?",
+    "sql": "SELECT COUNT(id) FROM users WHERE Reputation > 2000 AND Views > 1000",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "List all the elements of the toxicology of the molecule \"TR004\".",
+    "sql": "SELECT DISTINCT T.element FROM atom AS T WHERE T.molecule_id = 'TR004'",
+    "difficulty": "challenging",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "How many bonds which involved atom 12 does molecule TR009 have?",
+    "sql": "SELECT COUNT(T2.bond_id) FROM bond AS T1 INNER JOIN connected AS T2 ON T1.bond_id = T2.bond_id WHERE T1.molecule_id = 'TR009' AND T2.atom_id = T1.molecule_id || '_1' AND T2.atom_id2 = T1.molecule_id || '_2'",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "How many accounts who have region in Prague are eligible for loans?",
+    "sql": "SELECT COUNT(T1.account_id) FROM account AS T1 INNER JOIN loan AS T2 ON T1.account_id = T2.account_id INNER JOIN district AS T3 ON T1.district_id = T3.district_id WHERE T3.A3 = 'Prague'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "In the branch where the second-highest number of crimes were committed in 1995 occurred, how many male clients are there?",
+    "sql": "SELECT COUNT(T1.client_id) FROM client AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id WHERE T1.gender = 'M' AND T2.A15 = (SELECT T3.A15 FROM district AS T3 ORDER BY T3.A15 DESC NULLS LAST LIMIT 1 OFFSET 1)",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "Write all the comments left by users who edited the post titled 'Why square the difference instead of taking the absolute value in standard deviation?'",
+    "sql": "SELECT T2.Comment FROM posts AS T1 INNER JOIN postHistory AS T2 ON T1.Id = T2.PostId WHERE T1.Title = 'Why square the difference instead of taking the absolute value in standard deviation?'",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "What is the carcinogenic label for bond TR001_2_4?",
+    "sql": "SELECT DISTINCT T2.label FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id INNER JOIN bond AS T3 ON T2.molecule_id = T3.molecule_id WHERE T3.bond_id = 'TR001_2_4'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "Describe the post title which got positive comments and display names of the users who posted those comments.",
+    "sql": "SELECT T1.Title, T2.UserDisplayName FROM posts AS T1 INNER JOIN comments AS T2 ON T2.PostId = T2.Id WHERE T1.Score > 60",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "In the non-carcinogenic molecules, how many contain chlorine atoms?",
+    "sql": "SELECT COUNT(DISTINCT T1.molecule_id) FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'cl' AND T1.label = '-'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "How many tags have post count between 5,000 to 7,000?",
+    "sql": "SELECT COUNT(Id) FROM tags WHERE Count BETWEEN 5000 AND 7000",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "What is the molecule id of bond id TR001_1_7?",
+    "sql": "SELECT DISTINCT T1.molecule_id FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id WHERE T2.bond_id = 'TR001_1_7'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "Write down bond id for molecules that are carcinogenic.",
+    "sql": "SELECT DISTINCT T1.bond_id FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "Who is the owner of the post \"Eliciting priors from experts\"?",
+    "sql": "SELECT T2.DisplayName FROM posts AS T1 INNER JOIN users AS T2 ON T1.OwnerUserId = T2.Id WHERE T1.Title = 'Eliciting priors from experts'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "What is the average monthly number of links created in 2010 for posts that have no more than 2 answers?",
+    "sql": "SELECT CAST(COUNT(T1.Id) AS REAL) / NULLIF(12, 0) FROM postLinks AS T1 INNER JOIN posts AS T2 ON T1.PostId = T2.Id WHERE T2.AnswerCount <= 2 AND TO_CHAR(CAST(T1.CreationDate AS TIMESTAMP), 'YYYY') = '2010'",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "List the element and bond type included in the molecule with molecule ID of TR002.",
+    "sql": "SELECT DISTINCT T1.element, T2.bond_type FROM atom AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.molecule_id = 'TR002'",
+    "difficulty": "challenging",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "List the loan ID, district and average salary for loan with duration of 60 months.",
+    "sql": "SELECT T3.loan_id, T2.A2, T2.A11 FROM account AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id INNER JOIN loan AS T3 ON T1.account_id = T3.account_id WHERE T3.duration = 60",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "In 1996, which districts have the highest unemployment rate? List their branch location and district name.",
+    "sql": "SELECT district_id, A2 FROM district ORDER BY A13 DESC NULLS LAST LIMIT 1",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "Please list the users' display names whose posts had over 20000 views in 2011.",
+    "sql": "SELECT T1.DisplayName FROM users AS T1 INNER JOIN posts AS T2 ON T1.Id = T2.OwnerUserId WHERE TO_CHAR(CAST(T2.CreaionDate AS TIMESTAMP), 'YYYY') = '2011' AND T2.ViewCount > 20000",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "What are the bond type for atoms with element Tin?",
+    "sql": "SELECT DISTINCT T3.bond_type FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id INNER JOIN bond AS T3 ON T3.bond_id = T2.bond_id WHERE T1.element = 'sn'",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "What was the difference in the number of crimes committed in East and North Bohemia in 1996?",
+    "sql": "SELECT SUM(CASE WHEN A3 = 'east Bohemia' THEN A16 ELSE 0 END) - SUM(CASE WHEN A3 = 'north Bohemia' THEN A16 ELSE 0 END) FROM district",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "Among the weekly issuance accounts, how many have a loan of under 200000?",
+    "sql": "SELECT COUNT(T1.account_id) FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id WHERE T2.frequency = 'POPLATEK TYDNE' AND T1.amount < 200000",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "List out all post that are related to post ID 61217 and what is the popularity of this post?",
+    "sql": "SELECT T1.ViewCount FROM posts AS T1 INNER JOIN postLinks AS T2 ON T1.Id = T2.PostId WHERE T2.PostId = 61217",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "Which user made a post titled 'Understanding what Dassault iSight is doing?' and how much is the reputation of the user?",
+    "sql": "SELECT T1.DisplayName, T1.Reputation FROM users AS T1 INNER JOIN posts AS T2 ON T1.Id = T2.OwnerUserId WHERE T2.Title = 'Understanding what Dassault iSight is doing?'",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "What are the labels for TR000, TR001 and TR002?",
+    "sql": "SELECT molecule_id, T.label FROM molecule AS T WHERE T.molecule_id IN ('TR000', 'TR001', 'TR002')",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "How many negative comments were given by user ID 13?",
+    "sql": "SELECT COUNT(Id) FROM comments WHERE UserId = 13 AND Score < 60",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "How many male customers who were born between 1974 and 1976 have made a payment on their home in excess of $4000?",
+    "sql": "SELECT COUNT(T1.account_id) FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN disp AS T4 ON T2.account_id = T4.account_id INNER JOIN client AS T3 ON T4.client_id = T3.client_id WHERE TO_CHAR(CAST(T3.birth_date AS TIMESTAMP), 'YYYY') BETWEEN '1974' AND '1976' AND T3.gender = 'M' AND T1.amount > 4000 AND T1.k_symbol = 'SIPO'",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "How many users were from New York?",
+    "sql": "SELECT COUNT(Id) FROM users WHERE Location = 'New York'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "What is the sum that client number 4's account has following transaction 851? Who owns this account, a man or a woman?",
+    "sql": "SELECT T4.balance, T1.gender FROM client AS T1 INNER JOIN disp AS T2 ON T1.client_id = T2.client_id INNER JOIN account AS T3 ON T2.account_id = T3.account_id INNER JOIN trans AS T4 ON T3.account_id = T4.account_id WHERE T1.client_id = 4 AND T4.trans_id = 851",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "List account ID and account opening date for accounts from 'Prachatice'.",
+    "sql": "SELECT T1.account_id, T1.date FROM account AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id WHERE T2.A2 = 'Prachatice'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "What is the type of bond that molecule TR000 has when involved in any bonds?",
+    "sql": "SELECT DISTINCT T.bond_type FROM bond AS T WHERE T.molecule_id = 'TR000'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "How many clients who choose statement of weekly issuance are Owner?",
+    "sql": "SELECT COUNT(T2.account_id) FROM account AS T1 INNER JOIN disp AS T2 ON T2.account_id = T1.account_id WHERE T1.frequency = 'POPLATEK TYDNE' AND T2.type = 'OWNER'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "List all ID and district for clients that can only have the right to issue permanent orders or apply for loans.",
+    "sql": "SELECT T3.client_id, T2.district_id, T2.A2 FROM account AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id INNER JOIN disp AS T3 ON T1.account_id = T3.account_id WHERE T3.type = 'OWNER'",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "What year was account owner number 130 born?",
+    "sql": "SELECT TO_CHAR(CAST(T1.birth_date AS TIMESTAMP), 'YYYY') FROM client AS T1 INNER JOIN disp AS T3 ON T1.client_id = T3.client_id INNER JOIN account AS T2 ON T3.account_id = T2.account_id WHERE T2.account_id = 130",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "What is the average loan amount by male borrowers?",
+    "sql": "SELECT AVG(T4.amount) FROM client AS T1 INNER JOIN disp AS T2 ON T1.client_id = T2.client_id INNER JOIN account AS T3 ON T2.account_id = T3.account_id INNER JOIN loan AS T4 ON T3.account_id = T4.account_id WHERE T1.gender = 'M'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "Who is the owner of the account with the largest loan amount?",
+    "sql": "SELECT T1.client_id FROM disp AS T1 INNER JOIN account AS T3 ON T1.account_id = T3.account_id INNER JOIN loan AS T2 ON T3.account_id = T2.account_id WHERE T1.type = 'OWNER' ORDER BY T2.amount DESC NULLS LAST LIMIT 1",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "What is the average number of bonds the atoms with the element iodine have?",
+    "sql": "SELECT CAST(COUNT(T2.bond_id) AS REAL) / NULLIF(COUNT(T1.atom_id), 0) FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id WHERE T1.element = 'i'",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "Please list all the transactions made by accounts from district 5.",
+    "sql": "SELECT T3.trans_id FROM district AS T1 INNER JOIN account AS T2 ON T1.district_id = T2.district_id INNER JOIN trans AS T3 ON T2.account_id = T3.account_id WHERE T1.district_id = 5",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "How much is the average amount in credit card made by account holders in a month, in year 2021?",
+    "sql": "SELECT AVG(T4.amount) FROM card AS T1 INNER JOIN disp AS T2 ON T1.disp_id = T2.disp_id INNER JOIN account AS T3 ON T2.account_id = T3.account_id INNER JOIN trans AS T4 ON T3.account_id = T4.account_id WHERE TO_CHAR(CAST(T4.date AS TIMESTAMP), 'YYYY') = '1998' AND T4.operation = 'VYBER KARTOU'",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "What is the display name of the user who is the owner of the most valuable post?",
+    "sql": "SELECT T2.DisplayName FROM posts AS T1 INNER JOIN users AS T2 ON T1.OwnerUserId = T2.Id ORDER BY T1.FavoriteCount DESC NULLS LAST LIMIT 1",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "Indicate which atoms are connected in non-carcinogenic type molecules.",
+    "sql": "SELECT DISTINCT T1.atom_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id INNER JOIN connected AS T3 ON T1.atom_id = T3.atom_id WHERE T2.label = '-'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "What is the composition of element chlorine in percentage among the single bond molecules?",
+    "sql": "SELECT CAST(COUNT(CASE WHEN T.element = 'cl' THEN T.atom_id ELSE NULL END) AS REAL) * 100 / NULLIF(COUNT(T.atom_id), 0) FROM (SELECT T1.atom_id, T1.element FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id INNER JOIN bond AS T3 ON T2.molecule_id = T3.molecule_id WHERE T3.bond_type = '-') AS T",
+    "difficulty": "challenging",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "Please list top five molecules that have double bonds in alphabetical order.",
+    "sql": "SELECT DISTINCT T.molecule_id FROM bond AS T WHERE T.bond_type = '=' ORDER BY T.molecule_id NULLS FIRST LIMIT 5",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "What is the display name of the user who has the most number of views?",
+    "sql": "SELECT DisplayName FROM users WHERE Views = (SELECT MAX(Views) FROM users)",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "Enumerate the bond ID of triple bond type molecules and tell me if they are carcinogenic or not.",
+    "sql": "SELECT DISTINCT T1.bond_id, T2.label FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.bond_type = '#'",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "Indicate the creation date of the maximum number of votes.",
+    "sql": "SELECT CreationDate FROM votes GROUP BY CreationDate ORDER BY COUNT(Id) DESC NULLS LAST LIMIT 1",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "How many male clients in 'Hl.m. Praha' district?",
+    "sql": "SELECT COUNT(T1.client_id) FROM client AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id WHERE T1.gender = 'M' AND T2.A2 = 'Hl.m. Praha'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "What is the sum of favourite count gained by user ID 686 in 2011?",
+    "sql": "SELECT SUM(DISTINCT FavoriteCount) FROM posts WHERE Id IN (SELECT PostId FROM postHistory WHERE UserId = 686 AND TO_CHAR(CAST(CreationDate AS TIMESTAMP), 'YYYY') = '2011')",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "How many high-level credit cards have \"OWNER\" type of disposition?",
+    "sql": "SELECT COUNT(T1.card_id) FROM card AS T1 INNER JOIN disp AS T2 ON T1.disp_id = T2.disp_id WHERE T1.type = 'gold' AND T2.type = 'OWNER'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "What is the percentage of loan amount that has been fully paid with no issue.",
+    "sql": "SELECT (CAST(SUM(CASE WHEN status = 'A' THEN amount ELSE 0 END) AS REAL) * 100) / NULLIF(SUM(amount), 0) FROM loan",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "Among the badges obtained by csgillespie, how many of them were obtained in the year 2011?",
+    "sql": "SELECT COUNT(T1.Id) FROM badges AS T1 INNER JOIN users AS T2 ON T1.UserId = T2.Id WHERE TO_CHAR(CAST(T1.Date AS TIMESTAMP), 'YYYY') = '2011' AND T2.DisplayName = 'csgillespie'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "How many bonds are created by bonding atoms with chlorine element?",
+    "sql": "SELECT COUNT(T1.bond_id) FROM connected AS T1 INNER JOIN atom AS T2 ON T1.atom_id = T2.atom_id WHERE T2.element = 'cl'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "What is the owner's display name of the most popular post?",
+    "sql": "SELECT DisplayName FROM users WHERE Id = (SELECT OwnerUserId FROM posts ORDER BY ViewCount DESC NULLS LAST LIMIT 1)",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "List the account IDs with monthly issuance of statements.",
+    "sql": "SELECT account_id FROM account WHERE Frequency = 'POPLATEK MESICNE'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "What is the molecule of atom id \"TR000_2\" and atom id 2 \"TR000_4\"?",
+    "sql": "SELECT T1.molecule_id FROM bond AS T1 INNER JOIN connected AS T2 ON T1.bond_id = T2.bond_id WHERE T2.atom_id = 'TR000_2' AND T2.atom_id2 = 'TR000_4'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "In the molecule TR008, how many carbons are present?",
+    "sql": "SELECT COUNT(T.atom_id) FROM atom AS T WHERE T.molecule_id = 'TR008' AND T.element = 'c'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "Among the molecules between TR004 to TR010, how many of them has single bonds?",
+    "sql": "SELECT COUNT(DISTINCT T.molecule_id) FROM bond AS T WHERE T.molecule_id BETWEEN 'TR004' AND 'TR010' AND T.bond_type = '-'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "What are the atoms that are bonded in the molecule TR001 with the bond ID of TR001_2_6?",
+    "sql": "SELECT SUBSTRING(T.bond_id FROM 1 FOR 7) AS atom_id1, T.molecule_id || SUBSTRING(T.bond_id FROM 8 FOR 2) AS atom_id2 FROM bond AS T WHERE T.molecule_id = 'TR001' AND T.bond_id = 'TR001_2_6'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "What is the gender of the oldest client who opened his/her account in the highest average salary branch?",
+    "sql": "SELECT T2.gender FROM district AS T1 INNER JOIN client AS T2 ON T1.district_id = T2.district_id ORDER BY T1.A11 DESC NULLS LAST, T2.birth_date ASC NULLS FIRST LIMIT 1",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "What is the post ID and the comments commented in the post titled by \"Group differences on a five point Likert item\"?",
+    "sql": "SELECT T2.Id, T1.Text FROM comments AS T1 INNER JOIN posts AS T2 ON T1.PostId = T2.Id WHERE T2.Title = 'Group differences on a five point Likert item'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "How many single bonds are there in the list?",
+    "sql": "SELECT COUNT(T.bond_id) FROM bond AS T WHERE T.bond_type = '-'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "What are the atoms of the triple bond with the molecule \"TR041\"?",
+    "sql": "SELECT T2.atom_id, T2.atom_id2 FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id INNER JOIN bond AS T3 ON T2.bond_id = T3.bond_id WHERE T3.bond_type = '#' AND T3.molecule_id = 'TR041'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "How many molecules are carcinogenic and have the bromine element?",
+    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+' AND T1.element = 'br'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "List out the no. of districts that have female average salary is more than 6000 but less than 10000?",
+    "sql": "SELECT COUNT(DISTINCT T2.district_id) FROM client AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id WHERE T1.gender = 'F' AND T2.A11 BETWEEN 6000 AND 10000",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "How many accounts were opened in Litomerice in 1996?",
+    "sql": "SELECT COUNT(T2.account_id) FROM district AS T1 INNER JOIN account AS T2 ON T1.district_id = T2.district_id WHERE TO_CHAR(CAST(T2.date AS TIMESTAMP), 'YYYY') = '1996' AND T1.A2 = 'Litomerice'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "Among the single bond molecule id, which molecules are not carcinogenic?",
+    "sql": "SELECT DISTINCT T1.molecule_id FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '-' AND T1.bond_type = '-'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "How many users are awarded with supporter badge during year 2011?",
+    "sql": "SELECT COUNT(Id) FROM badges WHERE TO_CHAR(CAST(Date AS TIMESTAMP), 'YYYY') = '2011' AND Name = 'Supporter'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "The transaction of 840 USD happened in 1998/10/14, when was this account opened?",
+    "sql": "SELECT T1.date FROM account AS T1 INNER JOIN trans AS T2 ON T1.account_id = T2.account_id WHERE T2.amount = 840 AND T2.date = '1998-10-14'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "What type of credit card does the client with the id 13539 own?",
+    "sql": "SELECT T3.type FROM disp AS T1 INNER JOIN client AS T2 ON T1.client_id = T2.client_id INNER JOIN card AS T3 ON T1.disp_id = T3.disp_id WHERE T2.client_id = 13539",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "How many atoms belong to molecule id TR001?",
+    "sql": "SELECT COUNT(T.atom_id) FROM atom AS T WHERE T.molecule_id = 'TR001'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "What are the display names and ages of user who got the highest in views?",
+    "sql": "SELECT DisplayName, Age FROM users WHERE Views = (SELECT MAX(Views) FROM users)",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "How many of the molecules are not carcinogenic?",
+    "sql": "SELECT COUNT(T.molecule_id) FROM molecule AS T WHERE T.label = '-'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "State the detailed content of the comment which was created on 7/19/2010 7:25:47 PM.",
+    "sql": "SELECT Text FROM comments WHERE CreationDate = '2010-07-19 19:16:14.0'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "Among the posts with views ranging from 100 to 150, what is the comment with the highest score?",
+    "sql": "SELECT Text FROM comments WHERE PostId IN (SELECT Id FROM posts WHERE ViewCount BETWEEN 100 AND 150) ORDER BY Score DESC NULLS LAST LIMIT 1",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "Name 10 users with the badge name 'Necromancer.'",
+    "sql": "SELECT T1.DisplayName FROM users AS T1 INNER JOIN badges AS T2 ON T1.Id = T2.UserId WHERE T2.Name = 'Necromancer' LIMIT 10",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "Calculate the total atoms consisting of the element carbon and hydrogen.",
+    "sql": "SELECT COUNT(T.atom_id) FROM atom AS T WHERE T.element = 'c' OR T.element = 'h'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "How many female customers have a junior credit card?",
+    "sql": "SELECT COUNT(T1.client_id) FROM client AS T1 INNER JOIN disp AS T2 ON T1.client_id = T2.client_id INNER JOIN card AS T3 ON T2.disp_id = T3.disp_id WHERE T1.gender = 'F' AND T3.type = 'junior'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "How many accounts in Beroun were opened after 1996?",
+    "sql": "SELECT COUNT(account_id) FROM account AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id WHERE TO_CHAR(CAST(T1.date AS TIMESTAMP), 'YYYY') > '1996' AND T2.A2 = 'Beroun'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "Describe the display name of the parent ID for child post with the highest score.",
+    "sql": "SELECT DisplayName FROM users WHERE Id = (SELECT OwnerUserId FROM posts WHERE NOT ParentId IS NULL ORDER BY Score DESC NULLS LAST LIMIT 1)",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "Among the molecules which contain \"cl\" element, which of them are carcinogenic?",
+    "sql": "SELECT DISTINCT T1.molecule_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'cl' AND T2.label = '+'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "Give the user's reputation and up vote number of the user that commented \"fine, you win :)\".",
+    "sql": "SELECT T2.Reputation, T2.UpVotes FROM comments AS T1 INNER JOIN users AS T2 ON T1.UserId = T2.Id WHERE T1.Text = 'fine, you win :)'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "How many of the accounts are from Jesenik district?",
+    "sql": "SELECT COUNT(T2.account_id) FROM district AS T1 INNER JOIN account AS T2 ON T1.district_id = T2.district_id WHERE T1.A2 = 'Jesenik'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "Please list the accounts whose district is Tabor that are eligible for loans.",
+    "sql": "SELECT T2.account_id FROM district AS T1 INNER JOIN account AS T2 ON T1.district_id = T2.district_id INNER JOIN disp AS T3 ON T2.account_id = T3.account_id WHERE T3.type = 'OWNER' AND T1.A2 = 'Tabor'",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "Write the contents of comments with a score of 17.",
+    "sql": "SELECT Text FROM comments WHERE Score = 17",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "How many female clients' accounts are in the region of South Bohemia?",
+    "sql": "SELECT COUNT(T1.client_id) FROM client AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id WHERE T1.gender = 'F' AND T2.A3 = 'south Bohemia'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "What is the average amount of loan which are still on running contract with statement issuance after each transaction?",
+    "sql": "SELECT AVG(T2.amount) FROM account AS T1 INNER JOIN loan AS T2 ON T1.account_id = T2.account_id WHERE T2.status IN ('C', 'D') AND T1.frequency = 'POPLATEK PO OBRATU'",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "List down atom id2 for atoms with element sulfur.",
+    "sql": "SELECT DISTINCT T2.atom_id2 FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id WHERE T1.element = 's'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "Who is the editor of the post titled 'Open source tools for visualizing multi-dimensional data?'",
+    "sql": "SELECT T2.DisplayName FROM posts AS T1 INNER JOIN users AS T2 ON T1.OwnerUserId = T2.Id WHERE T1.Title = 'Open source tools for visualizing multi-dimensional data?'",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "How long did it take the user, known by his or her display name 'Zolomon' to get the badge? Count from the date the user's account was created.",
+    "sql": "SELECT T1.Date - T2.CreationDate FROM badges AS T1 INNER JOIN users AS T2 ON T1.UserId = T2.Id WHERE T2.DisplayName = 'Zolomon'",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "For the female client who was born in 1976/1/29, which district did she opened her account?",
+    "sql": "SELECT T1.A2 FROM district AS T1 INNER JOIN client AS T2 ON T1.district_id = T2.district_id WHERE T2.birth_date = '1976-01-29' AND T2.gender = 'F'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "Among the molecules which contain \"c\" element, which of them are not carcinogenic?",
+    "sql": "SELECT DISTINCT T1.molecule_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'c' AND T2.label = '-'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "On average how many carcinogenic molecules are single bonded?",
+    "sql": "SELECT AVG(single_bond_count) FROM (SELECT T3.molecule_id, COUNT(T1.bond_type) AS single_bond_count FROM bond AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id INNER JOIN molecule AS T3 ON T3.molecule_id = T2.molecule_id WHERE T1.bond_type = '-' AND T3.label = '+' GROUP BY T3.molecule_id) AS subquery",
+    "difficulty": "challenging",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "For the first client who opened his/her account in Prague, what is his/her account ID?",
+    "sql": "SELECT T1.account_id FROM account AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id WHERE T2.A3 = 'Prague' ORDER BY T1.date ASC NULLS FIRST LIMIT 1",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "How many clients opened their accounts in Jesenik branch were women?",
+    "sql": "SELECT COUNT(T1.client_id) FROM client AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id WHERE T1.gender = 'F' AND T2.A2 = 'Jesenik'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "What percentage of bonds have the most common combination of atoms' elements?",
+    "sql": "SELECT CAST((SELECT COUNT(T1.atom_id) FROM connected AS T1 INNER JOIN bond AS T2 ON T1.bond_id = T2.bond_id GROUP BY T2.bond_type ORDER BY COUNT(T2.bond_id) DESC NULLS LAST LIMIT 1) AS REAL) * 100 / NULLIF((SELECT COUNT(atom_id) FROM connected), 0)",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "Is molecule TR124 carcinogenic?",
+    "sql": "SELECT T.label FROM molecule AS T WHERE T.molecule_id = 'TR124'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "In posts with 1 comment, how many of the comments have 0 score?",
+    "sql": "SELECT COUNT(T1.id) FROM comments AS T1 INNER JOIN posts AS T2 ON T1.PostId = T2.Id WHERE T2.CommentCount = 1 AND T2.Score = 0",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "Among the atoms that contain element carbon, which one does not contain compound carcinogenic?",
+    "sql": "SELECT T1.atom_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'c' AND T2.label = '-'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "Which bond ids are double-bond with carcinogenic compound?",
+    "sql": "SELECT T1.bond_id FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+' AND T1.bond_type = '='",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "Which accounts placed orders for household payment in Pisek?",
+    "sql": "SELECT DISTINCT T2.account_id FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN district AS T3 ON T2.district_id = T3.district_id WHERE T1.k_symbol = 'SIPO' AND T3.A2 = 'Pisek'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "financial",
+    "question": "What is the average number of crimes committed in 1995 in regions where the number exceeds 4000 and the region has accounts that are opened starting from the year 1997?",
+    "sql": "SELECT AVG(T1.A15) FROM district AS T1 INNER JOIN account AS T2 ON T1.district_id = T2.district_id WHERE TO_CHAR(CAST(T2.date AS TIMESTAMP), 'YYYY') >= '1997' AND T1.A15 > 4000",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "How many double bonds does TR006 have and is it carcinogenic?",
+    "sql": "SELECT COUNT(T1.bond_id), T2.label FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.bond_type = '=' AND T2.molecule_id = 'TR006' GROUP BY T2.label",
+    "difficulty": "moderate",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "Of the first 100 molecules in number order, how many are carcinogenic?",
+    "sql": "SELECT COUNT(T.molecule_id) FROM molecule AS T WHERE molecule_id BETWEEN 'TR000' AND 'TR099' AND T.label = '+'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "How many users obtained the \"Announcer\" badge?",
+    "sql": "SELECT COUNT(id) FROM badges WHERE Name = 'Announcer'",
+    "difficulty": "simple",
+    "source": "real"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "Which bond type accounted for the majority of the bonds found in molecule TR010 and state whether or not this molecule is carcinogenic?",
+    "sql": "SELECT T.bond_type FROM (SELECT T1.bond_type, COUNT(T1.molecule_id) FROM bond AS T1 WHERE T1.molecule_id = 'TR010' GROUP BY T1.bond_type ORDER BY COUNT(T1.molecule_id) DESC NULLS LAST LIMIT 1) AS T",
+    "difficulty": "challenging",
+    "source": "real"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "What is the up vote number of the user that commented \"R is also lazy evaluated.\"?",
+    "sql": "SELECT T2.UpVotes FROM comments AS T1 INNER JOIN users AS T2 ON T1.UserId = T2.Id WHERE T1.Text = 'R is also lazy evaluated.'",
+    "difficulty": "simple",
+    "source": "real"
+  }
+]

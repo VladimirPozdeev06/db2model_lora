@@ -1,0 +1,352 @@
+[
+  {
+    "db_id": "toxicology",
+    "question": "What is the ratio of the total number of atoms in molecules with a positive label to the total number of atoms in molecules with a negative label?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T2.label = '+' THEN 1 ELSE 0 END) AS FLOAT) * 100 / SUM(CASE WHEN T2.label = '-' THEN 1 ELSE 0 END) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id",
+    "difficulty": "moderate",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "What is the label of the molecule with molecule_id 'TR004'?",
+    "sql": "SELECT label FROM molecule WHERE molecule_id = 'TR004'",
+    "difficulty": "simple",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "What is the average reputation of users who have posted at least 10 questions?",
+    "sql": "SELECT AVG(reputation) FROM users WHERE id IN (SELECT owneruserid FROM posts WHERE posttypeid = 1 GROUP BY owneruserid HAVING COUNT(owneruserid) >= 10)",
+    "difficulty": "challenging",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "What is the ratio of the number of molecules with at least one double bond to those with at least one single bond among molecules labeled as positive?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T1.bond_type = '=' THEN 1 ELSE 0 END) AS FLOAT) / SUM(CASE WHEN T1.bond_type = '-' THEN 1 ELSE 0 END) FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+'",
+    "difficulty": "moderate",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "How many users have more than 5000 upvotes and less than 1000 downvotes?",
+    "sql": "SELECT COUNT(id) FROM users WHERE upvotes > 5000 AND downvotes < 1000",
+    "difficulty": "simple",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "List all elements present in molecules labeled as positive.",
+    "sql": "SELECT DISTINCT T1.element FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+'",
+    "difficulty": "simple",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "financial",
+    "question": "What is the total amount of loans issued in the year 2019?",
+    "sql": "SELECT SUM(amount) FROM loan WHERE EXTRACT(YEAR FROM date) = 2019",
+    "difficulty": "simple",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "financial",
+    "question": "What is the proportion of transactions classified as 'PREVOD NA UCET' (transfer to another account)?",
+    "sql": "SELECT (SUM(CASE WHEN T1.operation = 'PREVOD NA UCET' THEN 1 ELSE 0 END)::FLOAT / COUNT(*)) * 100 AS transfer_percentage FROM trans AS T1",
+    "difficulty": "moderate",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "financial",
+    "question": "What is the maximum transaction amount for account number 505?",
+    "sql": "SELECT MAX(amount) FROM trans WHERE account_id = 505",
+    "difficulty": "simple",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "Which users have both received more than 1000 upvotes and have more than 5000 views?",
+    "sql": "SELECT id, displayname FROM users WHERE reputation > 2000 AND views > 1000",
+    "difficulty": "simple",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "When was the last time a user named 'Alice' made a comment?",
+    "sql": "SELECT MAX(T1.creationdate) FROM comments AS T1 INNER JOIN users AS T2 ON T1.userid = T2.id WHERE T2.displayname = 'Alice'",
+    "difficulty": "simple",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "Is molecule TR012 a carcinogen?",
+    "sql": "SELECT T.label FROM molecule AS T WHERE T.molecule_id = 'TR012'",
+    "difficulty": "simple",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "financial",
+    "question": "Find the clients who have received more than 100000 transactions.",
+    "sql": "SELECT T4.client_id FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN disp AS T3 ON T2.account_id = T3.account_id INNER JOIN client AS T4 ON T3.client_id = T4.client_id GROUP BY T4.client_id HAVING SUM(T1.amount) > 100000",
+    "difficulty": "moderate",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "What is the average number of atoms per molecule for molecules with a '+' label?",
+    "sql": "SELECT AVG(COUNT(*)) OVER () FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+' GROUP BY T2.molecule_id",
+    "difficulty": "moderate",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "Find the display names of users who have received exactly 10 votes on their posts.",
+    "sql": "SELECT DISTINCT T1.displayname FROM users AS T1 INNER JOIN posts AS T2 ON T1.id = T2.owneruserid INNER JOIN votes AS T3 ON T2.id = T3.postid GROUP BY T1.displayname HAVING COUNT(T3.id) = 10",
+    "difficulty": "challenging",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "How many molecules contain exactly three bonds?",
+    "sql": "SELECT COUNT(*) FROM bond WHERE molecule_id IN (SELECT molecule_id FROM bond GROUP BY molecule_id HAVING COUNT(*) = 3)",
+    "difficulty": "moderate",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "List the bond IDs and their corresponding molecule labels, ordered by the number of heavy atoms involved in each bond.",
+    "sql": "SELECT T2.bond_id, T1.label, COUNT(CASE WHEN T3.element != 'h' THEN 1 ELSE 0 END) AS num_heavy_atoms FROM molecule AS T1 JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id JOIN connected AS L ON T2.bond_id = L.bond_id JOIN atom AS T3 ON L.atom_id = T3.atom_id OR L.atom_id2 = T3.atom_id GROUP BY T2.bond_id, T1.label ORDER BY num_heavy_atoms DESC",
+    "difficulty": "challenging",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "financial",
+    "question": "Identify the top 2 accounts with the largest balance difference between deposits and withdrawals.",
+    "sql": "SELECT account_id, (MAX(balance) - MIN(balance)) AS balance_difference FROM trans GROUP BY account_id ORDER BY balance_difference DESC LIMIT 2",
+    "difficulty": "challenging",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "List all unique molecules that have both 'c' and 'cl' elements.",
+    "sql": "SELECT T2.molecule_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element IN ('c', 'cl') GROUP BY T2.molecule_id HAVING COUNT(DISTINCT T1.element) = 2",
+    "difficulty": "moderate",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "How many times did the user with ID 1000 comment on posts?",
+    "sql": "SELECT COUNT(*) FROM comments WHERE userid = 1000",
+    "difficulty": "simple",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "financial",
+    "question": "What is the percentage of transactions that are deposits?",
+    "sql": "SELECT CAST(SUM(CASE WHEN type = 'PRIJEM' THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM trans",
+    "difficulty": "simple",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "financial",
+    "question": "How many loans were taken out in the year 1997?",
+    "sql": "SELECT COUNT(*) FROM loan WHERE EXTRACT(YEAR FROM date) = 1997",
+    "difficulty": "simple",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "financial",
+    "question": "What is the proportion of accounts with a frequency of weekly statements among all accounts?",
+    "sql": "SELECT (COUNT(*) FILTER (WHERE frequency = 'POPLATEK TYDNE')::float / COUNT(*)) AS proportion_weekly_statements FROM account",
+    "difficulty": "moderate",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "financial",
+    "question": "How many transactions of type 'VYDAJ' (withdrawal) were made by accounts in the 'Prague' district?",
+    "sql": "SELECT COUNT(T3.trans_id) FROM district AS T1 INNER JOIN account AS T2 ON T1.district_id = T2.district_id INNER JOIN trans AS T3 ON T2.account_id = T3.account_id WHERE T1.a2 = 'Prague' AND T3.type = 'VYDAJ'",
+    "difficulty": "moderate",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "Find the average reputation of users who have both the 'Teacher' and 'Editor' badges.",
+    "sql": "SELECT AVG(U.Reputation) FROM users AS U WHERE EXISTS (SELECT 1 FROM badges AS B1 WHERE B1.UserId = U.Id AND B1.Name = 'Teacher') AND EXISTS (SELECT 1 FROM badges AS B2 WHERE B2.UserId = U.Id AND B2.Name = 'Editor')",
+    "difficulty": "challenging",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "financial",
+    "question": "How many loans have been made to accounts in the district of Litomerice?",
+    "sql": "SELECT COUNT(*) FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN district AS T3 ON T2.district_id = T3.district_id WHERE T3.a2 = 'Litomerice'",
+    "difficulty": "simple",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "financial",
+    "question": "What is the average payment amount for loans that have been fully paid (status 'A')?",
+    "sql": "SELECT AVG(payments) FROM loan WHERE status = 'A'",
+    "difficulty": "simple",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "How many molecules have bonds involving atom 'TR000_1'?",
+    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM connected AS T1 INNER JOIN bond AS T2 ON T1.bond_id = T2.bond_id WHERE T1.atom_id = 'TR000_1'",
+    "difficulty": "simple",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "financial",
+    "question": "What percentage of clients who own accounts are male?",
+    "sql": "SELECT (COUNT(*) FILTER (WHERE T1.gender = 'M' AND T2.type = 'OWNER') * 100.0 / COUNT(DISTINCT T1.client_id)) AS percentage_male_owners FROM client AS T1 INNER JOIN disp AS T2 ON T1.client_id = T2.client_id",
+    "difficulty": "challenging",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "What is the average reputation of users who have posted more than 10 posts?",
+    "sql": "SELECT AVG(reputation) FROM users WHERE id IN (SELECT owneruserid FROM posts GROUP BY owneruserid HAVING COUNT(owneruserid) > 10)",
+    "difficulty": "moderate",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "How many comments were made by users who have more than 1000 reputation points?",
+    "sql": "SELECT COUNT(*) FROM comments AS T1 INNER JOIN users AS T2 ON T1.userid = T2.id WHERE T2.reputation > 1000",
+    "difficulty": "simple",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "List the elements of atoms involved in molecules that contain a triple bond and are labeled as carcinogenic.",
+    "sql": "SELECT DISTINCT T3.element FROM bond AS T1 INNER JOIN connected AS T2 ON T1.bond_id = T2.bond_id INNER JOIN atom AS T3 ON T2.atom_id = T3.atom_id INNER JOIN molecule AS T4 ON T1.molecule_id = T4.molecule_id WHERE T1.bond_type = '#' AND T4.label = '+'",
+    "difficulty": "challenging",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "Find the latest activity date of users who have posted answers to questions.",
+    "sql": "SELECT MAX(lasactivitydate) FROM posts WHERE posttypeid = 2",
+    "difficulty": "simple",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "financial",
+    "question": "What is the total number of transactions per month?",
+    "sql": "SELECT EXTRACT(YEAR FROM date) AS year, EXTRACT(MONTH FROM date) AS month, COUNT(*) AS total_transactions FROM trans GROUP BY year, month ORDER BY year, month",
+    "difficulty": "moderate",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "What is the ratio of posts with more than 100 views to posts with less than 100 views?",
+    "sql": "SELECT CAST(SUM(CASE WHEN viewcount > 100 THEN 1 ELSE 0 END) AS FLOAT) / SUM(CASE WHEN viewcount <= 100 THEN 1 ELSE 0 END) AS ratio FROM posts",
+    "difficulty": "moderate",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "financial",
+    "question": "How many cards were issued to the owner of account number 303?",
+    "sql": "SELECT COUNT(*) FROM card AS T1 INNER JOIN disp AS T2 ON T1.disp_id = T2.disp_id WHERE T2.account_id = 303 AND T2.type = 'OWNER'",
+    "difficulty": "simple",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "financial",
+    "question": "What is the ratio of loans that are in the 'A' status to those in the 'B' status?",
+    "sql": "SELECT SUM(CASE WHEN status = 'A' THEN 1 ELSE 0 END) * 1.0 / SUM(CASE WHEN status = 'B' THEN 1 ELSE 0 END) AS ratio FROM loan",
+    "difficulty": "moderate",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "Identify molecules that have at least three different types of bonds.",
+    "sql": "SELECT T2.molecule_id FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id HAVING COUNT(DISTINCT T1.bond_type) >= 3",
+    "difficulty": "moderate",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "financial",
+    "question": "What is the percentage of accounts that have been active for over 10 years?",
+    "sql": "SELECT CAST(SUM(CASE WHEN EXTRACT(YEAR FROM AGE(date)) > 10 THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM account",
+    "difficulty": "simple",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "What is the percentage of atoms in molecule 'TR001' that are carbon atoms?",
+    "sql": "WITH carbon_count AS (SELECT COUNT(*) AS carbon_num FROM atom WHERE molecule_id = 'TR001' AND element = 'c'), total_atoms AS (SELECT COUNT(*) AS total_num FROM atom WHERE molecule_id = 'TR001') SELECT CAST(carbon_count.carbon_num AS FLOAT) * 100 / total_atoms.total_num AS percentage_carbon FROM carbon_count, total_atoms",
+    "difficulty": "moderate",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "List the titles of posts with more than 1000 views.",
+    "sql": "SELECT Title FROM posts WHERE ViewCount > 1000",
+    "difficulty": "simple",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "How many different elements are used in molecules labeled as non-carcinogenic?",
+    "sql": "SELECT COUNT(DISTINCT T1.element) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '-'",
+    "difficulty": "moderate",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "Find the top 10 users with the highest reputation who have posted the most answers.",
+    "sql": "SELECT T1.DisplayName, COUNT(T2.Id) AS AnswerCount, T1.Reputation FROM users AS T1 INNER JOIN posts AS T2 ON T1.Id = T2.OwnerUserId WHERE T2.PostTypeId = 2 GROUP BY T1.DisplayName, T1.Reputation ORDER BY AnswerCount DESC, Reputation DESC LIMIT 10",
+    "difficulty": "moderate",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "financial",
+    "question": "Find the number of clients who are female and were born in 1960.",
+    "sql": "SELECT COUNT(client_id) FROM client WHERE EXTRACT(YEAR FROM birth_date) = 1960 AND gender = 'F'",
+    "difficulty": "simple",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "What percentage of comments have a score between 3 and 5?",
+    "sql": "SELECT CAST(COUNT(*) FILTER (WHERE score BETWEEN 3 AND 5) AS FLOAT) * 100 / COUNT(*) FROM comments",
+    "difficulty": "simple",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "Find the title of the post with ID 12345.",
+    "sql": "SELECT Title FROM posts WHERE Id = 12345",
+    "difficulty": "simple",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "List the labels of molecules that have at least one bond of type '#' and another bond of type '='.",
+    "sql": "SELECT T1.label FROM molecule AS T1 JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE EXISTS (SELECT 1 FROM bond AS T3 WHERE T3.molecule_id = T1.molecule_id AND T3.bond_type = '#') AND EXISTS (SELECT 1 FROM bond AS T4 WHERE T4.molecule_id = T1.molecule_id AND T4.bond_type = '=')",
+    "difficulty": "challenging",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "What percentage of bonds in molecule 'TR000' are double bonds?",
+    "sql": "WITH total_bonds AS (SELECT COUNT(*) AS total FROM bond WHERE molecule_id = 'TR000'), double_bonds AS (SELECT COUNT(*) AS count FROM bond WHERE molecule_id = 'TR000' AND bond_type = '=') SELECT CAST(double_bonds.count AS FLOAT) * 100 / total_bonds.total AS percentage_double_bonds FROM double_bonds, total_bonds",
+    "difficulty": "moderate",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "codebase_community",
+    "question": "Find the sum of bounty amounts for all votes cast by users under the age of 20.",
+    "sql": "SELECT SUM(votes.BountyAmount) FROM votes JOIN users ON votes.UserId = users.Id WHERE users.Age < 20",
+    "difficulty": "moderate",
+    "source": "synthetic"
+  },
+  {
+    "db_id": "toxicology",
+    "question": "List all molecules that contain at least one carbon atom.",
+    "sql": "SELECT DISTINCT T2.molecule_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'c'",
+    "difficulty": "simple",
+    "source": "synthetic"
+  }
+]

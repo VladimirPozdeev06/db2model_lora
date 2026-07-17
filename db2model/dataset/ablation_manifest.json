@@ -1,0 +1,10 @@
+{
+  "seed": 0,
+  "variants": {
+    "train_real_143": 143,
+    "train_synth_143": 143,
+    "train_synth_347": 347,
+    "train_synth_50": 50,
+    "train_unfiltered_347": 347
+  }
+}
