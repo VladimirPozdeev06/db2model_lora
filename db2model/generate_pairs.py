@@ -38,16 +38,20 @@ FLAVOURS = [
 
 SYSTEM = """You are a PostgreSQL expert building a training set for a smaller model.
 
-Below is the complete profile of the database `{db_id}`: its tables, columns,
-foreign keys, statistics and real values taken from the live database.
+Database `{db_id}`. Its exact shape — these are the ONLY tables and columns that
+exist, and the ONLY ways the tables connect:
+
+{summary}
+
+Full profile with statistics and real values, use it to pick literals:
 
 {profile}
 
 Rules:
-- Every table, column and literal you use MUST appear in the profile above.
-  Inventing a value that is not in the data makes the pair useless.
-- Follow the foreign keys in the profile when joining. Do not join on columns
-  that are not linked there.
+- Every table, column and literal you use MUST appear above. Inventing a column
+  that does not exist makes the pair useless.
+- All tables live in the default schema. Never prefix them with `{db_id}.`.
+- Join only along the connections listed above. Do not invent join columns.
 - Questions must sound like a human analyst asking, not like a description of SQL.
 - The SQL must be valid PostgreSQL and must return at least one row.
 - Every subquery in FROM must have an alias. PostgreSQL rejects it otherwise.
@@ -62,6 +66,57 @@ Prefer these tables where it makes sense: {tables}.
 Answer with a JSON array only, no prose:
 [{{"question": "...", "sql": "...", "difficulty": "simple|moderate|challenging"}}]
 """
+
+
+def _summary(profile: dict) -> str:
+    """A compact CREATE TABLE view plus the join graph, put in front of the full
+    profile. The profile alone is thousands of tokens of JSON and the teacher
+    loses track of which column sits on which table — the dominant failure in the
+    first runs was hallucinated columns, not bad questions."""
+    lines = []
+    for table, info in profile["tables"].items():
+        cols = ", ".join(f"{c['name']} {c['type']}" for c in info["columns"])
+        lines.append(f"{table}({cols})")
+
+    edges = []
+    for fk in profile["foreign_keys"]:
+        src = ", ".join(fk["from_columns"])
+        dst = ", ".join(fk["to_columns"])
+        edges.append(f"  {fk['from_table']}.{src} -> {fk['to_table']}.{dst}")
+    edges.extend(f"  {e}  (implied by name)" for e in _implied_edges(profile))
+
+    lines.append("\nHow tables connect:")
+    lines.extend(edges or ["  nothing declared: join on columns that share a name"])
+    return "\n".join(lines)
+
+
+def _implied_edges(profile: dict) -> list[str]:
+    """These databases under-declare their foreign keys — toxicology declares 3 and
+    leaves atom.molecule_id -> molecule.molecule_id implicit. Listing only the
+    declared ones would forbid legitimate joins, so recover the obvious ones: a
+    column named exactly like some other table's single primary key."""
+    pk_owner = {}
+    for table, info in profile["tables"].items():
+        pk = info.get("primary_key") or []
+        if len(pk) == 1:
+            pk_owner[pk[0]] = table
+
+    declared = {
+        (fk["from_table"], tuple(fk["from_columns"]))
+        for fk in profile["foreign_keys"]
+    }
+
+    implied = []
+    for table, info in profile["tables"].items():
+        for col in info["columns"]:
+            name = col["name"]
+            target = pk_owner.get(name)
+            if not target or target == table:
+                continue
+            if (table, (name,)) in declared:
+                continue
+            implied.append(f"{table}.{name} -> {target}.{name}")
+    return implied
 
 
 def _fewshot(db_id: str) -> str:
@@ -107,7 +162,8 @@ def _parse(text: str) -> list[dict]:
 
 async def generate(db_id: str, target: int) -> list[dict]:
     profile = (PROFILES / f"{db_id}.json").read_text(encoding="utf-8")
-    tables = list(json.loads(profile)["tables"])
+    parsed = json.loads(profile)
+    tables = list(parsed["tables"])
 
     client = OpenAIChatCompletionClient(
         model=os.environ["LLM_MODEL_NAME"],
@@ -117,7 +173,7 @@ async def generate(db_id: str, target: int) -> list[dict]:
         model_info={"json_output": False, "function_calling": False, "vision": False,
                     "family": "unknown", "structured_output": False},
     )
-    system = SYSTEM.format(db_id=db_id, profile=profile)
+    system = SYSTEM.format(db_id=db_id, profile=profile, summary=_summary(parsed))
 
     pairs: list[dict] = []
     n_calls = -(-target // PAIRS_PER_CALL)
