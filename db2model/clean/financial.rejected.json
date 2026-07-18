@@ -567,5 +567,1751 @@
     "flavour": "simple lookups with a WHERE filter",
     "error": "(psycopg.errors.UndefinedColumn) column t2.bank does not exist",
     "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Find the total number of orders placed by account ID 1234.",
+    "sql": "SELECT SUM(amount) FROM order WHERE account_id = 1234",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Retrieve the date and type of transactions made by account ID 5678.",
+    "sql": "SELECT date, type FROM trans WHERE account_id = 5678",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "List all clients who have a loan with a duration of more than 60 months.",
+    "sql": "SELECT DISTINCT T2.client_id FROM loan AS T1 INNER JOIN disp AS T2 ON T1.account_id = T2.account_id WHERE T1.duration > 60",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "How many orders were placed between April 1, 1995 and June 30, 1995?",
+    "sql": "SELECT COUNT(*) FROM order WHERE date BETWEEN '1995-04-01' AND '1995-06-30'",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many transactions were made each day in 1998?",
+    "sql": "SELECT T3.date, COUNT(*) as num_transactions FROM trans AS T3 WHERE YEAR(T3.date) = 1998 GROUP BY T3.date ORDER BY T3.date;",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.UndefinedFunction) function year(date) does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "List the count of distinct account IDs that made more than 5000 USD transactions in 1998.",
+    "sql": "SELECT COUNT(DISTINCT T1.account_id) as unique_accounts FROM trans AS T1 WHERE YEAR(T1.date) = 1998 AND T1.amount > 5000;",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.UndefinedFunction) function year(date) does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the total amount of money transferred by female clients?",
+    "sql": "SELECT SUM(T4.amount) FROM client AS T1 INNER JOIN account AS T2 ON T1.client_id = T2.client_id INNER JOIN trans AS T4 ON T2.account_id = T4.account_id WHERE T1.gender = 'F'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many loans were taken out by clients from Prague?",
+    "sql": "SELECT COUNT(T3.loan_id) FROM client AS T1 INNER JOIN account AS T2 ON T1.client_id = T2.client_id INNER JOIN loan AS T3 ON T2.account_id = T3.account_id INNER JOIN district AS T4 ON T2.district_id = T4.district_id WHERE T4.a3 = 'Prague'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Find the average transaction amount for orders placed by male clients.",
+    "sql": "SELECT AVG(T4.amount) FROM client AS T1 INNER JOIN account AS T2 ON T1.client_id = T2.client_id INNER JOIN order AS T3 ON T2.account_id = T3.account_id INNER JOIN trans AS T4 ON T2.account_id = T4.account_id WHERE T1.gender = 'M'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "List all distinct banks involved in transactions made by clients from Karlovy Vary.",
+    "sql": "SELECT DISTINCT T4.bank FROM client AS T1 INNER JOIN account AS T2 ON T1.client_id = T2.client_id INNER JOIN trans AS T4 ON T2.account_id = T4.account_id INNER JOIN district AS T5 ON T2.district_id = T5.district_id WHERE T5.a2 = 'Karlovy Vary'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many different districts had at least one loan application?",
+    "sql": "SELECT COUNT(DISTINCT T2.district_id) FROM client AS T1 INNER JOIN account AS T2 ON T1.client_id = T2.client_id INNER JOIN loan AS T3 ON T2.account_id = T3.account_id",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Find the maximum amount borrowed by any client in the database.",
+    "sql": "SELECT MAX(T3.amount) FROM client AS T1 INNER JOIN account AS T2 ON T1.client_id = T2.client_id INNER JOIN loan AS T3 ON T2.account_id = T3.account_id",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many clients have both an account and a loan?",
+    "sql": "SELECT COUNT(DISTINCT T1.client_id) FROM client AS T1 INNER JOIN account AS T2 ON T1.client_id = T2.client_id INNER JOIN loan AS T3 ON T2.account_id = T3.account_id",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "List all distinct banks involved in transactions made by clients from Litomerice.",
+    "sql": "SELECT DISTINCT T4.bank FROM client AS T1 INNER JOIN account AS T2 ON T1.client_id = T2.client_id INNER JOIN trans AS T4 ON T2.account_id = T4.account_id INNER JOIN district AS T5 ON T2.district_id = T5.district_id WHERE T5.a2 = 'Litomerice'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Which clients have made transactions exceeding $1000 in the month of July 1998?",
+    "sql": "SELECT T3.client_id, T3.gender, T3.birth_date FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN client AS T3 ON T2.client_id = T3.client_id WHERE T1.date >= '1998-07-01' AND T1.date < '1998-08-01' AND T1.amount > 1000",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "List the top 3 most active clients based on the number of transactions they have made.",
+    "sql": "SELECT T3.client_id, T3.gender, T3.birth_date, COUNT(*) as transaction_count FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN client AS T3 ON T2.client_id = T3.client_id GROUP BY T3.client_id ORDER BY transaction_count DESC LIMIT 3",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the average monthly income of clients who have taken out loans in the amount of over $100,000?",
+    "sql": "SELECT AVG(T4.amount) as avg_income FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN client AS T3 ON T2.client_id = T3.client_id INNER JOIN trans AS T4 ON T2.account_id = T4.account_id WHERE T1.amount > 100000 AND T4.type = 'PRIJEM'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Identify the 5 districts with the highest number of orders placed by female clients.",
+    "sql": "SELECT T2.a2, COUNT(*) as order_count FROM order AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN client AS T3 ON T2.client_id = T3.client_id WHERE T3.gender = 'F' GROUP BY T2.a2 ORDER BY order_count DESC LIMIT 5",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Find the clients who have both ordered items and taken out loans within the last year.",
+    "sql": "SELECT T3.client_id, T3.gender, T3.birth_date FROM order AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN client AS T3 ON T2.client_id = T3.client_id INNER JOIN loan AS T4 ON T2.account_id = T4.account_id WHERE (T1.date >= CURRENT_DATE - INTERVAL '1 year') AND (T4.date >= CURRENT_DATE - INTERVAL '1 year')",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the average number of transactions per month for clients in the city of Prague?",
+    "sql": "SELECT AVG(COUNT(*)) FROM (SELECT T2.client_id, EXTRACT(YEAR FROM T3.date) AS year, EXTRACT(MONTH FROM T3.date) AS month, COUNT(*) AS num_transactions FROM client AS T1 INNER JOIN account AS T2 ON T1.district_id = T2.district_id INNER JOIN trans AS T3 ON T2.account_id = T3.account_id WHERE T1.district_id = 1 GROUP BY T2.client_id, year, month) AS subquery",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Find the maximum number of transactions made by any client in 1998.",
+    "sql": "SELECT MAX(num_transactions) FROM (SELECT T2.client_id, COUNT(*) AS num_transactions FROM client AS T1 INNER JOIN account AS T2 ON T1.district_id = T2.district_id INNER JOIN trans AS T3 ON T2.account_id = T3.account_id WHERE EXTRACT(YEAR FROM T3.date) = 1998 GROUP BY T2.client_id) AS subquery",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Calculate the average loan amount for each district.",
+    "sql": "SELECT T1.a2, AVG(T1.amount) AS avg_loan_amount FROM district AS T1 INNER JOIN loan AS T2 ON T1.district_id = T2.account_id GROUP BY T1.district_id",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t1.amount does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the percentage of clients who have more than one card issued?",
+    "sql": "SELECT CAST(COUNT(DISTINCT T2.client_id) AS FLOAT) * 100 / (SELECT COUNT(client_id) FROM client) FROM card AS T1 INNER JOIN disp AS T2 ON T1.disp_id = T2.disp_id GROUP BY T2.client_id HAVING COUNT(T1.card_id) > 1",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "What is the ratio of accounts with a frequency of monthly statements compared to the total number of accounts in Prague?",
+    "sql": "SELECT CAST(COUNT(CASE WHEN T.frequency = 'POPLATEK MESICNE' THEN 1 ELSE NULL END) AS FLOAT) * 100 / (SELECT COUNT(*) FROM account WHERE district_id IN (SELECT district_id FROM district WHERE a2 = 'Prague')) FROM account AS T",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.DivisionByZero) division by zero",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many orders were made by clients from Prague?",
+    "sql": "SELECT COUNT(*) FROM client AS T1 INNER JOIN order AS T2 ON T1.client_id = T2.account_id WHERE T1.district_id = (SELECT district_id FROM district WHERE a3 = 'Prague')",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the average age of clients who have an account with a frequency of 'POPLATEK PO OBRATU'?",
+    "sql": "SELECT AVG(EXTRACT(YEAR FROM AGE(CURRENT_DATE, T2.birth_date))) as avg_age FROM client AS T2 INNER JOIN account AS T1 ON T2.client_id = T1.client_id WHERE T1.frequency = 'POPLATEK PO OBRATU'",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t1.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the total amount of money transferred between accounts opened in different districts?",
+    "sql": "SELECT SUM(CASE WHEN T1.district_id <> T3.district_id THEN T2.amount ELSE 0 END) as total_transferred FROM district AS T1 INNER JOIN trans AS T2 ON T1.district_id = T2.district_id INNER JOIN account AS T3 ON T2.account_id = T3.account_id",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.district_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many distinct clients have ordered products from 'CD' bank?",
+    "sql": "SELECT COUNT(DISTINCT T2.client_id) FROM client AS T2 INNER JOIN order AS T1 ON T1.account_id = T2.account_id WHERE T1.bank_to = 'CD'",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the total number of loans taken out by clients who have more than one account?",
+    "sql": "SELECT COUNT(*) FROM loan AS L JOIN account AS A ON L.account_id = A.account_id GROUP BY A.client_id HAVING COUNT(A.account_id) > 1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.UndefinedColumn) column a.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Find the average age of clients whose accounts have been active for more than 10 years.",
+    "sql": "SELECT AVG(EXTRACT(YEAR FROM AGE(date))) FROM client AS C JOIN account AS A ON C.client_id = A.client_id WHERE date <= CURRENT_DATE - INTERVAL '10 years'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.UndefinedColumn) column a.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many distinct clients have accounts with a balance greater than 10000?",
+    "sql": "SELECT COUNT(DISTINCT client_id) FROM account WHERE balance > 10000",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.UndefinedColumn) column \"client_id\" does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "List the top 5 districts with the highest number of accounts and show the average account balance in each district.",
+    "sql": "SELECT T1.a2, AVG(T2.balance) as avg_balance, COUNT(T2.account_id) as num_accounts FROM district AS T1 JOIN account AS T2 ON T1.district_id = T2.district_id GROUP BY T1.a2 ORDER BY num_accounts DESC LIMIT 5",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.balance does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Calculate the average account balance for each account type.",
+    "sql": "SELECT T.type, AVG(balance) as avg_balance FROM account AS T2 JOIN card AS T ON T2.account_id = T.account_id GROUP BY T.type",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.UndefinedColumn) column t.account_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the total number of transactions made by clients from the 'Central Bohemia' region?",
+    "sql": "SELECT SUM(CASE WHEN T2.a3 = 'central Bohemia' THEN 1 ELSE 0 END) as total_transactions FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN district AS T3 ON T2.district_id = T3.district_id",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.a3 does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "List the names and genders of clients who have ordered products from the bank and have at least one loan active.",
+    "sql": "SELECT T4.name, T4.gender FROM order AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN client AS T4 ON T2.client_id = T4.client_id INNER JOIN loan AS T5 ON T2.account_id = T5.account_id WHERE T1.bank_to IS NOT NULL AND T5.status = 'A'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many unique clients have placed orders and also have active loans?",
+    "sql": "SELECT COUNT(DISTINCT T4.client_id) as unique_clients FROM order AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN client AS T4 ON T2.client_id = T4.client_id INNER JOIN loan AS T5 ON T2.account_id = T5.account_id WHERE T1.amount > 0 AND T5.status = 'A'",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Find the total amount spent by each client who has made more than 50 transactions.",
+    "sql": "SELECT T4.client_id, SUM(T1.amount) as total_spent FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN client AS T4 ON T2.client_id = T4.client_id GROUP BY T4.client_id HAVING COUNT(T1.trans_id) > 50",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many transactions were made between clients from 'Prague' and 'Liberec' districts?",
+    "sql": "SELECT SUM(CASE WHEN T3.a3 = 'Prague' AND T4.a3 = 'Liberec' OR T3.a3 = 'Liberec' AND T4.a3 = 'Prague' THEN 1 ELSE 0 END) as cross_district_transactions FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN district AS T3 ON T2.district_id = T3.district_id INNER JOIN account AS T5 ON T1.account_to = T5.account_id INNER JOIN district AS T4 ON T5.district_id = T4.district_id",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedColumn) column t1.account_to does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Calculate the total number of orders placed by each client, but only include those who have made more than 30 orders.",
+    "sql": "SELECT T4.client_id, COUNT(T1.order_id) as total_orders FROM order AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN client AS T4 ON T2.client_id = T4.client_id GROUP BY T4.client_id HAVING COUNT(T1.order_id) > 30",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Which clients made the largest order amounts?",
+    "sql": "SELECT T1.client_id, SUM(T2.amount) as total_order_amount FROM client AS T1 INNER JOIN order AS T2 ON T1.client_id = T2.account_id GROUP BY T1.client_id ORDER BY total_order_amount DESC LIMIT 5",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many accounts were opened each month in 1998?",
+    "sql": "SELECT EXTRACT(YEAR_MONTH FROM T2.date) as month_year, COUNT(*) as num_accounts FROM account AS T2 WHERE EXTRACT(YEAR FROM T2.date) = 1998 GROUP BY month_year ORDER BY month_year",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "What is the maximum loan amount for each district?",
+    "sql": "SELECT T2.a2, MAX(T1.amount) FROM loan AS T1 INNER JOIN district AS T2 ON T1.account_id = T2.account_id GROUP BY T2.a2",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.account_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Among clients aged 30 and over, what is the percentage who have more than 5 accounts?",
+    "sql": "WITH age AS (SELECT client_id FROM client WHERE EXTRACT(YEAR FROM AGE(NOW(), birth_date)) >= 30), account_count AS (SELECT client_id, COUNT(*) as num_accounts FROM account WHERE client_id IN (SELECT client_id FROM age) GROUP BY client_id HAVING COUNT(*) > 5) SELECT CAST(COUNT(*) AS REAL) * 100 / (SELECT COUNT(*) FROM age) FROM account_count",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.UndefinedColumn) column \"client_id\" does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What percentage of orders have a non-empty 'k_symbol' field?",
+    "sql": "SELECT CAST(SUM(CASE WHEN k_symbol != '' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(*) FROM order",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Among districts with more than 100 accounts, what is the average number of accounts per district?",
+    "sql": "SELECT AVG(num_accounts) FROM (SELECT COUNT(*) AS num_accounts FROM account GROUP BY district_id HAVING COUNT(*) > 100)",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.SyntaxError) subquery in FROM must have an alias",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Among clients who have taken out a loan, what is the percentage who have a 'POPLATEK MESICNE' account frequency?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T2.frequency = 'POPLATEK MESICNE' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(DISTINCT T2.client_id) FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many accounts were opened by male clients?",
+    "sql": "SELECT COUNT(*) FROM account AS T1 INNER JOIN client AS T2 ON T1.client_id = T2.client_id WHERE T2.gender = 'M'",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t1.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the average payment amount for loans with status 'A'?",
+    "sql": "SELECT AVG(payments) FROM loan WHERE status = 'A'",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "How many orders were placed by clients from the district of Karlovy Vary?",
+    "sql": "SELECT COUNT(*) FROM order AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN district AS T3 ON T2.district_id = T3.district_id WHERE T3.a2 = 'Karlovy Vary'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the total amount of loans issued to clients over the age of 50?",
+    "sql": "SELECT SUM(T1.amount) FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN client AS T3 ON T2.client_id = T3.client_id WHERE EXTRACT(YEAR FROM AGE(NOW(), T3.birth_date)) > 50",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many loans were taken by male clients?",
+    "sql": "SELECT COUNT(*) FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN client AS T3 ON T2.client_id = T3.client_id WHERE T3.gender = 'M'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Calculate the maximum loan amount for each account type.",
+    "sql": "SELECT T1.type, MAX(T2.amount) FROM card AS T1 INNER JOIN loan AS T2 ON T1.account_id = T2.account_id GROUP BY T1.type",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.UndefinedColumn) column t1.account_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the total amount borrowed by clients with a gender of 'M'?",
+    "sql": "SELECT SUM(T1.amount) FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN client AS T3 ON T2.client_id = T3.client_id WHERE T3.gender = 'M'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Find the number of distinct accounts held by clients who have taken out more than one loan.",
+    "sql": "SELECT COUNT(DISTINCT T2.account_id) FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id GROUP BY T2.account_id HAVING COUNT(T1.loan_id) > 1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "List the account IDs and types of cards issued to clients in 'Liberec'.",
+    "sql": "SELECT T2.account_id, T4.type FROM district AS T1 INNER JOIN client AS T2 ON T1.district_id = T2.district_id INNER JOIN disp AS T3 ON T2.client_id = T3.client_id INNER JOIN card AS T4 ON T3.disp_id = T4.disp_id WHERE T1.a2 = 'Liberec'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.account_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "List the account IDs and frequencies of accounts opened in 'Ostrava' by male clients.",
+    "sql": "SELECT T2.account_id, T2.frequency FROM district AS T1 INNER JOIN account AS T2 ON T1.district_id = T2.district_id INNER JOIN client AS T3 ON T2.client_id = T3.client_id WHERE T1.a2 = 'Ostrava' AND T3.gender = 'M'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many distinct clients have both loans and orders?",
+    "sql": "SELECT COUNT(DISTINCT T3.client_id) FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN client AS T3 ON T2.client_id = T3.client_id INNER JOIN order AS T4 ON T2.account_id = T4.account_id",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Find the average loan amount for loans taken out by male clients.",
+    "sql": "SELECT AVG(T2.amount) FROM client AS T1 INNER JOIN loan AS T2 ON T1.client_id = T2.client_id WHERE T1.gender = 'M'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many distinct clients have more than 10 transactions?",
+    "sql": "SELECT COUNT(DISTINCT T1.client_id) FROM client AS T1 INNER JOIN trans AS T2 ON T1.client_id = T2.client_id GROUP BY T1.client_id HAVING COUNT(*) > 10",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many accounts were opened by clients under the age of 30?",
+    "sql": "SELECT COUNT(T2.account_id) FROM client AS T1 INNER JOIN account AS T2 ON T1.client_id = T2.client_id WHERE EXTRACT(YEAR FROM AGE(NOW(), T1.birth_date)) < 30",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Find the count of distinct clients who have both a savings and checking account.",
+    "sql": "SELECT COUNT(DISTINCT T1.client_id) FROM client AS T1 INNER JOIN account AS T2 ON T1.client_id = T2.client_id WHERE T2.frequency IN ('POPLATEK MESICNE', 'POPLATEK TYDNE') GROUP BY T1.client_id HAVING COUNT(DISTINCT T2.frequency) > 1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What percentage of loans were in the status 'A'?",
+    "sql": "SELECT CAST(SUM(CASE WHEN status = 'A' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(*) FROM loan",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "What percentage of districts have more than 50 accounts?",
+    "sql": "SELECT CAST(SUM(CASE WHEN COUNT(*) > 50 THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(*) FROM (SELECT district_id FROM account GROUP BY district_id) AS subquery",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the percentage increase in loan amounts from 1993 to 1994?",
+    "sql": "WITH loan_1993 AS (SELECT SUM(amount) AS sum_1993 FROM loan WHERE EXTRACT(YEAR FROM date) = 1993), loan_1994 AS (SELECT SUM(amount) AS sum_1994 FROM loan WHERE EXTRACT(YEAR FROM date) = 1994) SELECT ((loan_1994.sum_1994 - loan_1993.sum_1993) / loan_1993.sum_1993) * 100 AS percentage_increase",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.UndefinedTable) missing FROM-clause entry for table \"loan_1994\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What percentage of orders were made by female clients?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T3.gender = 'F' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(*) FROM account AS T1 INNER JOIN order AS T2 ON T1.account_id = T2.account_id INNER JOIN client AS T3 ON T3.client_id = T1.client_id",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Get the account ID of the oldest client.",
+    "sql": "SELECT T1.account_id FROM account AS T1 INNER JOIN client AS T2 ON T1.client_id = T2.client_id ORDER BY T2.birth_date ASC LIMIT 1",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t1.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "List the account IDs of clients whose birthday is in June.",
+    "sql": "SELECT T1.account_id FROM client AS T1 INNER JOIN disp AS T2 ON T1.client_id = T2.client_id WHERE EXTRACT(MONTH FROM T1.birth_date) = 6",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t1.account_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Find the count of orders placed by clients from 'Prague'.",
+    "sql": "SELECT COUNT(*) FROM client AS T1 INNER JOIN disp AS T2 ON T1.client_id = T2.client_id INNER JOIN order AS T3 ON T2.account_id = T3.account_id WHERE T1.district_id IN (SELECT district_id FROM district WHERE a3 = 'Prague')",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "List the account IDs of clients who have taken out more than one loan.",
+    "sql": "SELECT T1.account_id FROM loan AS T1 GROUP BY T1.account_id HAVING COUNT(T1.loan_id) > 1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "What is the average transaction amount for orders placed in the month of December 1998?",
+    "sql": "SELECT AVG(amount) AS avg_transaction_amount FROM order WHERE EXTRACT(MONTH FROM date) = 12 AND EXTRACT(YEAR FROM date) = 1998",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many distinct clients have applied for loans from accounts opened in the district of Rakovnik?",
+    "sql": "SELECT COUNT(DISTINCT T2.client_id) FROM district AS T1 INNER JOIN account AS T2 ON T1.district_id = T2.district_id INNER JOIN loan AS T3 ON T2.account_id = T3.account_id WHERE T1.a2 = 'Rakovnik'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many accounts have been opened by female clients born after 1970 and reside in the district of Brno - mesto?",
+    "sql": "SELECT COUNT(*) FROM district AS T1 INNER JOIN client AS T2 ON T1.district_id = T2.district_id INNER JOIN account AS T3 ON T2.client_id = T3.client_id WHERE T2.gender = 'F' AND EXTRACT(YEAR FROM AGE(NOW(), T2.birth_date)) > 40 AND T1.a2 = 'Brno - mesto'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedColumn) column t3.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Find the top 5 clients by total transaction amount.",
+    "sql": "SELECT T1.client_id, SUM(T3.amount) AS total_amount FROM client AS T1 INNER JOIN account AS T2 ON T1.client_id = T2.client_id INNER JOIN trans AS T3 ON T2.account_id = T3.account_id GROUP BY T1.client_id ORDER BY total_amount DESC LIMIT 5",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Who are the top 3 clients with the most orders?",
+    "sql": "SELECT T1.client_id, COUNT(*) AS order_count FROM client AS T1 INNER JOIN account AS T2 ON T1.client_id = T2.client_id INNER JOIN order AS T3 ON T2.account_id = T3.account_id GROUP BY T1.client_id ORDER BY order_count DESC LIMIT 3",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the total loan amount for each client ordered by their loan count?",
+    "sql": "SELECT T1.client_id, SUM(T4.amount) AS total_loan_amount, COUNT(*) AS loan_count FROM client AS T1 INNER JOIN account AS T2 ON T1.client_id = T2.client_id INNER JOIN loan AS T4 ON T2.account_id = T4.account_id GROUP BY T1.client_id ORDER BY loan_count",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Which clients have both an active loan and an open credit card?",
+    "sql": "SELECT T4.client_id FROM (SELECT DISTINCT T3.client_id FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN disp AS T3 ON T2.account_id = T3.account_id WHERE T1.status = 'A') AS T4 INNER JOIN (SELECT DISTINCT T3.client_id FROM card AS T1 INNER JOIN disp AS T3 ON T1.disp_id = T3.disp_id WHERE T1.type = 'credit') AS T5 ON T4.client_id = T5.client_id",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "List the names of clients whose loans have been paid off within their duration.",
+    "sql": "SELECT T1.gender, T1.birth_date FROM client AS T1 INNER JOIN disp AS T2 ON T1.client_id = T2.client_id INNER JOIN account AS T3 ON T2.account_id = T3.account_id INNER JOIN loan AS T4 ON T3.account_id = T4.account_id WHERE T4.duration = T4.payments",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "How many distinct bank transfers were made by clients who have a junior credit card?",
+    "sql": "SELECT COUNT(DISTINCT T1.account_to) FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN disp AS T3 ON T2.account_id = T3.account_id INNER JOIN card AS T4 ON T3.disp_id = T4.disp_id WHERE T4.type = 'junior'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t1.account_to does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Find the total number of orders placed by clients over the age of 50.",
+    "sql": "SELECT SUM(CASE WHEN EXTRACT(YEAR FROM AGE(CURRENT_DATE, T1.birth_date)) > 50 THEN 1 ELSE 0 END) AS total_orders FROM client AS T1 INNER JOIN disp AS T2 ON T1.client_id = T2.client_id INNER JOIN account AS T3 ON T2.account_id = T3.account_id INNER JOIN order AS T4 ON T3.account_id = T4.account_id",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Identify the most common bank used by clients with multiple credit cards.",
+    "sql": "SELECT T1.bank FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN disp AS T3 ON T2.account_id = T3.account_id INNER JOIN card AS T4 ON T3.disp_id = T4.disp_id WHERE T4.type = 'credit' GROUP BY T1.bank ORDER BY COUNT(*) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "What is the ratio of the total transaction amounts for accounts opened in Prague compared to other districts?",
+    "sql": "SELECT SUM(CASE WHEN T3.a3 = 'Prague' THEN T2.amount ELSE 0 END) / SUM(T2.amount) AS prague_ratio FROM district AS T3 INNER JOIN account AS T2 ON T3.district_id = T2.district_id INNER JOIN trans AS T2 ON T3.district_id = T2.district_id",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.DuplicateAlias) table name \"t2\" specified more than once",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the percentage of orders that have a non-empty k_symbol compared to all orders?",
+    "sql": "SELECT ROUND((COUNT(CASE WHEN k_symbol <> '' THEN 1 ELSE NULL END) * 100.0 / COUNT(*)), 2) AS non_empty_k_symbol_percentage FROM order",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the ratio of the total transaction amounts for accounts opened in the district with the highest number of accounts compared to the lowest?",
+    "sql": "WITH max_district AS (SELECT district_id FROM account GROUP BY district_id ORDER BY COUNT(*) DESC LIMIT 1), min_district AS (SELECT district_id FROM account GROUP BY district_id ORDER BY COUNT(*) ASC LIMIT 1) SELECT SUM(CASE WHEN T3.district_id = (SELECT district_id FROM max_district) THEN T2.amount ELSE 0 END) / SUM(CASE WHEN T3.district_id = (SELECT district_id FROM min_district) THEN T2.amount ELSE 0 END) AS district_amount_ratio FROM district AS T3 INNER JOIN account AS T2 ON T3.district_id = T2.district_id INNER JOIN trans AS T2 ON T3.district_id = T2.district_id",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.DuplicateAlias) table name \"t2\" specified more than once",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the total number of transactions made by clients from the 'Central Bohemia' region?",
+    "sql": "SELECT SUM(CASE WHEN T4.a3 = 'central Bohemia' THEN 1 ELSE 0 END) as total_transactions FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN client AS T3 ON T2.client_id = T3.client_id INNER JOIN district AS T4 ON T3.district_id = T4.district_id",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many orders were placed between 1996 and 1997?",
+    "sql": "SELECT COUNT(*) FROM order AS T1 WHERE date BETWEEN '1996-01-01' AND '1997-12-31'",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many distinct banks were involved in transactions made by female clients?",
+    "sql": "SELECT COUNT(DISTINCT T1.bank) FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN client AS T3 ON T2.client_id = T3.client_id WHERE T3.gender = 'F'",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Find the sum of all amounts in orders where the k_symbol is 'SIPO'.",
+    "sql": "SELECT SUM(amount) FROM order WHERE k_symbol = 'SIPO'",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the maximum amount of any single order placed?",
+    "sql": "SELECT MAX(amount) as max_order_amount FROM order",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many clients have more than one account?",
+    "sql": "SELECT COUNT(DISTINCT client_id) FROM account GROUP BY client_id HAVING COUNT(account_id) > 1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.UndefinedColumn) column \"client_id\" does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "List the account IDs and transaction dates for transactions made by clients in the 'Central Bohemia' region.",
+    "sql": "SELECT T1.account_id, T2.date FROM trans AS T1 INNER JOIN account AS T3 ON T1.account_id = T3.account_id INNER JOIN district AS T4 ON T3.district_id = T4.district_id WHERE T4.a3 = 'Central Bohemia'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedTable) missing FROM-clause entry for table \"t2\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "List the account IDs and the sum of their transaction amounts for accounts in the 'South Moravia' region.",
+    "sql": "SELECT T1.account_id, SUM(T1.amount) AS total_amount FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN district AS T3 ON T2.district_id = T3.district_id WHERE T3.a3 = 'South Moravia' GROUP BY T1.account_id",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "Find the top 5 districts by the total number of loans issued.",
+    "sql": "SELECT T2.a2, COUNT(*) as loan_count FROM loan AS T1 JOIN district AS T2 ON T2.district_id = T1.district_id GROUP BY T2.a2 ORDER BY loan_count DESC LIMIT 5",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column t1.district_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Find the maximum number of transactions per month for any given account.",
+    "sql": "SELECT MAX(COUNT(*)) FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id GROUP BY EXTRACT(YEAR FROM T1.date), EXTRACT(MONTH FROM T1.date)",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Which account has received the most deposits (PRIJEM) over the last year?",
+    "sql": "SELECT T2.account_id FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id WHERE T1.type = 'PRIJEM' AND T1.date >= CURRENT_DATE - INTERVAL '1 year' GROUP BY T2.account_id ORDER BY SUM(T1.amount) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "Which account has had the highest balance increase due to deposits (PRIJEM) over the past six months?",
+    "sql": "SELECT T2.account_id FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id WHERE T1.type = 'PRIJEM' AND T1.date >= CURRENT_DATE - INTERVAL '6 months' GROUP BY T2.account_id ORDER BY SUM(T1.balance) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "What is the ratio of loans to accounts in the district of Brno?",
+    "sql": "SELECT (COUNT(T3.loan_id)::FLOAT / COUNT(T2.account_id)) AS ratio FROM district AS T1 INNER JOIN account AS T2 ON T1.district_id = T2.district_id LEFT JOIN loan AS T3 ON T2.account_id = T3.account_id WHERE T1.a2 = 'Brno'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.DivisionByZero) division by zero",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the percentage of accounts in central Bohemia that have a balance greater than 10000?",
+    "sql": "SELECT ROUND((SUM(CASE WHEN T2.balance > 10000 THEN 1 ELSE 0 END) * 100.0 / COUNT(*)), 2) AS percent FROM district AS T1 INNER JOIN account AS T2 ON T1.district_id = T2.district_id WHERE T1.a3 = 'central Bohemia'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.balance does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the ratio of orders to transactions involving account ID 123?",
+    "sql": "SELECT (COUNT(T2.order_id)::FLOAT / COUNT(T1.trans_id)) AS ratio FROM trans AS T1 INNER JOIN order AS T2 ON T1.account_id = T2.account_id WHERE T1.account_id = 123",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many distinct banks are involved in the transactions made by client ID 123?",
+    "sql": "SELECT COUNT(DISTINCT bank) FROM trans WHERE client_id = 123",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "error": "(psycopg.errors.UndefinedColumn) column \"client_id\" does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the average payment amount for loans with a status of 'A'?",
+    "sql": "SELECT AVG(payments) FROM loan WHERE status = 'A'",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "What is the total amount spent by client ID 12345 on transactions in 1998?",
+    "sql": "SELECT SUM(amount) FROM trans WHERE client_id = 12345 AND EXTRACT(YEAR FROM date) = 1998",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "error": "(psycopg.errors.UndefinedColumn) column \"client_id\" does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Which client has taken the most loans and how many loans do they have?",
+    "sql": "SELECT T2.client_id, COUNT(*) AS loan_count FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id GROUP BY T2.client_id ORDER BY loan_count DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many transactions were made by clients under the age of 30?",
+    "sql": "SELECT COUNT(*) AS num_transactions FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN client AS T3 ON T2.client_id = T3.client_id WHERE EXTRACT(YEAR FROM AGE(NOW(), T3.birth_date)) < 30",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the maximum amount of money ever ordered by any client?",
+    "sql": "SELECT MAX(T1.amount) AS max_order_amount FROM order AS T1",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many orders were placed between January 1, 1995 and December 31, 1995?",
+    "sql": "SELECT COUNT(*) AS num_orders FROM order AS T1 WHERE T1.date BETWEEN '1995-01-01' AND '1995-12-31'",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the total number of transactions made by clients from the city of Karlovy Vary?",
+    "sql": "SELECT SUM(T1.amount) FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN client AS T3 ON T2.client_id = T3.client_id INNER JOIN district AS T4 ON T3.district_id = T4.district_id WHERE T4.a2 = 'Karlovy Vary'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many distinct clients have orders with a total value greater than 100,000?",
+    "sql": "SELECT COUNT(DISTINCT T3.client_id) FROM order AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN client AS T3 ON T2.client_id = T3.client_id GROUP BY T3.client_id HAVING SUM(T1.amount) > 100000",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "For each gender, find the average loan amount and the number of loans made.",
+    "sql": "SELECT T1.gender, AVG(T3.amount), COUNT(*) FROM client AS T1 INNER JOIN account AS T2 ON T1.client_id = T2.client_id INNER JOIN loan AS T3 ON T2.account_id = T3.account_id GROUP BY T1.gender",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Identify the top 3 clients with the highest total loan amount.",
+    "sql": "SELECT T2.client_id, SUM(T3.amount) as total_amount FROM account AS T2 INNER JOIN loan AS T3 ON T2.account_id = T3.account_id GROUP BY T2.client_id ORDER BY total_amount DESC LIMIT 3",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many distinct clients have at least one loan and one transaction?",
+    "sql": "SELECT COUNT(DISTINCT T2.client_id) FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN trans AS T3 ON T2.account_id = T3.account_id",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Rank the districts by the total number of orders placed within the last year.",
+    "sql": "SELECT T1.a2, COUNT(*) as total_orders FROM district AS T1 INNER JOIN account AS T2 ON T1.district_id = T2.district_id INNER JOIN order AS T3 ON T2.account_id = T3.account_id WHERE T3.date >= CURRENT_DATE - INTERVAL '1 year' GROUP BY T1.a2 ORDER BY total_orders DESC",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many orders were made by clients who are under 30 years old?",
+    "sql": "SELECT COUNT(*) FROM order AS T1 INNER JOIN client AS T2 ON T1.account_id = T2.account_id WHERE EXTRACT(YEAR FROM AGE(NOW(), T2.birth_date)) < 30",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many transactions were made by clients who are over 50 years old?",
+    "sql": "SELECT COUNT(*) FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN client AS T3 ON T2.client_id = T3.client_id WHERE EXTRACT(YEAR FROM AGE(NOW(), T3.birth_date)) > 50",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the total amount of money ordered by clients who have made more than 10 transactions?",
+    "sql": "SELECT SUM(T1.amount) FROM order AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id WHERE T2.account_id IN (SELECT account_id FROM trans GROUP BY account_id HAVING COUNT(*) > 10)",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many distinct clients have placed orders within the last month?",
+    "sql": "SELECT COUNT(DISTINCT client_id) FROM order WHERE date >= CURRENT_DATE - INTERVAL '1 month'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the ratio of the total loan amount to the average transaction amount?",
+    "sql": "SELECT SUM(amount) / AVG(amount) AS ratio FROM loan JOIN trans ON loan.account_id = trans.account_id",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.AmbiguousColumn) column reference \"amount\" is ambiguous",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the percentage of clients who have more than 50 transactions?",
+    "sql": "WITH client_transactions AS (SELECT client_id, COUNT(*) AS num_transactions FROM trans GROUP BY client_id HAVING COUNT(*) > 50) SELECT (CAST(COUNT(client_id) AS REAL) * 100) / NULLIF((SELECT COUNT(client_id) FROM client), 0) FROM client_transactions",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.UndefinedColumn) column \"client_id\" does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Total amount spent on transactions involving card type 'gold'.",
+    "sql": "SELECT SUM(T2.amount) AS total_spent FROM card AS T1 INNER JOIN trans AS T2 ON T1.card_id = T2.card_id WHERE T1.type = 'gold'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.card_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Number of different clients who have multiple gold cards.",
+    "sql": "SELECT COUNT(DISTINCT T1.client_id) FROM client AS T1 INNER JOIN disp AS T3 ON T1.client_id = T3.client_id INNER JOIN card AS T2 ON T3.disp_id = T2.disp_id WHERE T2.type = 'gold' GROUP BY T1.client_id HAVING COUNT(T2.card_id) > 1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "Maximum transaction amount made by clients with more than 2 accounts.",
+    "sql": "SELECT MAX(T2.amount) AS max_transaction FROM client AS T1 INNER JOIN account AS T2 ON T1.client_id = T2.client_id WHERE T1.client_id IN (SELECT client_id FROM account GROUP BY client_id HAVING COUNT(account_id) > 2)",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Count of distinct banks involved in transactions for accounts held by female clients.",
+    "sql": "SELECT COUNT(DISTINCT T2.bank) AS distinct_banks FROM client AS T1 INNER JOIN account AS T2 ON T1.client_id = T2.client_id INNER JOIN trans AS T3 ON T2.account_id = T3.account_id WHERE T1.gender = 'F'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Total number of transactions made by clients who have both a savings and checking account.",
+    "sql": "SELECT COUNT(DISTINCT T1.client_id) AS total_clients FROM client AS T1 INNER JOIN account AS T2 ON T1.client_id = T2.client_id INNER JOIN trans AS T3 ON T2.account_id = T3.account_id WHERE T1.client_id IN (SELECT client_id FROM account WHERE frequency IN ('POPLATEK MESICNE', 'POPLATEK TYDNE'))",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the total amount of loans made by clients from Prague?",
+    "sql": "SELECT SUM(T1.amount) FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN client AS T3 ON T2.client_id = T3.client_id INNER JOIN district AS T4 ON T3.district_id = T4.district_id WHERE T4.a3 = 'Prague'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Which districts have clients who have taken out loans with a payment amount greater than $10,000?",
+    "sql": "SELECT DISTINCT T2.district_id FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN disp AS T3 ON T2.account_id = T3.account_id WHERE T1.payments > 10000",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "How many distinct clients have orders with a non-empty k_symbol?",
+    "sql": "SELECT COUNT(DISTINCT T1.client_id) FROM client AS T1 INNER JOIN order AS T2 ON T1.client_id = T2.account_id WHERE T2.k_symbol <> ''",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the total balance of all transactions made by clients from the district of Karlovy Vary?",
+    "sql": "SELECT SUM(balance) FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN client AS T3 ON T2.client_id = T3.client_id INNER JOIN district AS T4 ON T3.district_id = T4.district_id WHERE T4.a2 = 'Karlovy Vary'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What are the top 3 types of cards issued by the bank in 1999?",
+    "sql": "SELECT type, COUNT(*) as card_count FROM card WHERE EXTRACT(YEAR FROM issued) = 1999 GROUP BY type ORDER BY card_count DESC LIMIT 3",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "What is the total number of loans made to clients who are over 50 years old?",
+    "sql": "SELECT SUM(T3.amount) FROM client AS T1 INNER JOIN account AS T2 ON T1.client_id = T2.client_id INNER JOIN loan AS T3 ON T2.account_id = T3.account_id WHERE EXTRACT(YEAR FROM AGE(NOW(), T1.birth_date)) > 50",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many distinct clients have placed orders within the last year?",
+    "sql": "SELECT COUNT(DISTINCT T1.client_id) FROM client AS T1 INNER JOIN account AS T2 ON T1.client_id = T2.client_id INNER JOIN order AS T3 ON T2.account_id = T3.account_id WHERE T3.date >= CURRENT_DATE - INTERVAL '1 year'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Calculate the average transaction amount for each gender group.",
+    "sql": "SELECT T1.gender, AVG(T3.amount) FROM client AS T1 INNER JOIN account AS T2 ON T1.client_id = T2.client_id INNER JOIN trans AS T3 ON T2.account_id = T3.account_id GROUP BY T1.gender",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Find the total amount of money spent by male clients who have made at least three transactions.",
+    "sql": "SELECT SUM(T3.amount) FROM client AS T1 INNER JOIN account AS T2 ON T1.client_id = T2.client_id INNER JOIN trans AS T3 ON T2.account_id = T3.account_id WHERE T1.gender = 'M' GROUP BY T1.client_id HAVING COUNT(T3.trans_id) >= 3",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many accounts have been opened by clients who have taken out a loan?",
+    "sql": "SELECT COUNT(DISTINCT T2.account_id) FROM client AS T1 INNER JOIN account AS T2 ON T1.client_id = T2.client_id INNER JOIN loan AS T3 ON T2.account_id = T3.account_id",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many unique clients have placed orders that involve transferring money between different accounts?",
+    "sql": "SELECT COUNT(DISTINCT T1.client_id) FROM client AS T1 INNER JOIN account AS T2 ON T1.client_id = T2.client_id INNER JOIN order AS T3 ON T2.account_id = T3.account_id WHERE T3.account_to IS NOT NULL",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the ratio of orders made to 'MN' bank to those made to 'YZ' bank?",
+    "sql": "SELECT SUM(CASE WHEN bank_to = 'MN' THEN 1 ELSE 0 END) * 1.0 / SUM(CASE WHEN bank_to = 'YZ' THEN 1 ELSE 0 END) AS mn_yz_ratio FROM order",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the total value of orders placed by accounts in district 7?",
+    "sql": "SELECT SUM(T4.amount) FROM district AS T1 INNER JOIN account AS T2 ON T1.district_id = T2.district_id INNER JOIN order AS T4 ON T2.account_id = T4.account_id WHERE T1.district_id = 7",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many distinct clients have accounts in district 10?",
+    "sql": "SELECT COUNT(DISTINCT T2.client_id) FROM district AS T1 INNER JOIN account AS T2 ON T1.district_id = T2.district_id WHERE T1.district_id = 10",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many clients have more than one account in district 2?",
+    "sql": "SELECT COUNT(client_id) FROM (SELECT client_id FROM account WHERE district_id = 2 GROUP BY client_id HAVING COUNT(account_id) > 1)",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "error": "(psycopg.errors.SyntaxError) subquery in FROM must have an alias",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the total number of transactions made by each type?",
+    "sql": "SELECT type, COUNT(*) as total_transactions FROM trans GROUP BY type;",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "What is the total sum of all orders made to each bank?",
+    "sql": "SELECT bank_to, SUM(amount) as total_amount FROM order GROUP BY bank_to;",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Which card was issued first to a client who opened their account in the district with the highest average transaction amount?",
+    "sql": "SELECT T5.type FROM district AS T1 INNER JOIN client AS T2 ON T1.district_id = T2.district_id INNER JOIN disp AS T3 ON T2.client_id = T3.client_id INNER JOIN account AS T4 ON T3.account_id = T4.account_id INNER JOIN card AS T5 ON T3.disp_id = T5.disp_id ORDER BY (SELECT SUM(T6.amount) FROM trans AS T6 WHERE T6.account_id = T4.account_id) DESC NULLS LAST, T5.issued ASC NULLS FIRST LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.QueryCanceled) canceling statement due to statement timeout",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many unique clients have cards issued by the bank 'ST'?",
+    "sql": "SELECT COUNT(DISTINCT T2.client_id) FROM card AS T1 INNER JOIN disp AS T2 ON T1.disp_id = T2.disp_id WHERE T1.bank = 'ST'",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedColumn) column t1.bank does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many loans were made to accounts that have been active for more than 5 years?",
+    "sql": "SELECT COUNT(*) FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id WHERE date_part('year', AGE(date)) > 5",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.AmbiguousColumn) column reference \"date\" is ambiguous",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the total number of transactions made by female clients in 1998?",
+    "sql": "SELECT SUM(T3.amount) FROM client AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN trans AS T3 ON T2.account_id = T3.account_id WHERE T1.gender = 'F' AND EXTRACT(YEAR FROM T3.date) = 1998",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column t1.account_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many orders were placed by male clients in 1997?",
+    "sql": "SELECT COUNT(T1.order_id) FROM client AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN order AS T3 ON T2.account_id = T3.account_id WHERE T1.gender = 'M' AND EXTRACT(YEAR FROM T3.date) = 1997",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the total amount of money transferred between accounts within the same district in 1998?",
+    "sql": "SELECT SUM(T3.amount) FROM district AS T2 INNER JOIN account AS T1 ON T2.district_id = T1.district_id INNER JOIN trans AS T3 ON T1.account_id = T3.account_id WHERE T3.bank_to IN (SELECT T2.a3 FROM district AS T2 INNER JOIN account AS T1 ON T2.district_id = T1.district_id INNER JOIN trans AS T3 ON T1.account_id = T3.account_id)",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column t3.bank_to does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "List the top 3 districts with the highest number of loans with a status of 'A'.",
+    "sql": "SELECT T2.a3, COUNT(T1.loan_id) as loan_count FROM loan AS T1 INNER JOIN district AS T2 ON T1.account_id = T2.account_id WHERE T1.status = 'A' GROUP BY T2.a3 ORDER BY loan_count DESC LIMIT 3",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.account_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many transactions were made by clients whose birthday is in the first quarter of 1997?",
+    "sql": "SELECT COUNT(T3.trans_id) FROM client AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN trans AS T3 ON T2.account_id = T3.account_id WHERE EXTRACT(MONTH FROM T1.birth_date) BETWEEN 1 AND 3 AND EXTRACT(YEAR FROM T1.birth_date) = 1997",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column t1.account_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many male clients have taken out more than one loan?",
+    "sql": "SELECT COUNT(DISTINCT T1.client_id) FROM client AS T1 INNER JOIN loan AS T2 ON T1.client_id = T2.client_id WHERE T1.gender = 'M'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the total number of transactions made by accounts that belong to clients who were born after 1960?",
+    "sql": "SELECT COUNT(*) FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN client AS T3 ON T2.client_id = T3.client_id WHERE T3.birth_date > '1960-12-31'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many female clients have a total transaction amount greater than 100,000 USD?",
+    "sql": "SELECT COUNT(DISTINCT T1.client_id) FROM client AS T1 INNER JOIN account AS T2 ON T1.client_id = T2.client_id INNER JOIN trans AS T3 ON T2.account_id = T3.account_id WHERE T1.gender = 'F' GROUP BY T1.client_id HAVING SUM(T3.amount) > 100000",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many distinct clients have taken out at least three different types of cards?",
+    "sql": "SELECT COUNT(DISTINCT T1.client_id) FROM client AS T1 INNER JOIN disp AS T2 ON T1.client_id = T2.client_id INNER JOIN card AS T3 ON T2.disp_id = T3.disp_id GROUP BY T1.client_id HAVING COUNT(DISTINCT T3.type) >= 3",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "What is the percentage of orders made by male clients?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T2.gender = 'M' THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM order AS T1 INNER JOIN client AS T2 ON T1.account_id = T2.account_id",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the percentage of female clients among those who opened accounts in the last month?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T1.gender = 'F' THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM client AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id WHERE T2.date >= CURRENT_DATE - INTERVAL '1 month'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.UndefinedColumn) column t1.account_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the total amount spent by client number 101?",
+    "sql": "SELECT SUM(T2.amount) FROM client AS T1 INNER JOIN trans AS T2 ON T1.client_id = T2.client_id WHERE T1.client_id = 101",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many different banks are involved in transactions made by client number 54?",
+    "sql": "SELECT COUNT(DISTINCT T2.bank) FROM client AS T1 INNER JOIN trans AS T2 ON T1.client_id = T2.client_id WHERE T1.client_id = 54",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the total number of transactions made by clients from Prague?",
+    "sql": "SELECT SUM(CASE WHEN T1.a3 = 'Prague' THEN 1 ELSE 0 END) as total_transactions FROM district AS T1 INNER JOIN client AS T2 ON T1.district_id = T2.district_id INNER JOIN trans AS T3 ON T2.client_id = T3.client_id",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.UndefinedColumn) column t3.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the average age of male clients from Brno?",
+    "sql": "SELECT AVG(EXTRACT(YEAR FROM AGE(birth_date))) as avg_age FROM client WHERE gender = 'M' AND a2 = 'Brno'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.UndefinedColumn) column \"a2\" does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Find the district(s) with the highest number of transactions.",
+    "sql": "SELECT T1.a2 as district, COUNT(*) as num_transactions FROM district AS T1 INNER JOIN client AS T2 ON T1.district_id = T2.district_id INNER JOIN trans AS T3 ON T2.client_id = T3.client_id GROUP BY T1.a2 ORDER BY num_transactions DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.UndefinedColumn) column t3.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Find the average transaction amount for each month in 1997.",
+    "sql": "SELECT EXTRACT(YEAR_MONTH FROM T3.date) AS month, AVG(T3.amount) AS avg_amount FROM account AS T1 INNER JOIN trans AS T3 ON T1.account_id = T3.account_id WHERE EXTRACT(YEAR FROM T3.date) = 1997 GROUP BY month",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.InvalidParameterValue) unit \"year_month\" not recognized for type date",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Which clients have taken out more than one loan and how many loans do they have?",
+    "sql": "SELECT T3.client_id, COUNT(T2.loan_id) AS num_loans FROM account AS T1 INNER JOIN loan AS T2 ON T1.account_id = T2.account_id INNER JOIN disp AS T4 ON T1.account_id = T4.account_id INNER JOIN client AS T3 ON T4.client_id = T3.client_id GROUP BY T3.client_id HAVING COUNT(T2.loan_id) > 1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "Calculate the total loan amount for each district where the loan status is 'A'.",
+    "sql": "SELECT T2.a3, SUM(T2.amount) AS total_loan_amount FROM account AS T1 INNER JOIN loan AS T2 ON T1.account_id = T2.account_id INNER JOIN district AS T2 ON T1.district_id = T2.district_id WHERE T2.status = 'A' GROUP BY T2.a3",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.DuplicateAlias) table name \"t2\" specified more than once",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Which client has the earliest birth date among those who opened their account in 'Olomouc'?",
+    "sql": "SELECT T2.client_id, MIN(T2.birth_date) AS earliest_birth_date FROM account AS T1 INNER JOIN client AS T2 ON T1.client_id = T2.client_id INNER JOIN district AS T3 ON T1.district_id = T3.district_id WHERE T3.a2 = 'Olomouc'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column t1.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Find the gender distribution among clients whose accounts were opened in the year 1994.",
+    "sql": "SELECT T2.gender, COUNT(*) AS count FROM account AS T1 INNER JOIN client AS T2 ON T1.client_id = T2.client_id WHERE EXTRACT(YEAR FROM T1.date) = 1994 GROUP BY T2.gender",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column t1.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Retrieve the top 3 clients with the highest number of transactions.",
+    "sql": "SELECT T2.client_id, COUNT(*) AS transaction_count FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id GROUP BY T2.client_id ORDER BY transaction_count DESC LIMIT 3",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many clients from the Prachatice district have more than one account?",
+    "sql": "SELECT COUNT(DISTINCT T1.client_id) FROM client AS T1 INNER JOIN account AS T2 ON T1.client_id = T2.client_id INNER JOIN district AS T3 ON T1.district_id = T3.district_id WHERE T3.a2 = 'Prachatice' GROUP BY T1.client_id HAVING COUNT(T2.account_id) > 1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the average number of transactions per month for accounts owned by male clients?",
+    "sql": "SELECT AVG(COUNT(*)) FROM (SELECT T2.account_id FROM client AS T1 INNER JOIN disp AS T2 ON T1.client_id = T2.client_id INNER JOIN trans AS T3 ON T2.account_id = T3.account_id WHERE T1.gender = 'M' GROUP BY T2.account_id) AS T4",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the maximum number of transactions per day for any account?",
+    "sql": "SELECT MAX(COUNT(*)) FROM (SELECT T2.account_id, T3.date FROM account AS T2 INNER JOIN trans AS T3 ON T2.account_id = T3.account_id GROUP BY T2.account_id, T3.date) AS T4",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What percentage of orders were made using bank transfer?",
+    "sql": "SELECT (COUNT(*) FILTER (WHERE bank_to IS NOT NULL) * 100.0 / COUNT(*)) AS bank_transfer_percentage FROM order",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the ratio of the total amount of money borrowed from loans to the total amount of money spent on orders?",
+    "sql": "SELECT (SUM(amount) FROM loan)::FLOAT / SUM(amount) FROM order",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "reject_reason": "не парсится"
+  },
+  {
+    "question": "What is the ratio of the total number of transactions made by female clients to the total number of transactions made by male clients?",
+    "sql": "SELECT (COUNT(*) FILTER (WHERE T1.gender = 'F')::FLOAT / COUNT(*) FILTER (WHERE T1.gender = 'M')) AS female_male_transaction_ratio FROM client AS T1 INNER JOIN trans AS T2 ON T1.client_id = T2.client_id",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Calculate the average age of clients who have more than 5 accounts.",
+    "sql": "SELECT AVG(EXTRACT(YEAR FROM AGE(NOW(), T3.birth_date))) AS avg_age FROM account AS T1 INNER JOIN client AS T3 ON T1.client_id = T3.client_id GROUP BY T3.client_id HAVING COUNT(T1.account_id) > 5",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.UndefinedColumn) column t1.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Find the total number of distinct banks involved in transactions made by clients from Prague.",
+    "sql": "SELECT COUNT(DISTINCT T4.bank) AS distinct_banks FROM client AS T3 INNER JOIN account AS T1 ON T3.client_id = T1.client_id INNER JOIN trans AS T4 ON T1.account_id = T4.account_id INNER JOIN district AS T2 ON T1.district_id = T2.district_id WHERE T2.a3 = 'Prague'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.UndefinedColumn) column t1.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many different districts have clients who have issued more than 10 cards?",
+    "sql": "SELECT COUNT(DISTINCT T2.district_id) AS distinct_districts FROM card AS T1 INNER JOIN disp AS T2 ON T1.disp_id = T2.disp_id GROUP BY T2.client_id HAVING COUNT(T1.card_id) > 10",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.district_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Find the names of all districts that have issued more than 500 cards.",
+    "sql": "SELECT T4.a2 FROM card AS T1 INNER JOIN disp AS T2 ON T1.disp_id = T2.disp_id INNER JOIN account AS T3 ON T2.account_id = T3.account_id INNER JOIN district AS T4 ON T3.district_id = T4.district_id GROUP BY T4.district_id HAVING COUNT(T1.card_id) > 500",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "Calculate the total amount of money transferred between different accounts within the same district.",
+    "sql": "SELECT SUM(T3.amount) FROM trans AS T3 INNER JOIN account AS T4 ON T3.account_id = T4.account_id INNER JOIN district AS T5 ON T4.district_id = T5.district_id WHERE T3.account_to IS NOT NULL AND T3.bank != 'OWN'",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedColumn) column t3.account_to does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Which client has made the most transactions in the year 2000?",
+    "sql": "SELECT T1.client_id, COUNT(*) as transaction_count FROM client AS T1 INNER JOIN account AS T2 ON T1.client_id = T2.client_id INNER JOIN trans AS T3 ON T2.account_id = T3.account_id WHERE EXTRACT(YEAR FROM T3.date) = 2000 GROUP BY T1.client_id ORDER BY transaction_count DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "List the top 5 clients who have taken out loans with the longest duration.",
+    "sql": "SELECT T1.client_id, T1.duration FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN client AS T3 ON T2.client_id = T3.client_id ORDER BY T1.duration DESC LIMIT 5",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Which district had the highest total transaction volume in the year 2001?",
+    "sql": "SELECT T2.a2, SUM(T4.amount) as total_volume FROM trans AS T4 INNER JOIN account AS T3 ON T4.account_id = T3.account_id INNER JOIN district AS T2 ON T3.district_id = T2.district_id WHERE EXTRACT(YEAR FROM T4.date) = 2001 GROUP BY T2.a2 ORDER BY total_volume DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "Identify the top 3 clients with the highest total loan payment made.",
+    "sql": "SELECT T3.client_id, SUM(T1.payments) as total_payments FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN client AS T3 ON T2.client_id = T3.client_id GROUP BY T3.client_id ORDER BY total_payments DESC LIMIT 3",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Which client has the largest difference between the maximum and minimum transaction amounts?",
+    "sql": "SELECT T1.client_id, MAX(T4.amount) - MIN(T4.amount) as diff_amount FROM client AS T1 INNER JOIN account AS T2 ON T1.client_id = T2.client_id INNER JOIN trans AS T4 ON T2.account_id = T4.account_id GROUP BY T1.client_id ORDER BY diff_amount DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many distinct orders were placed by female clients between the years 1995 and 2000?",
+    "sql": "SELECT COUNT(DISTINCT T2.order_id) FROM client AS T1 INNER JOIN order AS T2 ON T1.client_id = T2.account_id WHERE T1.gender = 'F' AND EXTRACT(YEAR FROM T2.date) BETWEEN 1995 AND 2000",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Which client has the highest total transaction amount for all transactions in 1997?",
+    "sql": "SELECT T1.client_id, SUM(T1.amount) AS total_amount FROM client AS T1 INNER JOIN trans AS T2 ON T1.client_id = T2.account_id WHERE EXTRACT(YEAR FROM T2.date) = 1997 GROUP BY T1.client_id ORDER BY total_amount DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t1.amount does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Find the count of distinct accounts that have been involved in at least two transactions in 1998.",
+    "sql": "SELECT COUNT(DISTINCT T2.account_id) FROM trans AS T2 WHERE EXTRACT(YEAR FROM T2.date) = 1998 GROUP HAVING COUNT(DISTINCT T2.trans_id) >= 2",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "reject_reason": "не парсится"
+  },
+  {
+    "question": "Calculate the sum of loan amounts for each loan status in the 'Central Bohemia' region.",
+    "sql": "SELECT T3.status, SUM(T3.amount) AS total_amount FROM client AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id INNER JOIN loan AS T3 ON T1.client_id = T3.account_id WHERE T2.a3 = 'Central Bohemia' GROUP BY T3.status",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "What percentage of clients in Prague have more than one account?",
+    "sql": "SELECT ROUND(SUM(CASE WHEN (SELECT COUNT(*) FROM account AS T2 WHERE T2.client_id = T1.client_id) > 1 THEN 1 ELSE 0 END)::FLOAT * 100 / COUNT(T1.client_id)) AS percentage FROM client AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id WHERE T2.a3 = 'Prague'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the ratio of gold cards to junior cards among all active cards?",
+    "sql": "SELECT ROUND((SUM(CASE WHEN T1.type = 'gold' THEN 1 ELSE 0 END) / SUM(CASE WHEN T1.type = 'junior' THEN 1 ELSE 0 END))::FLOAT, 2) AS ratio FROM card AS T1",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.UndefinedFunction) function round(double precision, integer) does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the ratio of loans made to accounts opened in the year 1997 compared to those opened in the year 1996?",
+    "sql": "SELECT ROUND((SUM(CASE WHEN EXTRACT(YEAR FROM T2.date) = 1997 THEN 1 ELSE 0 END) / SUM(CASE WHEN EXTRACT(YEAR FROM T2.date) = 1996 THEN 1 ELSE 0 END))::FLOAT, 2) AS ratio FROM account AS T2 LEFT JOIN loan AS T1 ON T2.account_id = T1.account_id",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.UndefinedFunction) function round(double precision, integer) does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What percentage of accounts with an average transaction amount greater than 5000 have a junior card?",
+    "sql": "SELECT ROUND(SUM(CASE WHEN AVG(T3.amount) > 5000 THEN 1 ELSE 0 END)::FLOAT * 100 / COUNT(DISTINCT T2.account_id)) AS percentage FROM card AS T1 INNER JOIN disp AS T2 ON T1.disp_id = T2.disp_id INNER JOIN trans AS T3 ON T2.account_id = T3.account_id WHERE T1.type = 'junior'",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the ratio of accounts opened by female clients to those opened by male clients?",
+    "sql": "SELECT ROUND((COUNT(CASE WHEN T1.gender = 'F' THEN 1 ELSE NULL END) / COUNT(CASE WHEN T1.gender = 'M' THEN 1 ELSE NULL END))::FLOAT, 2) AS ratio FROM client AS T1 INNER JOIN account AS T2 ON T1.client_id = T2.client_id",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What percentage of accounts that have received a loan also have a gold card?",
+    "sql": "SELECT ROUND(SUM(CASE WHEN EXISTS (SELECT 1 FROM loan AS T2 WHERE T2.account_id = T1.account_id) THEN 1 ELSE 0 END)::FLOAT * 100 / COUNT(DISTINCT T1.account_id)) AS percentage FROM card AS T1 INNER JOIN disp AS T2 ON T1.disp_id = T2.disp_id",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.UndefinedColumn) column t1.account_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the ratio of accounts with a balance less than 0 to those with a balance greater than or equal to 0?",
+    "sql": "SELECT ROUND((SUM(CASE WHEN T1.balance < 0 THEN 1 ELSE 0 END) / SUM(CASE WHEN T1.balance >= 0 THEN 1 ELSE 0 END))::FLOAT, 2) AS ratio FROM trans AS T1",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "error": "(psycopg.errors.UndefinedFunction) function round(double precision, integer) does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many distinct accounts had orders placed between 1998-01-01 and 1998-12-31?",
+    "sql": "SELECT COUNT(DISTINCT T1.account_id) FROM account AS T1 JOIN order AS T2 ON T1.account_id = T2.account_id WHERE T2.date BETWEEN '1998-01-01' AND '1998-12-31'",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "error": "(psycopg.errors.SyntaxError) syntax error at or near \"order\"",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "How many different clients made transactions involving exactly 1000 USD in 1998?",
+    "sql": "SELECT COUNT(DISTINCT T1.client_id) FROM client AS T1 JOIN disp AS T2 ON T1.client_id = T2.client_id JOIN trans AS T3 ON T2.disp_id = T3.disp_id WHERE T3.amount = 1000 AND EXTRACT(YEAR FROM T3.date) = 1998",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "simple lookups with a WHERE filter",
+    "error": "(psycopg.errors.UndefinedColumn) column t3.disp_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "Number of accounts with a frequency of 'POPLATEK MESICNE'.",
+    "sql": "SELECT COUNT(*) FROM account WHERE frequency = 'POPLATEK MESICNE';",
+    "difficulty": "simple",
+    "db_id": "financial",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "What is the total amount of loans for accounts held by female clients?",
+    "sql": "SELECT SUM(T2.amount) FROM client AS T1 INNER JOIN account AS T3 ON T1.client_id = T3.client_id INNER JOIN loan AS T2 ON T3.account_id = T2.account_id WHERE T1.gender = 'F'",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedColumn) column t3.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the total number of loans taken out by clients who are over 60 years old?",
+    "sql": "SELECT SUM(T2.amount) FROM client AS T1 INNER JOIN account AS T3 ON T1.client_id = T3.client_id INNER JOIN loan AS T2 ON T3.account_id = T2.account_id WHERE EXTRACT(YEAR FROM AGE(CURRENT_DATE, T1.birth_date)) > 60",
+    "difficulty": "moderate",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedColumn) column t3.client_id does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "List the client IDs of all clients who have both an active loan and a transaction on their account in 2022.",
+    "sql": "SELECT T1.client_id FROM client AS T1 INNER JOIN account AS T2 ON T1.client_id = T2.client_id INNER JOIN loan AS T3 ON T2.account_id = T3.account_id INNER JOIN trans AS T4 ON T2.account_id = T4.account_id WHERE T3.status = 'A' AND EXTRACT(YEAR FROM T4.date) = 2022",
+    "difficulty": "challenging",
+    "db_id": "financial",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "error": "(psycopg.errors.UndefinedColumn) column t2.client_id does not exist",
+    "reject_reason": "не исполняется"
   }
 ]

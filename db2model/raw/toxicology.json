@@ -1342,5 +1342,3428 @@
     "difficulty": "simple",
     "db_id": "toxicology",
     "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "What is the count of molecules with the label '+'?",
+    "sql": "SELECT COUNT(*) FROM molecule WHERE label = '+'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "How many molecules contain the element carbon?",
+    "sql": "SELECT COUNT(DISTINCT T1.molecule_id) FROM atom AS T1 WHERE T1.element = 'c'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Find the number of bonds of type '=' in molecules with the label '-'.",
+    "sql": "SELECT COUNT(*) FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '-' AND T1.bond_type = '='",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "How many distinct molecules have exactly three bonds?",
+    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id HAVING COUNT(T1.bond_id) = 3",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "List all elements present in molecules labeled as '-'",
+    "sql": "SELECT DISTINCT T1.element FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '-'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Count the number of molecules with exactly four atoms.",
+    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id HAVING COUNT(T1.atom_id) = 4",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Find how many molecules have at least one bond of type '#'.",
+    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.bond_type = '#'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "How many molecules have more than five bonds?",
+    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id HAVING COUNT(T1.bond_id) > 5",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "What is the total number of bonds of type '-' for each molecule?",
+    "sql": "SELECT T2.molecule_id, COUNT(*) as total_bonds FROM bond AS T2 WHERE T2.bond_type = '-' GROUP BY T2.molecule_id",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Find the average number of bonds per molecule.",
+    "sql": "SELECT AVG(total_bonds) as avg_bonds_per_molecule FROM (SELECT T2.molecule_id, COUNT(*) as total_bonds FROM bond AS T2 GROUP BY T2.molecule_id) AS subquery",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Which molecules have more than 50 bonds?",
+    "sql": "SELECT T2.molecule_id FROM bond AS T2 GROUP BY T2.molecule_id HAVING COUNT(T2.bond_id) > 50",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Calculate the sum of bond lengths for all bonds of type '='.",
+    "sql": "SELECT SUM(T2.length) as total_length FROM bond AS T2 WHERE T2.bond_type = '='",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "What is the maximum number of bonds any single molecule has?",
+    "sql": "SELECT MAX(total_bonds) as max_bonds FROM (SELECT T2.molecule_id, COUNT(*) as total_bonds FROM bond AS T2 GROUP BY T2.molecule_id) AS subquery",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Count the number of molecules that have exactly three bonds of type '#'.",
+    "sql": "SELECT COUNT(*) FROM (SELECT T2.molecule_id FROM bond AS T2 WHERE T2.bond_type = '#' GROUP BY T2.molecule_id HAVING COUNT(T2.bond_id) = 3) AS subquery",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Find the average number of bonds per molecule that are of type '-'.",
+    "sql": "SELECT AVG(total_bonds) as avg_minus_bonds_per_molecule FROM (SELECT T2.molecule_id, COUNT(*) as total_bonds FROM bond AS T2 WHERE T2.bond_type = '-' GROUP BY T2.molecule_id) AS subquery",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "List all molecules with more than 20 atoms.",
+    "sql": "SELECT T2.molecule_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id HAVING COUNT(T1.atom_id) > 20",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Which molecules have both single and double bonds?",
+    "sql": "SELECT DISTINCT T2.molecule_id FROM connected AS T1 INNER JOIN bond AS T3 ON T1.bond_id = T3.bond_id INNER JOIN molecule AS T2 ON T3.molecule_id = T2.molecule_id WHERE T3.bond_type IN ('-', '=')",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "List all atoms in the molecule 'TR006' and their respective elements.",
+    "sql": "SELECT T1.atom_id, T1.element FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.molecule_id = 'TR006'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Find the number of distinct molecules containing atoms of carbon and hydrogen.",
+    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element IN ('c', 'h')",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "What is the total number of bonds in the molecule 'TR006'?",
+    "sql": "SELECT COUNT(*) FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.molecule_id = 'TR006'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Identify molecules that contain at least one nitrogen atom and have a positive label.",
+    "sql": "SELECT DISTINCT T2.molecule_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'n' AND T2.label = '+'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "List all atoms connected to 'TR000_1' and their bond types.",
+    "sql": "SELECT T1.atom_id, T3.bond_type FROM connected AS T1 INNER JOIN bond AS T3 ON T1.bond_id = T3.bond_id WHERE T1.atom_id = 'TR000_1'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "How many unique molecules have exactly three different bond types?",
+    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id HAVING COUNT(DISTINCT T1.bond_type) = 3",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Find the most common bond type among all molecules.",
+    "sql": "SELECT bond_type FROM bond GROUP BY bond_type ORDER BY COUNT(*) DESC LIMIT 1",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Which molecule has the most bonds?",
+    "sql": "SELECT T1.molecule_id FROM molecule AS T1 JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id ORDER BY COUNT(T2.bond_id) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "What is the total number of bonds per molecule type?",
+    "sql": "SELECT T1.label, COUNT(T2.bond_id) AS total_bonds FROM molecule AS T1 JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.label",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "List the top 5 molecules with the highest number of connected atoms.",
+    "sql": "SELECT T1.molecule_id, COUNT(T2.atom_id) AS num_atoms FROM molecule AS T1 JOIN connected AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id ORDER BY num_atoms DESC LIMIT 5",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Find the average number of bonds per molecule that contains the element carbon.",
+    "sql": "SELECT AVG(num_bonds) FROM (SELECT COUNT(*) AS num_bonds FROM molecule AS T1 JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id JOIN connected AS T3 ON T2.bond_id = T3.bond_id JOIN atom AS T4 ON T3.atom_id = T4.atom_id WHERE T4.element = 'c') AS subquery",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "How many molecules contain at least three different elements?",
+    "sql": "SELECT COUNT(DISTINCT T1.molecule_id) FROM molecule AS T1 JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id HAVING COUNT(DISTINCT T2.element) >= 3",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Rank molecules by their number of bonds, but exclude those without any bonds.",
+    "sql": "SELECT T1.molecule_id, COUNT(T2.bond_id) AS num_bonds FROM molecule AS T1 LEFT JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.bond_id IS NOT NULL GROUP BY T1.molecule_id ORDER BY num_bonds DESC",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "What are the labels of molecules that have exactly two distinct bond types?",
+    "sql": "SELECT T1.label FROM molecule AS T1 JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.label HAVING COUNT(DISTINCT T2.bond_type) = 2",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Find the molecule with the highest degree of connectivity (number of unique connected atoms).",
+    "sql": "SELECT T1.molecule_id, COUNT(DISTINCT T3.atom_id) AS degree_of_connectivity FROM molecule AS T1 JOIN connected AS T2 ON T1.molecule_id = T2.molecule_id JOIN atom AS T3 ON T2.atom_id = T3.atom_id GROUP BY T1.molecule_id ORDER BY degree_of_connectivity DESC LIMIT 1",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Among the molecules with a bond type of '#', what is the count of distinct molecule IDs?",
+    "sql": "SELECT COUNT(DISTINCT molecule_id) FROM bond WHERE bond_type = '#'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "What is the total number of molecules with a label of '+' that have at least one bond of type '='?",
+    "sql": "SELECT SUM(CASE WHEN T2.bond_type = '=' THEN 1 ELSE 0 END) FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.label = '+'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Among the molecules with a bond type of '-', find those with exactly two atoms.",
+    "sql": "SELECT DISTINCT T1.molecule_id FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.bond_type = '-' GROUP BY T1.molecule_id HAVING COUNT(T2.bond_id) = 2",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "How many unique molecules contain at least one atom of type 's'?",
+    "sql": "SELECT COUNT(DISTINCT molecule_id) FROM atom WHERE element = 's'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Find the number of molecules that have both a single bond ('-') and a double bond ('=').",
+    "sql": "SELECT COUNT(*) FROM (SELECT molecule_id FROM bond WHERE bond_type = '-' INTERSECT SELECT molecule_id FROM bond WHERE bond_type = '=') AS shared_bonds",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Among molecules with a bond type of '=', calculate the average number of atoms per molecule.",
+    "sql": "SELECT AVG(COUNT(*)) OVER () FROM (SELECT T1.molecule_id, T2.atom_id FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.bond_type = '=') AS bonded_atoms",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "How many molecules have exactly three atoms of any element?",
+    "sql": "SELECT COUNT(DISTINCT molecule_id) FROM atom GROUP BY molecule_id HAVING COUNT(*) = 3",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Calculate the total number of bonds for each molecule type ('-', '=', '#'), excluding molecules with a label of '-'",
+    "sql": "SELECT T1.bond_type, COUNT(*) FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label != '-' GROUP BY T1.bond_type",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "What is the percentage of molecules labeled '+' among all molecules?",
+    "sql": "SELECT CAST(SUM(CASE WHEN label = '+' THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM molecule",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "Among the molecules between TR004 to TR010, what is the ratio of molecules with double bonds to those with single bonds?",
+    "sql": "SELECT SUM(CASE WHEN T.bond_type = '=' THEN 1 ELSE 0 END) * 1.0 / SUM(CASE WHEN T.bond_type = '-' THEN 1 ELSE 0 END) AS ratio FROM bond AS T WHERE T.molecule_id BETWEEN 'TR004' AND 'TR010'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "How many molecules contain at least one carbon atom?",
+    "sql": "SELECT COUNT(DISTINCT T1.molecule_id) FROM atom AS T1 WHERE T1.element = 'c'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What percentage of atoms in the molecule 'TR041' are oxygen elements?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T2.element = 'o' THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.molecule_id = 'TR041'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "How many molecules have more than three atoms bonded together?",
+    "sql": "SELECT COUNT(DISTINCT T1.molecule_id) FROM connected AS T1 GROUP BY T1.molecule_id HAVING COUNT(*) > 3",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What is the ratio of atoms bonded by single bonds to those bonded by double bonds?",
+    "sql": "SELECT SUM(CASE WHEN T.bond_type = '-' THEN 1 ELSE 0 END) * 1.0 / SUM(CASE WHEN T.bond_type = '=' THEN 1 ELSE 0 END) AS ratio FROM bond AS T",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "Among the molecules with a label of '+', what percentage have at least one nitrogen atom?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T2.element = 'n' THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "How many different molecules have exactly four atoms bonded together?",
+    "sql": "SELECT COUNT(DISTINCT T1.molecule_id) FROM connected AS T1 GROUP BY T1.molecule_id HAVING COUNT(*) = 4",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What is the label of the molecule with ID TR000?",
+    "sql": "SELECT label FROM molecule WHERE molecule_id = 'TR000'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "How many molecules have the label '+ '?",
+    "sql": "SELECT COUNT(*) FROM molecule WHERE label = '+'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "List all molecules with a single bond.",
+    "sql": "SELECT DISTINCT T1.molecule_id FROM bond AS T1 WHERE T1.bond_type = '-'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "What is the element of the first atom in molecule TR000?",
+    "sql": "SELECT element FROM atom WHERE molecule_id = 'TR000' ORDER BY atom_id ASC LIMIT 1",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "How many molecules contain the element 'o'?",
+    "sql": "SELECT COUNT(DISTINCT molecule_id) FROM atom WHERE element = 'o'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "List all unique bond types present in the database.",
+    "sql": "SELECT DISTINCT bond_type FROM bond",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "How many molecules have more than three atoms?",
+    "sql": "SELECT COUNT(*) FROM molecule WHERE molecule_id IN (SELECT molecule_id FROM atom GROUP BY molecule_id HAVING COUNT(*) > 3)",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Find the molecule IDs of all molecules with a single bond and the element 'c'.",
+    "sql": "SELECT DISTINCT T1.molecule_id FROM bond AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.bond_type = '-' AND T2.element = 'c'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Calculate the average number of atoms per molecule.",
+    "sql": "SELECT AVG(num_atoms) FROM (SELECT COUNT(*) AS num_atoms FROM atom GROUP BY molecule_id) AS subquery",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Find the total number of molecules with a positive label.",
+    "sql": "SELECT COUNT(*) FROM molecule WHERE label = '+'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "What is the most common bond type among all bonds?",
+    "sql": "SELECT bond_type FROM bond GROUP BY bond_type ORDER BY COUNT(*) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Calculate the total number of bonds involving atoms with elements oxygen or nitrogen.",
+    "sql": "SELECT COUNT(*) FROM connected AS T1 INNER JOIN atom AS T2 ON T1.atom_id = T2.atom_id WHERE T2.element = 'o' OR T2.element = 'n'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Find the average bond length for bonds with a bond type of '#'.",
+    "sql": "SELECT AVG(length) FROM bond WHERE bond_type = '#'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "How many unique molecules contain at least one bond of type '='?",
+    "sql": "SELECT COUNT(DISTINCT molecule_id) FROM bond WHERE bond_type = '='",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Calculate the sum of all possible unique pairs of atoms within each molecule.",
+    "sql": "SELECT molecule_id, SUM(COUNT(*)) OVER () AS total_pairs FROM connected GROUP BY molecule_id",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Find the maximum number of atoms in any single molecule.",
+    "sql": "SELECT MAX(num_atoms) FROM (SELECT COUNT(*) AS num_atoms FROM atom GROUP BY molecule_id) AS subquery",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Which molecule ids are connected through bond id 'TR000_1_2'?",
+    "sql": "SELECT DISTINCT T1.molecule_id FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id WHERE T2.bond_id = 'TR000_1_2'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "What elements are involved in the bond with id 'TR000_1_2'?",
+    "sql": "SELECT T1.element, T2.element FROM atom AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id INNER JOIN connected AS T3 ON T1.atom_id = T3.atom_id WHERE T3.bond_id = 'TR000_1_2'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "How many different bond types are there in molecule 'TR000'?",
+    "sql": "SELECT COUNT(DISTINCT T1.bond_type) FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.molecule_id = 'TR000'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "List all molecules that contain both carbon (C) and hydrogen (H) atoms.",
+    "sql": "SELECT DISTINCT T2.molecule_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element IN ('c', 'h')",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Find the most common bond type in molecule 'TR000'.",
+    "sql": "SELECT T.bond_type FROM (SELECT T1.bond_type, COUNT(*) AS count FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.molecule_id = 'TR000' GROUP BY T1.bond_type ORDER BY count DESC LIMIT 1) AS T",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "How many unique atoms are involved in molecule 'TR000'?",
+    "sql": "SELECT COUNT(DISTINCT T1.atom_id) FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id WHERE T2.molecule_id = 'TR000'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "List all molecules that have exactly two bonds.",
+    "sql": "SELECT T2.molecule_id FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id HAVING COUNT(T1.bond_id) = 2",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Find the element that forms the most bonds with molecule 'TR000'.",
+    "sql": "SELECT T1.element FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id INNER JOIN bond AS T3 ON T2.bond_id = T3.bond_id WHERE T3.molecule_id = 'TR000' GROUP BY T1.element ORDER BY COUNT(T2.bond_id) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "What is the bond type of the bonds involving atoms with element 'o'?",
+    "sql": "SELECT DISTINCT T3.bond_type FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id INNER JOIN bond AS T3 ON T3.bond_id = T2.bond_id WHERE T1.element = 'o'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Among molecules containing 's' elements, how many distinct molecules are there?",
+    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 's'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "List the top 5 molecules with the most number of connected atoms.",
+    "sql": "SELECT T2.molecule_id, COUNT(T1.atom_id) as atom_count FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id GROUP BY T2.molecule_id ORDER BY atom_count DESC LIMIT 5",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Which molecules have exactly 3 bonds involving atoms of element 'c'?",
+    "sql": "SELECT T2.molecule_id FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id WHERE T1.element = 'c' GROUP BY T2.molecule_id HAVING COUNT(T2.bond_id) = 3",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Find the molecules that contain both 'cl' and 'h' elements.",
+    "sql": "SELECT T2.molecule_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element IN ('cl', 'h') GROUP BY T2.molecule_id HAVING COUNT(DISTINCT T1.element) > 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Rank the molecules based on the number of connected atoms, showing only the top 3.",
+    "sql": "SELECT T2.molecule_id, COUNT(T1.atom_id) as atom_count FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id GROUP BY T2.molecule_id ORDER BY atom_count DESC LIMIT 3",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "How many distinct molecules contain atoms of elements 'p' and 'f'?",
+    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element IN ('p', 'f')",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "List the top 5 molecules with the highest number of distinct bond types.",
+    "sql": "SELECT T2.molecule_id, COUNT(DISTINCT T3.bond_type) as bond_type_count FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id INNER JOIN bond AS T3 ON T3.bond_id = T2.bond_id GROUP BY T2.molecule_id ORDER BY bond_type_count DESC LIMIT 5",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "How many molecules have more than two bonds?",
+    "sql": "SELECT COUNT(*) FROM molecule WHERE molecule_id IN (SELECT molecule_id FROM bond GROUP BY molecule_id HAVING COUNT(*) > 2)",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "List all unique bond types used in molecules labeled as '+'",
+    "sql": "SELECT DISTINCT T2.bond_type FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.label = '+'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "What is the total number of atoms in molecules that contain at least one carbon atom?",
+    "sql": "SELECT SUM(COUNT(*)) FROM atom WHERE molecule_id IN (SELECT molecule_id FROM atom WHERE element = 'c' GROUP BY molecule_id)",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Find the average number of bonds per molecule for molecules with labels '-'",
+    "sql": "SELECT AVG(COUNT(*)) FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.label = '-'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Count how many different molecules contain both 'o' and 'n' elements",
+    "sql": "SELECT COUNT(DISTINCT T1.molecule_id) FROM atom AS T1 WHERE T1.element IN ('o', 'n') GROUP BY T1.molecule_id HAVING COUNT(DISTINCT T1.element) > 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "How many molecules have exactly three bonds?",
+    "sql": "SELECT COUNT(*) FROM molecule WHERE molecule_id IN (SELECT molecule_id FROM bond GROUP BY molecule_id HAVING COUNT(*) = 3)",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "List molecules with labels '+' that have more than four atoms",
+    "sql": "SELECT T1.molecule_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.label = '+' GROUP BY T1.molecule_id HAVING COUNT(*) > 4",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Calculate the total number of atoms in molecules that have more than five bonds",
+    "sql": "SELECT SUM(COUNT(*)) FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.molecule_id IN (SELECT molecule_id FROM bond GROUP BY molecule_id HAVING COUNT(*) > 5)",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "What percentage of atoms in molecule TR002 are carbon?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T1.element = 'c' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(*) FROM atom AS T1 WHERE T1.molecule_id = 'TR002'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What fraction of bonds in molecule TR002 are single bonds?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T2.bond_type = '-' THEN 1 ELSE 0 END) AS REAL) / NULLIF(COUNT(*), 0) FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id INNER JOIN bond AS T3 ON T2.bond_id = T3.bond_id WHERE T1.molecule_id = 'TR002'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What is the ratio of atoms to bonds in molecule TR004?",
+    "sql": "SELECT CAST(COUNT(*) AS REAL) / NULLIF(COUNT(DISTINCT T2.bond_id), 0) FROM atom AS T1 LEFT JOIN connected AS T2 ON T1.atom_id = T2.atom_id WHERE T1.molecule_id = 'TR004'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "Of the first 100 molecules, what percentage have a positive label?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T.label = '+' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(*) FROM molecule AS T WHERE molecule_id BETWEEN 'TR000' AND 'TR099'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What proportion of all bonds are double bonds?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T3.bond_type = '=' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(*) FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id INNER JOIN bond AS T3 ON T2.bond_id = T3.bond_id",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "Among the first 100 molecules, what percentage have exactly 3 carbon atoms?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T2.count = 3 THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(*) FROM (SELECT molecule_id, COUNT(*) AS count FROM atom WHERE molecule_id BETWEEN 'TR000' AND 'TR099' AND element = 'c' GROUP BY molecule_id) AS T2",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What percentage of molecules with a negative label contain more than 5 atoms?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T2.count > 5 THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(*) FROM molecule AS T1 INNER JOIN (SELECT molecule_id, COUNT(*) AS count FROM atom WHERE element != 'h' GROUP BY molecule_id) AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.label = '-'",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What fraction of all atoms in molecule TR008 are oxygen atoms?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T1.element = 'o' THEN 1 ELSE 0 END) AS REAL) / NULLIF(COUNT(*), 0) FROM atom AS T1 WHERE T1.molecule_id = 'TR008'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What is the label of the molecule with ID 'TR012'?",
+    "sql": "SELECT label FROM molecule WHERE molecule_id = 'TR012'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "List all the molecules that have a bond type of '-'",
+    "sql": "SELECT DISTINCT T1.label FROM molecule AS T1 JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.bond_type = '-'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Find the element of the atom with ID 'TR025_2'",
+    "sql": "SELECT element FROM atom WHERE atom_id = 'TR025_2'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Which molecules contain atoms with the element 'o'?",
+    "sql": "SELECT DISTINCT T1.label FROM molecule AS T1 JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'o'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Get the bond IDs for bonds involving the molecule 'TR034'",
+    "sql": "SELECT bond_id FROM bond WHERE molecule_id = 'TR034'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "List all unique bond types used in the molecule 'TR006'",
+    "sql": "SELECT DISTINCT bond_type FROM bond WHERE molecule_id = 'TR006'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Find the number of atoms in the molecule 'TR058'",
+    "sql": "SELECT COUNT(*) FROM atom WHERE molecule_id = 'TR058'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Retrieve the labels of molecules that do not have any bonds of type '#'",
+    "sql": "SELECT label FROM molecule WHERE molecule_id NOT IN (SELECT molecule_id FROM bond WHERE bond_type = '#')",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "How many molecules have exactly three bonds?",
+    "sql": "SELECT COUNT(*) FROM (SELECT molecule_id FROM bond GROUP BY molecule_id HAVING COUNT(*) = 3) AS temp",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "What is the total number of atoms connected to each molecule?",
+    "sql": "SELECT T1.molecule_id, COUNT(*) AS total_atoms FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id INNER JOIN connected AS T3 ON T2.atom_id = T3.atom_id GROUP BY T1.molecule_id",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Find the maximum number of distinct atoms per molecule.",
+    "sql": "SELECT MAX(COUNT(DISTINCT T2.atom_id)) FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id INNER JOIN connected AS T3 ON T2.atom_id = T3.atom_id",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "List the molecule IDs of molecules with more than two bonds of type '#'.",
+    "sql": "SELECT molecule_id FROM bond WHERE bond_type = '#' GROUP BY molecule_id HAVING COUNT(*) > 2",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Calculate the sum of bond types for molecules labeled '+'.",
+    "sql": "SELECT SUM(CASE WHEN bond_type = '-' THEN 1 ELSE 0 END) + SUM(CASE WHEN bond_type = '=' THEN 1 ELSE 0 END) * 2 + SUM(CASE WHEN bond_type = '#' THEN 1 ELSE 0 END) * 3 AS total_bond_strength FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+'",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "How many molecules have at least one bond of type '-' and one of type '='?",
+    "sql": "SELECT COUNT(*) FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.bond_type = '-' INTERSECT SELECT COUNT(*) FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.bond_type = '='",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Find the count of unique atoms for each molecule type (+/-).",
+    "sql": "SELECT T1.label, COUNT(DISTINCT T2.atom_id) AS unique_atom_count FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id INNER JOIN connected AS T3 ON T2.atom_id = T3.atom_id GROUP BY T1.label",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "What is the total number of molecules with a positive label?",
+    "sql": "SELECT COUNT(*) FROM molecule WHERE label = '+'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "How many molecules contain at least one bond of type '#'",
+    "sql": "SELECT COUNT(DISTINCT T1.molecule_id) FROM bond AS T1 WHERE T1.bond_type = '#'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Which molecule has the most connected atoms?",
+    "sql": "SELECT T2.molecule_id FROM (SELECT T1.molecule_id, COUNT(DISTINCT T2.atom_id) AS num_atoms FROM molecule AS T1 JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id ORDER BY num_atoms DESC LIMIT 1) AS T2",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "How many different elements are used in molecules with a negative label?",
+    "sql": "SELECT COUNT(DISTINCT T3.element) FROM molecule AS T1 JOIN atom AS T3 ON T1.molecule_id = T3.molecule_id WHERE T1.label = '-'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Find all molecules that have both carbon ('C') and hydrogen ('H') atoms.",
+    "sql": "SELECT T1.molecule_id FROM molecule AS T1 JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element IN ('C', 'H') GROUP BY T1.molecule_id HAVING COUNT(DISTINCT T2.element) = 2",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Count how many molecules each unique bond type appears in.",
+    "sql": "SELECT T.bond_type, COUNT(T.molecule_id) AS count FROM bond AS T GROUP BY T.bond_type",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "List all molecules that have exactly three bonds.",
+    "sql": "SELECT T1.molecule_id FROM molecule AS T1 JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id HAVING COUNT(T2.bond_id) = 3",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "How many distinct molecules have at least one bond connecting atoms of type 'O' and 'N'?",
+    "sql": "SELECT COUNT(DISTINCT T1.molecule_id) FROM connected AS T1 JOIN atom AS T2 ON T1.atom_id = T2.atom_id JOIN atom AS T3 ON T1.atom_id2 = T3.atom_id WHERE (T2.element = 'O' AND T3.element = 'N') OR (T2.element = 'N' AND T3.element = 'O')",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Which molecule has the most number of bonds?",
+    "sql": "SELECT T2.molecule_id, COUNT(T1.bond_id) as num_bonds FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id ORDER BY num_bonds DESC LIMIT 1;",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "List the top 5 molecules with the highest number of atoms.",
+    "sql": "SELECT T2.molecule_id, COUNT(T1.atom_id) as num_atoms FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id ORDER BY num_atoms DESC LIMIT 5;",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Find the molecules that contain at least 10 different elements.",
+    "sql": "SELECT T2.molecule_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id HAVING COUNT(DISTINCT T1.element) >= 10;",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "What is the molecule ID of the molecule with the most connected pairs?",
+    "sql": "SELECT T2.molecule_id, COUNT(T1.bond_id) as num_connected_pairs FROM connected AS T1 INNER JOIN molecule AS T2 ON T1.bond_id = T2.molecule_id GROUP BY T2.molecule_id ORDER BY num_connected_pairs DESC LIMIT 1;",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Rank molecules based on the number of carbon atoms they contain, limiting the result to the top 3.",
+    "sql": "SELECT T2.molecule_id, COUNT(*) as num_carbon_atoms FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'c' GROUP BY T2.molecule_id ORDER BY num_carbon_atoms DESC LIMIT 3;",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Which molecule has the highest number of distinct bond types?",
+    "sql": "SELECT T2.molecule_id, COUNT(DISTINCT T1.bond_type) as num_bond_types FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id ORDER BY num_bond_types DESC LIMIT 1;",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "List the top 4 molecules with the most heavy metals (elements with atomic numbers greater than 20).",
+    "sql": "SELECT T2.molecule_id, COUNT(*) as num_heavy_metals FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element IN ('k', 'ca', 'sc', 'ti', 'v', 'cr', 'mn', 'fe', 'co', 'ni', 'cu', 'zn', 'ga', 'ge', 'as', 'se', 'br', 'kr') GROUP BY T2.molecule_id ORDER BY num_heavy_metals DESC LIMIT 4;",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Find the molecule IDs of the top 2 molecules with the most hydrogen atoms.",
+    "sql": "SELECT T2.molecule_id, COUNT(*) as num_hydrogen_atoms FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'h' GROUP BY T2.molecule_id ORDER BY num_hydrogen_atoms DESC LIMIT 2;",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "What is the total number of bonds in molecules labeled as '+ '?",
+    "sql": "SELECT SUM(CASE WHEN T2.label = '+' THEN 1 ELSE 0 END) AS total_bonds FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Calculate the average number of bonds per molecule.",
+    "sql": "SELECT AVG(CAST(COUNT(*) AS REAL)) AS avg_bonds_per_molecule FROM (SELECT T1.molecule_id, COUNT(T2.bond_id) AS num_bonds FROM bond AS T1 INNER JOIN connected AS T2 ON T1.bond_id = T2.bond_id GROUP BY T1.molecule_id) AS subquery",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Find the number of unique elements in molecules labeled as '-'?",
+    "sql": "SELECT COUNT(DISTINCT T1.element) AS unique_elements FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '-'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "What is the maximum number of bonds any single molecule has?",
+    "sql": "SELECT MAX(num_bonds) AS max_bonds FROM (SELECT T1.molecule_id, COUNT(T2.bond_id) AS num_bonds FROM bond AS T1 INNER JOIN connected AS T2 ON T1.bond_id = T2.bond_id GROUP BY T1.molecule_id) AS subquery",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "List the number of molecules each bond type occurs in.",
+    "sql": "SELECT T1.bond_type, COUNT(DISTINCT T1.molecule_id) AS num_molecules FROM bond AS T1 GROUP BY T1.bond_type",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Calculate the percentage of bonds that are of type '#'.",
+    "sql": "SELECT CAST(SUM(CASE WHEN T1.bond_type = '#' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(*) AS percent_hash_bonds FROM bond AS T1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "How many atoms are part of molecules with more than 5 bonds?",
+    "sql": "SELECT SUM(CAST(COUNT(*) AS REAL)) AS total_atoms FROM (SELECT T1.molecule_id, COUNT(T2.bond_id) AS num_bonds FROM bond AS T1 INNER JOIN connected AS T2 ON T1.bond_id = T2.bond_id GROUP BY T1.molecule_id HAVING COUNT(T2.bond_id) > 5) AS subquery",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Find the most common bond type in molecules labeled as '+ '?",
+    "sql": "SELECT T1.bond_type, COUNT(*) AS count FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+' GROUP BY T1.bond_type ORDER BY count DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "What is the percentage of molecules labeled '+'?",
+    "sql": "SELECT CAST(SUM(CASE WHEN label = '+' THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM molecule",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What fraction of bonds are single bonds?",
+    "sql": "SELECT CAST(SUM(CASE WHEN bond_type = '-' THEN 1 ELSE 0 END) AS FLOAT) / COUNT(*) FROM bond",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What proportion of molecules contain more than three bonds?",
+    "sql": "SELECT CAST(SUM(CASE WHEN COUNT(*) > 3 THEN 1 ELSE 0 END) AS FLOAT) / COUNT(*) FROM (SELECT molecule_id FROM bond GROUP BY molecule_id) AS T",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What percentage of atoms belong to molecules with a '+' label?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T1.label = '+' THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(T1.molecule_id) FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What is the ratio of the number of single bonds to the total number of bonds?",
+    "sql": "SELECT CAST(SUM(CASE WHEN bond_type = '-' THEN 1 ELSE 0 END) AS FLOAT) / COUNT(*) FROM bond",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What fraction of molecules have exactly four bonds?",
+    "sql": "SELECT CAST(SUM(CASE WHEN COUNT(*) = 4 THEN 1 ELSE 0 END) AS FLOAT) / COUNT(*) FROM (SELECT molecule_id FROM bond GROUP BY molecule_id) AS T",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What percentage of molecules contain more than four atoms?",
+    "sql": "SELECT CAST(SUM(CASE WHEN COUNT(*) > 4 THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM (SELECT molecule_id FROM atom GROUP BY molecule_id) AS T",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What is the ratio of the number of molecules labeled '+' to the total number of molecules?",
+    "sql": "SELECT CAST(SUM(CASE WHEN label = '+' THEN 1 ELSE 0 END) AS FLOAT) / COUNT(*) FROM molecule",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What is the element of the atom with id TR000_1?",
+    "sql": "SELECT element FROM atom WHERE atom_id = 'TR000_1'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Which molecules have a bond type of '-'?",
+    "sql": "SELECT DISTINCT T2.molecule_id FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.bond_type = '-'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Find the molecule id(s) of molecules with the label '+'.",
+    "sql": "SELECT molecule_id FROM molecule WHERE label = '+'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "What are the bond types for atoms connected by bond id TR001_1_7?",
+    "sql": "SELECT DISTINCT T1.bond_type FROM bond AS T1 INNER JOIN connected AS T2 ON T1.bond_id = T2.bond_id WHERE T2.bond_id = 'TR001_1_7'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Get the molecule id of the atom with id TR000_2.",
+    "sql": "SELECT DISTINCT T1.molecule_id FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id WHERE T1.atom_id = 'TR000_2'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "List all unique bond ids involving molecules labeled '+'.",
+    "sql": "SELECT DISTINCT T1.bond_id FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "What is the element of the atom connected to atom id TR000_2 via bond id TR001_1_7?",
+    "sql": "SELECT T3.element FROM connected AS T1 INNER JOIN atom AS T2 ON T1.atom_id2 = T2.atom_id INNER JOIN atom AS T3 ON T1.atom_id = T3.atom_id WHERE T1.bond_id = 'TR001_1_7' AND T2.atom_id = 'TR000_2'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Find the molecule id(s) of molecules with a bond type of '#'.",
+    "sql": "SELECT DISTINCT T2.molecule_id FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.bond_type = '#'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "What is the average number of atoms per molecule among the non-toxic molecules?",
+    "sql": "SELECT AVG(COUNT(*)) FROM (SELECT T2.molecule_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.label = '-' GROUP BY T2.molecule_id) AS T",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Which molecule has the most carbon atoms?",
+    "sql": "SELECT T1.molecule_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'c' GROUP BY T1.molecule_id ORDER BY COUNT(*) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "How many unique molecules have exactly three hydrogen atoms?",
+    "sql": "SELECT COUNT(DISTINCT T1.molecule_id) FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'h' GROUP BY T1.molecule_id HAVING COUNT(T2.element) = 3",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "What is the total number of single bonds in the database?",
+    "sql": "SELECT SUM(CASE WHEN bond_type = '-' THEN 1 ELSE 0 END) AS total_single_bonds FROM bond",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Find the maximum number of atoms in any single molecule.",
+    "sql": "SELECT MAX(COUNT(*)) FROM (SELECT T2.molecule_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id) AS T",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Calculate the average bond length of all molecules.",
+    "sql": "SELECT AVG(length) FROM (SELECT T1.bond_type, CASE WHEN T1.bond_type = '-' THEN 1.08 ELSE 1.54 END AS length FROM bond AS T1) AS T",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "How many molecules contain both oxygen and nitrogen atoms?",
+    "sql": "SELECT COUNT(DISTINCT T1.molecule_id) FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element IN ('o', 'n') GROUP BY T1.molecule_id HAVING COUNT(DISTINCT T2.element) > 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Find the total number of double bonds in molecules labeled as '+'.",
+    "sql": "SELECT SUM(CASE WHEN bond_type = '=' THEN 1 ELSE 0 END) AS total_double_bonds FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "How many atoms of hydrogen are present in molecules with a positive label?",
+    "sql": "SELECT COUNT(*) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+' AND T1.element = 'h'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "What is the average number of bonds per molecule?",
+    "sql": "SELECT AVG(COUNT(*)) FROM bond AS T GROUP BY T.molecule_id",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "List all molecules that contain both carbon and oxygen atoms.",
+    "sql": "SELECT DISTINCT T2.molecule_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element IN ('c', 'o')",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Find the total number of bonds involving molecules with a negative label.",
+    "sql": "SELECT SUM(CASE WHEN T2.label = '-' THEN 1 ELSE 0 END) FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "What is the most common bond type in molecules with a positive label?",
+    "sql": "SELECT T1.bond_type FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+' GROUP BY T1.bond_type ORDER BY COUNT(*) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Count the number of distinct molecules that have exactly two bonds.",
+    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id HAVING COUNT(*) = 2",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Which molecules contain only atoms from the elements hydrogen and carbon?",
+    "sql": "SELECT DISTINCT T2.molecule_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element IN ('h', 'c')",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Calculate the ratio of molecules with a positive label to those with a negative label.",
+    "sql": "SELECT CAST(SUM(CASE WHEN T2.label = '+' THEN 1 ELSE 0 END) AS REAL) * 100 / NULLIF(SUM(CASE WHEN T2.label = '-' THEN 1 ELSE 0 END), 0) FROM molecule AS T2",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Which molecule has the most carbon atoms?",
+    "sql": "SELECT T1.molecule_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'c' GROUP BY T1.molecule_id ORDER BY COUNT(T1.element) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "List the top 5 molecules with the highest number of oxygen atoms.",
+    "sql": "SELECT T1.molecule_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'o' GROUP BY T1.molecule_id ORDER BY COUNT(T1.element) DESC LIMIT 5",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Find the molecule with the longest chain of bonded atoms.",
+    "sql": "WITH RECURSIVE Chain AS (SELECT atom_id, atom_id2, bond_id FROM connected UNION ALL SELECT c1.atom_id, c2.atom_id2, c2.bond_id FROM Chain c1 JOIN connected c2 ON c1.atom_id2 = c2.atom_id) SELECT molecule_id FROM Chain WHERE atom_id IN (SELECT atom_id FROM atom WHERE element = 'c') GROUP BY molecule_id ORDER BY MAX(LENGTH(REPLACE(chain_id, ',', ''))) DESC LIMIT 1",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Rank the molecules by the number of hydrogen atoms they contain.",
+    "sql": "SELECT T1.molecule_id, COUNT(*) AS hydrogen_count FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'h' GROUP BY T1.molecule_id ORDER BY hydrogen_count DESC",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Which molecule has the highest concentration of fluorine atoms?",
+    "sql": "SELECT T1.molecule_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'f' GROUP BY T1.molecule_id ORDER BY COUNT(T1.element) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "List the top 3 molecules with the most nitrogen atoms and their labels.",
+    "sql": "SELECT T1.molecule_id, T2.label FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'n' GROUP BY T1.molecule_id, T2.label ORDER BY COUNT(T1.element) DESC LIMIT 3",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Find the molecule with the longest sequence of consecutive bonds.",
+    "sql": "WITH RECURSIVE BondSequence AS (SELECT atom_id, atom_id2, bond_id, 1 AS length FROM connected UNION ALL SELECT b.atom_id, b.atom_id2, b.bond_id, bs.length + 1 FROM BondSequence bs JOIN connected b ON bs.atom_id2 = b.atom_id) SELECT molecule_id FROM BondSequence WHERE atom_id IN (SELECT atom_id FROM atom WHERE element = 'c') GROUP BY molecule_id ORDER BY MAX(length) DESC LIMIT 1",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Rank the molecules by the number of bromine atoms they contain.",
+    "sql": "SELECT T1.molecule_id, COUNT(*) AS bromine_count FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'br' GROUP BY T1.molecule_id ORDER BY bromine_count DESC",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Which molecule has the most bonds of type '-'?",
+    "sql": "SELECT T2.molecule_id FROM (SELECT T1.molecule_id, COUNT(T1.bond_type) FROM bond AS T1 WHERE T1.bond_type = '-' GROUP BY T1.molecule_id ORDER BY COUNT(T1.bond_type) DESC LIMIT 1) AS T2",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "What is the total number of bonds for each molecule?",
+    "sql": "SELECT T2.molecule_id, COUNT(*) AS total_bonds FROM bond AS T1 JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Which molecule contains the most atoms of element 'c'?",
+    "sql": "SELECT T2.molecule_id FROM (SELECT T1.molecule_id, COUNT(*) FROM atom AS T1 WHERE T1.element = 'c' GROUP BY T1.molecule_id ORDER BY COUNT(*) DESC LIMIT 1) AS T2",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "How many bonds of type '=' are there per molecule?",
+    "sql": "SELECT T2.molecule_id, COUNT(*) AS equal_bonds FROM bond AS T1 JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.bond_type = '=' GROUP BY T2.molecule_id",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Among molecules with more than 5 bonds, how many contain the element 'o'?",
+    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM atom AS T1 JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'o' AND T2.molecule_id IN (SELECT molecule_id FROM bond GROUP BY molecule_id HAVING COUNT(*) > 5)",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "What is the average number of bonds per molecule for those with a '+' label?",
+    "sql": "SELECT AVG(COUNT(*)) AS avg_bonds FROM bond AS T1 JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+' GROUP BY T2.molecule_id",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Which molecule has the highest percentage of its atoms as 'cl'?",
+    "sql": "SELECT T2.molecule_id FROM (SELECT T1.molecule_id, CAST(SUM(CASE WHEN T1.element = 'cl' THEN 1 ELSE 0 END) AS FLOAT) / COUNT(*) * 100 AS cl_percentage FROM atom AS T1 JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id ORDER BY cl_percentage DESC LIMIT 1) AS T2",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "How many unique molecules are there that contain both 'c' and 'o' elements?",
+    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM atom AS T1 JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'c' INTERSECT SELECT COUNT(DISTINCT T2.molecule_id) FROM atom AS T1 JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'o'",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "What is the ratio of molecules labeled as '+', compared to those labeled as '-', in terms of the number of atoms they contain?",
+    "sql": "SELECT SUM(CASE WHEN T2.label = '+' THEN 1 ELSE 0 END) * 1.0 / SUM(CASE WHEN T2.label = '-' THEN 1 ELSE 0 END) AS ratio FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id;",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What percentage of bonds in the database are single bonds?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T1.bond_type = '-' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(*) AS percentage FROM bond AS T1;",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "How many unique molecules have both single and double bonds?",
+    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.bond_type IN ('-', '=');",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What is the percentage of atoms that are carbon elements in all molecules?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T1.element = 'c' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(*) AS percentage FROM atom AS T1;",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "How many molecules have more than 10 atoms?",
+    "sql": "SELECT COUNT(*) FROM (SELECT T2.molecule_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id HAVING COUNT(T1.atom_id) > 10) AS T;",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What is the ratio of atoms in molecules labeled as '+' to those labeled as '-'?",
+    "sql": "SELECT SUM(CASE WHEN T2.label = '+' THEN 1 ELSE 0 END) * 1.0 / SUM(CASE WHEN T2.label = '-' THEN 1 ELSE 0 END) AS ratio FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id;",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "How many distinct molecules have at least one bond of type '#'",
+    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.bond_type = '#';",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What is the percentage of single bond molecules out of all bond molecules?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T1.bond_type = '-' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(*) AS percentage FROM bond AS T1;",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What is the element of the first atom in molecule TR000?",
+    "sql": "SELECT element FROM atom WHERE molecule_id = 'TR000' ORDER BY atom_id ASC LIMIT 1;",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Which molecules have exactly three bonds?",
+    "sql": "SELECT T2.molecule_id FROM bond AS T2 INNER JOIN connected AS T1 ON T2.bond_id = T1.bond_id GROUP BY T2.molecule_id HAVING COUNT(*) = 3;",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "List all molecules with more than 5 atoms.",
+    "sql": "SELECT T2.molecule_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id HAVING COUNT(*) > 5;",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "How many different molecules are there with the label '+'?",
+    "sql": "SELECT COUNT(DISTINCT molecule_id) FROM molecule WHERE label = '+';",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Find the molecule IDs of molecules containing carbon atoms.",
+    "sql": "SELECT DISTINCT molecule_id FROM atom WHERE element = 'c';",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Count the number of molecules with at least one bond of type '-'.",
+    "sql": "SELECT COUNT(DISTINCT molecule_id) FROM bond WHERE bond_type = '-';",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Retrieve the molecule IDs of molecules with more than 10 atoms.",
+    "sql": "SELECT molecule_id FROM atom GROUP BY molecule_id HAVING COUNT(*) > 10;",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "List all molecules with a label of '-' that contain sulfur atoms.",
+    "sql": "SELECT DISTINCT T2.molecule_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '-' AND T1.element = 's';",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "What is the average number of bonds per molecule?",
+    "sql": "SELECT AVG(COUNT(*)) FROM (SELECT T1.molecule_id FROM bond AS T1 INNER JOIN connected AS T2 ON T1.bond_id = T2.bond_id GROUP BY T1.molecule_id) AS subquery",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Which molecule has the most atoms?",
+    "sql": "SELECT T1.molecule_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id ORDER BY COUNT(*) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "What is the total count of all bonds involving atom id 'TR000_2'?",
+    "sql": "SELECT COUNT(*) FROM connected AS T1 WHERE T1.atom_id = 'TR000_2'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "What is the sum of the lengths of all bonds of type '-'?",
+    "sql": "SELECT SUM(LENGTH(T1.bond_type)) FROM bond AS T1 WHERE T1.bond_type = '-'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "What is the maximum number of atoms in any single molecule?",
+    "sql": "SELECT MAX(COUNT(*)) FROM (SELECT T1.molecule_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id) AS subquery",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "What is the average number of different molecules each bond connects?",
+    "sql": "SELECT AVG(COUNT(DISTINCT T1.molecule_id)) FROM connected AS T1 INNER JOIN bond AS T2 ON T1.bond_id = T2.bond_id",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "What is the minimum number of bonds per molecule?",
+    "sql": "SELECT MIN(COUNT(*)) FROM (SELECT T1.molecule_id FROM bond AS T1 INNER JOIN connected AS T2 ON T1.bond_id = T2.bond_id GROUP BY T1.molecule_id) AS subquery",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "What is the total number of bonds between atoms 'TR000_2' and 'TR000_4'?",
+    "sql": "SELECT COUNT(*) FROM connected AS T1 WHERE (T1.atom_id = 'TR000_2' AND T1.atom_id2 = 'TR000_4') OR (T1.atom_id = 'TR000_4' AND T1.atom_id2 = 'TR000_2')",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "What is the bond type between atoms 'TR000_2' and 'TR000_3'?",
+    "sql": "SELECT T1.bond_type FROM bond AS T1 INNER JOIN connected AS T2 ON T1.bond_id = T2.bond_id WHERE T2.atom_id = 'TR000_2' AND T2.atom_id2 = 'TR000_3'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Which molecules contain both carbon ('C') and hydrogen ('H') atoms?",
+    "sql": "SELECT DISTINCT T2.molecule_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element IN ('C', 'H') GROUP BY T2.molecule_id HAVING COUNT(DISTINCT T1.element) > 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Find all bond types involving the molecule 'TR004'.",
+    "sql": "SELECT DISTINCT T1.bond_type FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.molecule_id = 'TR004'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "What elements are connected to atom 'TR000_2'?",
+    "sql": "SELECT T1.element FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id WHERE T2.atom_id = 'TR000_2'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Count the number of unique bonds in molecules labeled as positive.",
+    "sql": "SELECT COUNT(DISTINCT T1.bond_id) FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "List all molecules that have at least three different types of bonds.",
+    "sql": "SELECT DISTINCT T2.molecule_id FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id HAVING COUNT(DISTINCT T1.bond_type) >= 3",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "What is the average bond length for molecules containing the element fluorine ('F')?",
+    "sql": "SELECT AVG(T1.bond_length) FROM bond AS T1 INNER JOIN connected AS T2 ON T1.bond_id = T2.bond_id INNER JOIN atom AS T3 ON T2.atom_id = T3.atom_id WHERE T3.element = 'F'",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Find the molecule IDs of molecules that are both connected to 'TR000_2' and 'TR000_4'.",
+    "sql": "SELECT T2.molecule_id FROM connected AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.atom_id = 'TR000_2' INTERSECT SELECT T2.molecule_id FROM connected AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.atom_id = 'TR000_4'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Which molecule has the most number of single bonds?",
+    "sql": "SELECT T1.molecule_id FROM bond AS T1 WHERE T1.bond_type = '-' GROUP BY T1.molecule_id ORDER BY COUNT(*) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "List the top three elements that form the highest number of bonds.",
+    "sql": "SELECT T.element, COUNT(*) as bond_count FROM atom AS T JOIN connected AS C ON T.atom_id = C.atom_id GROUP BY T.element ORDER BY bond_count DESC LIMIT 3",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Find the molecule with the most diverse set of bond types.",
+    "sql": "SELECT T1.molecule_id FROM bond AS T1 GROUP BY T1.molecule_id HAVING COUNT(DISTINCT T1.bond_type) = (SELECT MAX(DISTINCT_COUNT) FROM (SELECT COUNT(DISTINCT T1.bond_type) AS distinct_count FROM bond AS T1 GROUP BY T1.molecule_id) AS sub)",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "What is the average number of bonds per molecule?",
+    "sql": "SELECT AVG(bond_count) AS avg_bonds_per_molecule FROM (SELECT T1.molecule_id, COUNT(T1.bond_id) AS bond_count FROM bond AS T1 GROUP BY T1.molecule_id) AS sub",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "List the top two molecules with the highest number of heavy atoms (carbon, oxygen, nitrogen, sulfur, phosphorus, chlorine, bromine, sodium, fluorine, iodine, silicon, copper, tin).",
+    "sql": "SELECT T1.molecule_id FROM atom AS T1 JOIN connected AS C ON T1.atom_id = C.atom_id WHERE T1.element IN ('c', 'o', 'n', 's', 'p', 'cl', 'br', 'na', 'f', 'i', 'si', 'cu', 'sn') GROUP BY T1.molecule_id ORDER BY COUNT(*) DESC LIMIT 2",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Identify the molecule with the longest chain of carbon atoms.",
+    "sql": "WITH recursive atom_chain AS (SELECT T1.atom_id, T1.molecule_id, T1.element, 1 AS length FROM atom AS T1 JOIN connected AS C ON T1.atom_id = C.atom_id WHERE T1.element = 'c' UNION ALL SELECT T2.atom_id, T2.molecule_id, T2.element, AC.length + 1 FROM atom AS T2 JOIN connected AS C ON T2.atom_id = C.atom_id JOIN atom_chain AS AC ON C.atom_id = AC.atom_id WHERE T2.element = 'c') SELECT T1.molecule_id FROM atom AS T1 JOIN atom_chain AS AC ON T1.atom_id = AC.atom_id ORDER BY AC.length DESC LIMIT 1",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "List the molecule IDs of molecules that contain both a nitrogen and a sulfur atom.",
+    "sql": "SELECT T1.molecule_id FROM atom AS T1 WHERE T1.element = 'n' INTERSECT SELECT T1.molecule_id FROM atom AS T1 WHERE T1.element = 's'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Find the molecule with the most number of hydrogen atoms bonded to it.",
+    "sql": "SELECT T1.molecule_id FROM atom AS T1 JOIN connected AS C ON T1.atom_id = C.atom_id WHERE T1.element = 'h' GROUP BY T1.molecule_id ORDER BY COUNT(*) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "How many distinct atoms are connected through single bonds in molecule TR000?",
+    "sql": "SELECT COUNT(DISTINCT T3.atom_id) FROM connected AS T1 INNER JOIN bond AS T2 ON T1.bond_id = T2.bond_id INNER JOIN atom AS T3 ON T1.atom_id = T3.atom_id WHERE T2.molecule_id = 'TR000' AND T2.bond_type = '-'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "What is the total number of double bonds in molecule TR001?",
+    "sql": "SELECT SUM(CASE WHEN T2.bond_type = '=' THEN 1 ELSE 0 END) FROM connected AS T1 INNER JOIN bond AS T2 ON T1.bond_id = T2.bond_id WHERE T2.molecule_id = 'TR001'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Which molecule has the most bonds involving carbon atoms?",
+    "sql": "SELECT T2.molecule_id FROM connected AS T1 INNER JOIN atom AS T3 ON T1.atom_id = T3.atom_id INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T3.element = 'c' GROUP BY T2.molecule_id ORDER BY COUNT(*) DESC LIMIT 1",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "How many different molecules contain both carbon and hydrogen atoms?",
+    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element IN ('c', 'h')",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "What is the average number of bonds per molecule for molecules labeled '+'?",
+    "sql": "SELECT AVG(COUNT(*)) FROM (SELECT T1.molecule_id FROM connected AS T1 INNER JOIN bond AS T2 ON T1.bond_id = T2.bond_id INNER JOIN molecule AS T3 ON T2.molecule_id = T3.molecule_id WHERE T3.label = '+' GROUP BY T1.molecule_id) AS T",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Which molecule has the highest percentage of bonds involving oxygen atoms?",
+    "sql": "SELECT T2.molecule_id FROM connected AS T1 INNER JOIN atom AS T3 ON T1.atom_id = T3.atom_id INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T3.element = 'o' GROUP BY T2.molecule_id ORDER BY COUNT(*) * 1.0 / (SELECT COUNT(*) FROM connected AS T4 INNER JOIN molecule AS T5 ON T4.molecule_id = T5.molecule_id WHERE T5.molecule_id = T2.molecule_id) DESC LIMIT 1",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "How many molecules contain at least three different elements?",
+    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id HAVING COUNT(DISTINCT T1.element) >= 3",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "What is the sum of the bond counts for all molecules with more than two carbon atoms?",
+    "sql": "SELECT SUM(COUNT(*)) FROM (SELECT T1.molecule_id FROM connected AS T1 INNER JOIN atom AS T2 ON T1.atom_id = T2.atom_id WHERE T2.element = 'c' GROUP BY T1.molecule_id HAVING COUNT(*) > 2) AS T",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "How many molecules have a label of '+'?",
+    "sql": "SELECT COUNT(*) FROM molecule WHERE label = '+'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "What is the element of the most frequently occurring atom in all molecules?",
+    "sql": "SELECT T.element FROM (SELECT T2.element, COUNT(DISTINCT T2.molecule_id) as count FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.element ORDER BY count DESC LIMIT 1) AS T",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "List all unique elements found in molecules with labels '-' sorted alphabetically.",
+    "sql": "SELECT DISTINCT T.element FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.label = '-' ORDER BY T.element",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "How many molecules contain exactly three atoms?",
+    "sql": "SELECT COUNT(*) FROM molecule WHERE molecule_id IN (SELECT T1.molecule_id FROM atom AS T1 GROUP BY T1.molecule_id HAVING COUNT(*) = 3)",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Find the bond type(s) used in molecules with the highest number of distinct atoms.",
+    "sql": "SELECT T.bond_type FROM (SELECT T1.bond_type, COUNT(DISTINCT T2.molecule_id) as count FROM bond AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.bond_type ORDER BY count DESC LIMIT 1) AS T",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "How many molecules have a single bond and a label of '+'?",
+    "sql": "SELECT COUNT(*) FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.bond_type = '-' AND T1.label = '+'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "List the molecule IDs of molecules that contain both 'C' and 'O' elements.",
+    "sql": "SELECT T1.molecule_id FROM atom AS T1 WHERE T1.element = 'c' INTERSECT SELECT T1.molecule_id FROM atom AS T1 WHERE T1.element = 'o'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "How many distinct molecules are there with a label of '-'?",
+    "sql": "SELECT COUNT(DISTINCT molecule_id) FROM molecule WHERE label = '-'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "What is the average number of bonds per molecule?",
+    "sql": "SELECT AVG(COUNT(*)) OVER () FROM bond GROUP BY molecule_id",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Find the total number of molecules that have more than 5 bonds.",
+    "sql": "SELECT COUNT(*) FROM (SELECT molecule_id FROM bond GROUP BY molecule_id HAVING COUNT(*) > 5) AS large_molecules",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "What is the maximum number of bonds any single molecule has?",
+    "sql": "SELECT MAX(COUNT(*)) OVER () FROM bond GROUP BY molecule_id",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "List the number of molecules for each bond type, sorted by count in descending order.",
+    "sql": "SELECT bond_type, COUNT(*) AS num_bonds FROM bond GROUP BY bond_type ORDER BY num_bonds DESC",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Calculate the average number of carbon atoms per molecule that is labeled as '+'.",
+    "sql": "SELECT AVG(COUNT(*)) OVER () FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'c' AND T2.label = '+' GROUP BY T2.molecule_id",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "How many molecules have exactly three hydrogen atoms?",
+    "sql": "SELECT COUNT(*) FROM (SELECT molecule_id FROM atom WHERE element = 'h' GROUP BY molecule_id HAVING COUNT(*) = 3) AS small_molecules",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "What is the sum of the number of bonds for all molecules that are labeled as '-'?",
+    "sql": "SELECT SUM(COUNT(*)) OVER () FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '-' GROUP BY T2.molecule_id",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Find the minimum number of bonds any single molecule has, but only consider molecules that have at least one oxygen atom.",
+    "sql": "SELECT MIN(COUNT(*)) OVER () FROM bond AS T1 INNER JOIN atom AS T2 ON T1.atom_id = T2.atom_id WHERE T2.element = 'o' GROUP BY T1.molecule_id HAVING COUNT(*) >= 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "List all molecules that have both a carbon and a hydrogen atom.",
+    "sql": "SELECT DISTINCT T2.molecule_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'c' AND EXISTS (SELECT 1 FROM atom AS T3 WHERE T3.molecule_id = T2.molecule_id AND T3.element = 'h')",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Find the number of unique bonds involving molecules labeled as '+'.",
+    "sql": "SELECT COUNT(DISTINCT T1.bond_id) FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Identify all atoms connected by single bonds in molecules with a label of '-' and list their elements.",
+    "sql": "SELECT T3.element FROM connected AS T1 INNER JOIN bond AS T2 ON T1.bond_id = T2.bond_id INNER JOIN atom AS T3 ON T1.atom_id = T3.atom_id WHERE T2.bond_type = '-'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Count the number of molecules containing at least one nitrogen atom and one oxygen atom.",
+    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'n' AND EXISTS (SELECT 1 FROM atom AS T3 WHERE T3.molecule_id = T2.molecule_id AND T3.element = 'o')",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Retrieve the IDs of all molecules that have at least one bond of type '#'.",
+    "sql": "SELECT DISTINCT T2.molecule_id FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.bond_type = '#'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "List the labels of all molecules that contain exactly two different types of atoms.",
+    "sql": "SELECT DISTINCT T2.label FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.label HAVING COUNT(DISTINCT T1.element) = 2",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Find the number of distinct atoms connected by double bonds in molecules with a label of '+'.",
+    "sql": "SELECT COUNT(DISTINCT T3.atom_id) FROM connected AS T1 INNER JOIN bond AS T2 ON T1.bond_id = T2.bond_id INNER JOIN atom AS T3 ON T1.atom_id = T3.atom_id INNER JOIN molecule AS T4 ON T1.bond_id = T4.molecule_id WHERE T2.bond_type = '=' AND T4.label = '+'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Calculate the total number of bonds in molecules that contain at least one chlorine atom.",
+    "sql": "SELECT SUM(CASE WHEN T1.element = 'cl' THEN 1 ELSE 0 END) AS total_bonds_with_cl FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id INNER JOIN bond AS T3 ON T1.molecule_id = T3.molecule_id",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Which molecules are labeled as toxic?",
+    "sql": "SELECT molecule_id, label FROM molecule WHERE label = '+'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Find the bond IDs for molecules with a specific element.",
+    "sql": "SELECT DISTINCT T1.bond_id FROM bond AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'cl'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "List the labels of molecules sorted by their bond count in descending order.",
+    "sql": "SELECT T2.molecule_id, T2.label, COUNT(T1.bond_id) AS bond_count FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id, T2.label ORDER BY bond_count DESC LIMIT 5",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Retrieve the most common bond types used in molecules with the label '-'.",
+    "sql": "SELECT bond_type FROM bond INNER JOIN molecule ON bond.molecule_id = molecule.molecule_id WHERE molecule.label = '-' GROUP BY bond_type ORDER BY COUNT(*) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Identify the top 3 molecules with the highest number of bonds.",
+    "sql": "SELECT T2.molecule_id, T2.label, COUNT(T1.bond_id) AS bond_count FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id, T2.label ORDER BY bond_count DESC LIMIT 3",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Get the elements of atoms involved in a specific bond, ordered by atomic number.",
+    "sql": "SELECT T1.element FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id WHERE T2.bond_id = 'TR000_1_2' ORDER BY element",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Find the total number of bonds per molecule type, ordered by the count in ascending order.",
+    "sql": "SELECT T2.label, COUNT(T1.bond_id) AS bond_count FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.label ORDER BY bond_count ASC LIMIT 2",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Determine the molecule with the most unique bond types, including its label.",
+    "sql": "SELECT T2.molecule_id, T2.label, COUNT(DISTINCT T1.bond_type) AS unique_bond_types FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id, T2.label ORDER BY unique_bond_types DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Find the average number of atoms per molecule.",
+    "sql": "SELECT AVG(num_atoms) FROM (SELECT molecule_id, COUNT(*) as num_atoms FROM atom GROUP BY molecule_id) AS subquery",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "List the molecule IDs of molecules with exactly three carbon atoms.",
+    "sql": "SELECT T1.molecule_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'c' GROUP BY T1.molecule_id HAVING COUNT(T2.element) = 3",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Which molecule has the most bonds of any type?",
+    "sql": "SELECT T1.molecule_id FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id ORDER BY COUNT(*) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Calculate the number of unique molecules containing both hydrogen and chlorine atoms.",
+    "sql": "SELECT COUNT(*) FROM (SELECT molecule_id FROM atom WHERE element IN ('h', 'cl') GROUP BY molecule_id HAVING COUNT(DISTINCT element) > 1) AS subquery",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Determine the most common bond type among all molecules.",
+    "sql": "SELECT bond_type FROM bond GROUP BY bond_type ORDER BY COUNT(*) DESC LIMIT 1",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "List the molecule IDs of molecules with more than two bonds of any type.",
+    "sql": "SELECT T1.molecule_id FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id HAVING COUNT(*) > 2",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Find the minimum number of different elements present in any molecule.",
+    "sql": "SELECT MIN(num_elements) FROM (SELECT molecule_id, COUNT(DISTINCT element) as num_elements FROM atom GROUP BY molecule_id) AS subquery",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "What is the percentage of molecules labeled '+' compared to those labeled '-'?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T2.label = '+' THEN 1 ELSE 0 END) AS REAL) * 100 / NULLIF(COUNT(T2.label), 0) AS percentage_plus FROM molecule AS T2",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What percentage of bonds are single bonds (#) in molecules labeled '+'?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T2.bond_type = '#' AND T2.molecule_id IN (SELECT molecule_id FROM molecule WHERE label = '+') THEN 1 ELSE 0 END) AS REAL) * 100 / NULLIF(COUNT(T2.bond_type), 0) AS percentage_single_bonds FROM bond AS T2",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What is the ratio of atoms of element Oxygen (o) to Hydrogen (h) in molecules labeled '+'?",
+    "sql": "SELECT CAST(COUNT(CASE WHEN T1.element = 'o' THEN T1.element ELSE NULL END) AS REAL) / COUNT(CASE WHEN T1.element = 'h' THEN T1.element ELSE NULL END) AS ratio_oxygen_to_hydrogen FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What percentage of atoms in molecules labeled '+' are either Carbon (c) or Nitrogen (n)?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T1.element IN ('c', 'n') THEN 1 ELSE 0 END) AS REAL) * 100 / NULLIF(COUNT(T1.element), 0) AS percentage_carbon_nitrogen FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What is the percentage of bonds in molecules labeled '+' that are double bonds (=)?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T2.bond_type = '=' AND T2.molecule_id IN (SELECT molecule_id FROM molecule WHERE label = '+') THEN 1 ELSE 0 END) AS REAL) * 100 / NULLIF(COUNT(T2.bond_type), 0) AS percentage_double_bonds FROM bond AS T2",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What is the ratio of connected atoms within molecules labeled '+' to those in molecules labeled '-'?",
+    "sql": "SELECT CAST(COUNT(DISTINCT CASE WHEN T2.label = '+' THEN T1.atom_id ELSE NULL END) AS REAL) / COUNT(DISTINCT CASE WHEN T2.label = '-' THEN T1.atom_id ELSE NULL END) AS ratio_connected_atoms FROM connected AS T1 INNER JOIN molecule AS T2 ON T1.bond_id = T2.bond_id",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What percentage of atoms in molecules labeled '+' are part of a bond of type '#'",
+    "sql": "SELECT CAST(SUM(CASE WHEN T1.atom_id IN (SELECT atom_id FROM connected WHERE bond_id IN (SELECT bond_id FROM bond WHERE molecule_id IN (SELECT molecule_id FROM molecule WHERE label = '+')))) AS REAL) * 100 / NULLIF(COUNT(T1.atom_id), 0) AS percentage_in_bonds FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+'",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What is the ratio of molecules labeled '+' to those labeled '-' in terms of their number of bonds?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T2.label = '+' THEN 1 ELSE 0 END) AS REAL) / SUM(CASE WHEN T2.label = '-' THEN 1 ELSE 0 END) AS ratio_molecules_with_bonds FROM bond AS T2",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What is the bond type between atoms TR000_1 and TR000_2?",
+    "sql": "SELECT T2.bond_type FROM connected AS T1 JOIN bond AS T2 ON T1.bond_id = T2.bond_id WHERE T1.atom_id = 'TR000_1' AND T1.atom_id2 = 'TR000_2'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "How many molecules labeled '+' have exactly two single bonds?",
+    "sql": "SELECT COUNT(*) FROM molecule AS T1 JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.label = '+' AND T2.bond_type = '-' GROUP BY T1.molecule_id HAVING COUNT(*) = 2",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "List all molecules that contain both carbon (C) and oxygen (O) atoms.",
+    "sql": "SELECT DISTINCT T1.molecule_id FROM molecule AS T1 JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element IN ('c', 'o')",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "How many distinct molecules are associated with the bond type '#'",
+    "sql": "SELECT COUNT(DISTINCT T1.molecule_id) FROM bond AS T1 WHERE T1.bond_type = '#'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Among the first 10 molecules sorted by molecule_id, how many have a '+' label?",
+    "sql": "SELECT COUNT(*) FROM molecule AS T WHERE molecule_id BETWEEN 'TR000' AND 'TR009' AND T.label = '+'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Find the element of the atom directly connected to atom TR000_1.",
+    "sql": "SELECT T2.element FROM connected AS T1 JOIN atom AS T2 ON T1.atom_id2 = T2.atom_id WHERE T1.atom_id = 'TR000_1'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "How many molecules have more than three bonds of any type?",
+    "sql": "SELECT COUNT(DISTINCT T1.molecule_id) FROM bond AS T1 GROUP BY T1.molecule_id HAVING COUNT(*) > 3",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Which molecule IDs are associated with at least one bond of type '='?",
+    "sql": "SELECT DISTINCT T1.molecule_id FROM bond AS T1 WHERE T1.bond_type = '='",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Among the molecules labeled as '+', how many distinct atoms do they contain?",
+    "sql": "SELECT COUNT(DISTINCT T2.element) FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.label = '+'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "What is the average number of bonds per molecule among those labeled as '-'?",
+    "sql": "SELECT AVG(COUNT(T1.bond_id)) FROM bond AS T1 WHERE T1.molecule_id IN (SELECT T2.molecule_id FROM molecule AS T2 WHERE T2.label = '-')",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "How many different elements are found in molecules labeled as '+'?",
+    "sql": "SELECT COUNT(DISTINCT T2.element) FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.label = '+'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "What is the total number of bonds involving molecules labeled as '+'?",
+    "sql": "SELECT SUM(CASE WHEN T1.label = '+' THEN 1 ELSE 0 END) * 2 FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Which element is most commonly found in molecules labeled as '-'?",
+    "sql": "SELECT T2.element FROM (SELECT T2.element, COUNT(DISTINCT T2.molecule_id) AS cnt FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.label = '-' GROUP BY T2.element ORDER BY cnt DESC LIMIT 1) AS t",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "What is the maximum number of unique atoms in a single molecule labeled as '+'?",
+    "sql": "SELECT MAX(COUNT(DISTINCT T2.element)) FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.label = '+'",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "How many molecules have more than three bonds?",
+    "sql": "SELECT COUNT(*) FROM molecule AS T1 WHERE T1.molecule_id IN (SELECT T2.molecule_id FROM bond AS T2 GROUP BY T2.molecule_id HAVING COUNT(T2.bond_id) > 3)",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "What is the average bond length of all bonds in molecules labeled as '-'?",
+    "sql": "SELECT AVG(CASE WHEN T1.label = '-' THEN 1 ELSE 0 END) FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "How many molecules contain both carbon and oxygen atoms?",
+    "sql": "SELECT COUNT(DISTINCT T1.molecule_id) FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element IN ('c', 'o')",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "List all molecules that have a single bond with hydrogen.",
+    "sql": "SELECT DISTINCT T1.molecule_id FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id INNER JOIN atom AS T3 ON T2.bond_id = T3.bond_id WHERE T3.element = 'h'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Find the number of distinct bonds involving nitrogen atoms.",
+    "sql": "SELECT COUNT(DISTINCT T3.bond_id) FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id INNER JOIN bond AS T3 ON T2.molecule_id = T3.molecule_id WHERE T2.element = 'n'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Which molecules contain both fluorine and bromine atoms?",
+    "sql": "SELECT DISTINCT T1.molecule_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element IN ('f', 'br')",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "List all molecules with a triple bond type.",
+    "sql": "SELECT DISTINCT T1.molecule_id FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.bond_type = '#'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "How many distinct atoms are involved in double bonds?",
+    "sql": "SELECT COUNT(DISTINCT T3.atom_id) FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id INNER JOIN connected AS T3 ON T2.bond_id = T3.bond_id WHERE T2.bond_type = '='",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Find the number of molecules containing sulfur and phosphorus atoms.",
+    "sql": "SELECT COUNT(DISTINCT T1.molecule_id) FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element IN ('s', 'p')",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "List all molecules with a single bond between silicon and copper atoms.",
+    "sql": "SELECT DISTINCT T1.molecule_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id INNER JOIN connected AS T3 ON T2.molecule_id = T3.bond_id INNER JOIN atom AS T4 ON T3.atom_id2 = T4.atom_id WHERE T2.element = 'si' AND T4.element = 'cu'",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Which bond type has the highest frequency in molecule TR010?",
+    "sql": "SELECT T.bond_type FROM (SELECT T1.bond_type, COUNT(T1.bond_id) AS count FROM bond AS T1 WHERE T1.molecule_id = 'TR010' GROUP BY T1.bond_type ORDER BY count DESC LIMIT 1) AS T",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "What is the most common element in molecule TR004?",
+    "sql": "SELECT T1.element FROM (SELECT T1.element, COUNT(*) AS count FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.molecule_id = 'TR004' GROUP BY T1.element ORDER BY count DESC LIMIT 1) AS T",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Which molecule has the most bonds of type '#'",
+    "sql": "SELECT T2.molecule_id FROM (SELECT T2.molecule_id, COUNT(T1.bond_id) AS count FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.bond_type = '#' GROUP BY T2.molecule_id ORDER BY count DESC LIMIT 1) AS T",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "List the top 5 molecules with the highest number of atoms.",
+    "sql": "SELECT T2.molecule_id, COUNT(*) AS num_atoms FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id ORDER BY num_atoms DESC LIMIT 5",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Find the molecule(s) with the longest chain of consecutive carbon atoms.",
+    "sql": "WITH RECURSIVE carbon_chain AS (SELECT T1.molecule_id, T1.atom_id, T1.element, 1 AS length FROM atom AS T1 WHERE T1.element = 'c' UNION ALL SELECT T1.molecule_id, T1.atom_id, T1.element, CC.length + 1 FROM atom AS T1 JOIN connected AS C ON T1.atom_id = C.atom_id JOIN carbon_chain AS CC ON C.atom_id2 = CC.atom_id WHERE T1.element = 'c') SELECT T2.molecule_id FROM carbon_chain AS CC INNER JOIN molecule AS T2 ON CC.molecule_id = T2.molecule_id GROUP BY T2.molecule_id ORDER BY SUM(CC.length) DESC LIMIT 1",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "How many molecules contain exactly three different elements?",
+    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id HAVING COUNT(DISTINCT T1.element) = 3",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Which molecule has the most bonds involving nitrogen atoms?",
+    "sql": "SELECT T2.molecule_id FROM (SELECT T2.molecule_id, COUNT(*) AS num_nitrogen_bonds FROM atom AS T1 INNER JOIN connected AS C ON T1.atom_id = C.atom_id INNER JOIN bond AS B ON C.bond_id = B.bond_id INNER JOIN molecule AS T2 ON B.molecule_id = T2.molecule_id WHERE T1.element = 'n' GROUP BY T2.molecule_id ORDER BY num_nitrogen_bonds DESC LIMIT 1) AS T",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "List the top 3 molecules with the most heavy atoms (atomic mass > 20).",
+    "sql": "SELECT T2.molecule_id, COUNT(*) AS num_heavy_atoms FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element IN ('s', 'p', 'o', 'n', 'cl', 'br', 'i', 'f') GROUP BY T2.molecule_id ORDER BY num_heavy_atoms DESC LIMIT 3",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "What is the total number of bonds in the molecule with ID 'TR000'?",
+    "sql": "SELECT COUNT(*) FROM bond AS T WHERE T.molecule_id = 'TR000'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "How many different types of bonds are present in the molecule with ID 'TR001'?",
+    "sql": "SELECT COUNT(DISTINCT T.bond_type) FROM bond AS T WHERE T.molecule_id = 'TR001'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Find the average bond length of all bonds in the molecule with ID 'TR002'.",
+    "sql": "SELECT AVG(T.bond_length) FROM bond AS T WHERE T.molecule_id = 'TR002'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "What is the maximum number of bonds connected to any single atom in the molecule with ID 'TR003'?",
+    "sql": "SELECT MAX(COUNT(*)) FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id WHERE T1.molecule_id = 'TR003'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "How many distinct elements are involved in the molecule with ID 'TR004'?",
+    "sql": "SELECT COUNT(DISTINCT T.element) FROM atom AS T WHERE T.molecule_id = 'TR004'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "What is the sum of bond lengths for all double bonds in the molecule with ID 'TR005'?",
+    "sql": "SELECT SUM(T.bond_length) FROM bond AS T WHERE T.molecule_id = 'TR005' AND T.bond_type = '='",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "How many unique molecules contain at least one bond of type '-'?",
+    "sql": "SELECT COUNT(DISTINCT T.molecule_id) FROM bond AS T WHERE T.bond_type = '-'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Find the minimum bond length among all single bonds in the molecule with ID 'TR006'.",
+    "sql": "SELECT MIN(T.bond_length) FROM bond AS T WHERE T.molecule_id = 'TR006' AND T.bond_type = '-'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "What percentage of bonds in the database are single bonds?",
+    "sql": "SELECT CAST(SUM(CASE WHEN bond_type = '-' THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM bond",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What is the ratio of double bonds to single bonds in the database?",
+    "sql": "SELECT CAST(SUM(CASE WHEN bond_type = '=' THEN 1 ELSE 0 END) AS FLOAT) / SUM(CASE WHEN bond_type = '-' THEN 1 ELSE 0 END) AS ratio FROM bond",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What percentage of molecules in the database are labeled as carcinogenic?",
+    "sql": "SELECT CAST(SUM(CASE WHEN label = '+' THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM molecule",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What is the ratio of molecules with labels '+' to those with labels '-'?",
+    "sql": "SELECT CAST(SUM(CASE WHEN label = '+' THEN 1 ELSE 0 END) AS FLOAT) / SUM(CASE WHEN label = '-' THEN 1 ELSE 0 END) AS ratio FROM molecule",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What percentage of atoms in the database belong to molecules with single bonds?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T1.bond_type = '-' THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM bond AS T1 JOIN connected AS T2 ON T1.bond_id = T2.bond_id",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What is the ratio of atoms in molecules with double bonds to those in molecules with single bonds?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T1.bond_type = '=' THEN 1 ELSE 0 END) AS FLOAT) / SUM(CASE WHEN T1.bond_type = '-' THEN 1 ELSE 0 END) AS ratio FROM bond AS T1 JOIN connected AS T2 ON T1.bond_id = T2.bond_id",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What percentage of connected pairs involve atoms from different molecules?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T1.molecule_id <> T2.molecule_id THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM connected AS T1 JOIN atom AS T2 ON T1.atom_id = T2.atom_id JOIN molecule AS T3 ON T2.molecule_id = T3.molecule_id",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What is the ratio of connected pairs involving atoms from different molecules to those involving atoms from the same molecule?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T1.molecule_id <> T2.molecule_id THEN 1 ELSE 0 END) AS FLOAT) / SUM(CASE WHEN T1.molecule_id = T2.molecule_id THEN 1 ELSE 0 END) AS ratio FROM connected AS T1 JOIN atom AS T2 ON T1.atom_id = T2.atom_id JOIN molecule AS T3 ON T2.molecule_id = T3.molecule_id",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What is the label of the molecule with ID TR008?",
+    "sql": "SELECT label FROM molecule WHERE molecule_id = 'TR008'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Find all the distinct elements present in molecules with label '+'.",
+    "sql": "SELECT DISTINCT T1.element FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "How many molecules have a single bond type?",
+    "sql": "SELECT COUNT(DISTINCT molecule_id) FROM bond WHERE bond_type = '-'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "List all atom IDs that form a connection with atom ID 'TR001_1'.",
+    "sql": "SELECT atom_id2 FROM connected WHERE atom_id = 'TR001_1'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Which molecules have at least one bond of type '#'?]\"",
+    "sql": "SELECT DISTINCT molecule_id FROM bond WHERE bond_type = '#'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Find the number of unique molecules that contain at least one atom of element 'o'.",
+    "sql": "SELECT COUNT(DISTINCT molecule_id) FROM atom WHERE element = 'o'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Retrieve the labels of molecules that do not have any bonds of type '='.",
+    "sql": "SELECT label FROM molecule WHERE molecule_id NOT IN (SELECT molecule_id FROM bond WHERE bond_type = '=')",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "How many different bond types are there in the database?",
+    "sql": "SELECT COUNT(DISTINCT bond_type) FROM bond",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "What is the total number of bonds in the database?",
+    "sql": "SELECT COUNT(*) FROM bond",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "What is the average number of bonds per molecule?",
+    "sql": "SELECT CAST(COUNT(T2.bond_id) AS REAL) / NULLIF(COUNT(DISTINCT T1.molecule_id), 0) FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Which elements are present in molecules with a label of '-'?",
+    "sql": "SELECT DISTINCT T1.element FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '-'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "How many unique molecules contain at least one bond of type '#'?",
+    "sql": "SELECT COUNT(DISTINCT T1.molecule_id) FROM bond AS T1 WHERE T1.bond_type = '#'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "What is the maximum number of bonds any single molecule has?",
+    "sql": "SELECT MAX(COUNT(*)) FROM bond GROUP BY molecule_id",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "How many molecules have exactly two bonds?",
+    "sql": "SELECT COUNT(*) FROM (SELECT molecule_id FROM bond GROUP BY molecule_id HAVING COUNT(*) = 2) AS temp",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "What is the sum of all bond types in the database?",
+    "sql": "SELECT SUM(CASE WHEN bond_type = '-' THEN 1 ELSE 0 END) + SUM(CASE WHEN bond_type = '=' THEN 1 ELSE 0 END) + SUM(CASE WHEN bond_type = '#' THEN 1 ELSE 0 END) AS total_bonds FROM bond",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "List all elements present in molecules with a single bond.",
+    "sql": "SELECT DISTINCT T2.element FROM connected AS T1 INNER JOIN atom AS T2 ON T1.atom_id = T2.atom_id INNER JOIN bond AS T3 ON T3.bond_id = T1.bond_id WHERE T3.bond_type = '-'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Find the number of distinct atoms involved in molecules with double bonds.",
+    "sql": "SELECT COUNT(DISTINCT T2.atom_id) FROM connected AS T1 INNER JOIN atom AS T2 ON T1.atom_id = T2.atom_id INNER JOIN bond AS T3 ON T3.bond_id = T1.bond_id WHERE T3.bond_type = '='",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Identify the most common element in molecules labeled as '+'.",
+    "sql": "SELECT T2.element FROM (SELECT T2.element, COUNT(DISTINCT T2.molecule_id) AS cnt FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.label = '+' GROUP BY T2.element ORDER BY cnt DESC LIMIT 1) AS t",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "List all molecules containing both carbon (C) and hydrogen (H) atoms.",
+    "sql": "SELECT T1.molecule_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element IN ('c', 'h') GROUP BY T1.molecule_id HAVING COUNT(DISTINCT T2.element) = 2",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Determine the bond types used in molecules with more than 5 atoms.",
+    "sql": "SELECT DISTINCT T3.bond_type FROM connected AS T1 INNER JOIN atom AS T2 ON T1.atom_id = T2.atom_id INNER JOIN bond AS T3 ON T3.bond_id = T1.bond_id INNER JOIN molecule AS T4 ON T4.molecule_id = T2.molecule_id GROUP BY T3.bond_type HAVING COUNT(T2.atom_id) > 5",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Count the number of unique molecules each element appears in.",
+    "sql": "SELECT T2.element, COUNT(DISTINCT T1.molecule_id) AS molecule_count FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.element",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Find the average number of atoms per molecule for those labeled '-'.",
+    "sql": "SELECT AVG(COUNT(*)) AS avg_atom_count FROM (SELECT T2.molecule_id, COUNT(*) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '-' GROUP BY T2.molecule_id) AS subquery",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "List all molecules with a specific atom connection pattern: A-B-C-D-E-F-G-H-I-J-K-L-M-N-O-P-Q-R-S-T-U-V-W-X-Y-Z.",
+    "sql": "SELECT T1.molecule_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id INNER JOIN connected AS T3 ON T2.atom_id = T3.atom_id WHERE T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'a' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'b' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'c' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'd' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'e' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'f' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'g' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'h' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'i' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'j' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'k' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'l' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'm' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'n' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'o' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'p' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'q' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'r' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 's' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 't' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'u' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'v' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'w' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'x' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'y' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'z' LIMIT 1)",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Which molecules have more than 5 bonds?",
+    "sql": "SELECT T1.molecule_id, COUNT(T2.bond_id) AS bond_count FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id HAVING COUNT(T2.bond_id) > 5",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "List the top 3 molecules with the most connected atoms.",
+    "sql": "SELECT T1.molecule_id, COUNT(DISTINCT T2.atom_id) AS atom_count FROM molecule AS T1 INNER JOIN connected AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id ORDER BY atom_count DESC LIMIT 3",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Find the elements of atoms connected to molecule TR004 with bond type '#'.",
+    "sql": "SELECT DISTINCT T1.element FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id INNER JOIN bond AS T3 ON T2.bond_id = T3.bond_id WHERE T3.molecule_id = 'TR004' AND T3.bond_type = '#'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Rank molecules by the number of unique atoms they contain, showing the top 5.",
+    "sql": "SELECT T1.molecule_id, COUNT(DISTINCT T2.atom_id) AS atom_count FROM molecule AS T1 INNER JOIN connected AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id ORDER BY atom_count DESC LIMIT 5",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "What are the labels of molecules that have exactly 3 bonds?",
+    "sql": "SELECT T1.label FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.label, T1.molecule_id HAVING COUNT(T2.bond_id) = 3",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Identify the molecules with the least number of bonds and list their IDs.",
+    "sql": "SELECT T1.molecule_id FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id ORDER BY COUNT(T2.bond_id) ASC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Find the elements of atoms directly connected to molecule TR002.",
+    "sql": "SELECT DISTINCT T1.element FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id WHERE T2.molecule_id = 'TR002'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Rank molecules by the number of distinct bonds they have, showing the bottom 3.",
+    "sql": "SELECT T1.molecule_id, COUNT(DISTINCT T2.bond_id) AS bond_count FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id ORDER BY bond_count ASC LIMIT 3",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "How many molecules have more than three bonds?",
+    "sql": "SELECT COUNT(*) FROM (SELECT T2.molecule_id FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id HAVING COUNT(T1.bond_id) > 3) AS subquery",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "What is the average number of bonds per molecule?",
+    "sql": "SELECT AVG(bond_count) FROM (SELECT T2.molecule_id, COUNT(T1.bond_id) AS bond_count FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id) AS subquery",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Which molecules have at least one bond type of '#'",
+    "sql": "SELECT DISTINCT T2.molecule_id FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.bond_type = '#'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Calculate the total number of atoms in molecules labeled as positive.",
+    "sql": "SELECT SUM(atom_count) FROM (SELECT T2.molecule_id, COUNT(T1.atom_id) AS atom_count FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+' GROUP BY T2.molecule_id) AS subquery",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Find the count of unique elements in molecules with exactly two bonds.",
+    "sql": "SELECT COUNT(DISTINCT T1.element) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id INNER JOIN bond AS T3 ON T2.molecule_id = T3.molecule_id WHERE T3.bond_type = '-' GROUP BY T2.molecule_id HAVING COUNT(T3.bond_id) = 2",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "How many molecules have a single bond type of '='?",
+    "sql": "SELECT COUNT(*) FROM (SELECT T2.molecule_id FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.bond_type = '=' GROUP BY T2.molecule_id) AS subquery",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Calculate the percentage of molecules that are positively labeled.",
+    "sql": "SELECT CAST(SUM(CASE WHEN T2.label = '+' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(*) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Find the maximum number of bonds in any molecule.",
+    "sql": "SELECT MAX(bond_count) FROM (SELECT T2.molecule_id, COUNT(T1.bond_id) AS bond_count FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id) AS subquery",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "What percentage of bonds in molecule TR004 are single bonds?",
+    "sql": "WITH bond_counts AS (SELECT bond_type, COUNT(*) AS count FROM bond WHERE molecule_id = 'TR004' GROUP BY bond_type) SELECT CAST(SUM(CASE WHEN bond_type = '-' THEN count ELSE 0 END) AS FLOAT) * 100 / SUM(count) AS percent_single_bonds FROM bond_counts;",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "Which elements make up 50% or more of the atoms in molecule TR002?",
+    "sql": "WITH element_counts AS (SELECT element, COUNT(*) AS count FROM atom WHERE molecule_id = 'TR002' GROUP BY element), total_atoms AS (SELECT SUM(count) AS total FROM element_counts) SELECT element FROM element_counts WHERE count * 100 / total >= 50;",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What fraction of all molecules contain at least one carbon atom?",
+    "sql": "WITH carbon_count AS (SELECT COUNT(*) AS count FROM atom WHERE element = 'c'), total_molecules AS (SELECT COUNT(DISTINCT molecule_id) AS total FROM atom) SELECT CAST(count AS FLOAT) * 100 / total FROM carbon_count, total_molecules;",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What percentage of atoms in molecule TR005 are nitrogen atoms?",
+    "sql": "WITH nitrogen_count AS (SELECT COUNT(*) AS count FROM atom WHERE molecule_id = 'TR005' AND element = 'n'), total_atoms AS (SELECT COUNT(*) AS total FROM atom WHERE molecule_id = 'TR005') SELECT CAST(count AS FLOAT) * 100 / total FROM nitrogen_count, total_atoms;",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "Which bond types account for over 10% of the bonds in molecule TR003?",
+    "sql": "WITH bond_percentages AS (SELECT bond_type, COUNT(*) * 100.0 / (SELECT COUNT(*) FROM bond WHERE molecule_id = 'TR003') AS percentage FROM bond WHERE molecule_id = 'TR003' GROUP BY bond_type HAVING percentage > 10) SELECT bond_type, percentage FROM bond_percentages;",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What is the ratio of the number of oxygen atoms to hydrogen atoms in molecule TR001?",
+    "sql": "WITH oxygen_count AS (SELECT COUNT(*) AS count FROM atom WHERE molecule_id = 'TR001' AND element = 'o'), hydrogen_count AS (SELECT COUNT(*) AS count FROM atom WHERE molecule_id = 'TR001' AND element = 'h') SELECT CAST(oxygen_count.count AS FLOAT) / hydrogen_count.count AS ratio FROM oxygen_count, hydrogen_count;",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What percentage of bonds in molecule TR006 are double bonds?",
+    "sql": "WITH bond_counts AS (SELECT bond_type, COUNT(*) AS count FROM bond WHERE molecule_id = 'TR006' GROUP BY bond_type) SELECT CAST(SUM(CASE WHEN bond_type = '=' THEN count ELSE 0 END) AS FLOAT) * 100 / SUM(count) AS percent_double_bonds FROM bond_counts;",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "Which element makes up the smallest percentage of atoms in molecule TR007?",
+    "sql": "WITH element_counts AS (SELECT element, COUNT(*) AS count FROM atom WHERE molecule_id = 'TR007' GROUP BY element), total_atoms AS (SELECT SUM(count) AS total FROM element_counts) SELECT element FROM element_counts WHERE count * 100 / total = (SELECT MIN(count * 100.0 / total) FROM element_counts, total_atoms);",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What is the molecule ID of the molecule with the element 'o'?",
+    "sql": "SELECT DISTINCT T1.molecule_id FROM atom AS T1 WHERE T1.element = 'o'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "How many atoms belong to the molecule 'TR008'?",
+    "sql": "SELECT COUNT(DISTINCT T1.atom_id) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.molecule_id = 'TR008'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "What is the bond type of the bond between atoms 'TR000_1' and 'TR000_2'?",
+    "sql": "SELECT DISTINCT T1.bond_type FROM bond AS T1 INNER JOIN connected AS T2 ON T1.bond_id = T2.bond_id WHERE T2.atom_id = 'TR000_1' AND T2.atom_id2 = 'TR000_2'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "How many molecules have the label '+'?",
+    "sql": "SELECT COUNT(DISTINCT molecule_id) FROM molecule WHERE label = '+'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "What is the element of the atom with the ID 'TR000_3'?",
+    "sql": "SELECT DISTINCT element FROM atom WHERE atom_id = 'TR000_3'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "How many bonds of type '-' are present in the molecule 'TR004'?",
+    "sql": "SELECT COUNT(DISTINCT T1.bond_id) FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.molecule_id = 'TR004' AND T1.bond_type = '-'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "What is the label of the molecule that contains the bond 'TR017_2_3'?",
+    "sql": "SELECT DISTINCT T2.label FROM molecule AS T2 INNER JOIN bond AS T1 ON T2.molecule_id = T1.molecule_id WHERE T1.bond_id = 'TR017_2_3'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "How many distinct elements are there in the molecule 'TR012'?",
+    "sql": "SELECT COUNT(DISTINCT T1.element) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.molecule_id = 'TR012'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "What is the average number of bonds per molecule?",
+    "sql": "SELECT AVG(T2.bond_id) AS avg_bonds_per_molecule FROM molecule AS T1 LEFT JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "How many single bonds are there in total?",
+    "sql": "SELECT COUNT(*) AS total_single_bonds FROM bond WHERE bond_type = '-'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Calculate the sum of all bond IDs as integers.",
+    "sql": "SELECT SUM(CAST(SUBSTRING_INDEX(bond_id, '_', -1) AS UNSIGNED)) AS sum_of_bond_ids FROM bond",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "What is the maximum number of bonds any molecule has?",
+    "sql": "SELECT MAX(COUNT(T2.bond_id)) AS max_bonds FROM molecule AS T1 LEFT JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Find the average bond length of all molecules with more than 10 bonds.",
+    "sql": "SELECT AVG(COUNT(T2.bond_id)) AS avg_bond_length FROM molecule AS T1 LEFT JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id HAVING COUNT(T2.bond_id) > 10",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Count the number of distinct elements used in molecules labeled as '+'.",
+    "sql": "SELECT COUNT(DISTINCT T1.element) AS distinct_elements_in_carcinogenic FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Find the total number of unique atom pairs involved in double bonds within non-carcinogenic molecules.",
+    "sql": "SELECT COUNT(DISTINCT T1.atom_id, T1.atom_id2) AS unique_atom_pairs FROM connected AS T1 INNER JOIN bond AS T2 ON T1.bond_id = T2.bond_id INNER JOIN molecule AS T3 ON T2.molecule_id = T3.molecule_id WHERE T2.bond_type = '=' AND T3.label = '-'",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "How many atoms are part of molecule TR000?",
+    "sql": "SELECT COUNT(*) FROM atom AS T WHERE T.molecule_id = 'TR000'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "What elements are involved in molecule TR004?",
+    "sql": "SELECT DISTINCT T.element FROM atom AS T WHERE T.molecule_id = 'TR004'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "How many bonds of type '-' are present in molecule TR002?",
+    "sql": "SELECT COUNT(*) FROM bond AS T1 INNER JOIN connected AS T2 ON T1.bond_id = T2.bond_id WHERE T1.molecule_id = 'TR002' AND T1.bond_type = '-'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Which molecules contain at least one bond of type '='?",
+    "sql": "SELECT DISTINCT T1.molecule_id FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.bond_type = '='",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "What is the total number of atoms connected by bond TR011_34_36?",
+    "sql": "SELECT COUNT(DISTINCT T2.atom_id) + COUNT(DISTINCT T2.atom_id2) FROM connected AS T2 WHERE T2.bond_id = 'TR011_34_36'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Find all molecules that have at least one carbon atom.",
+    "sql": "SELECT DISTINCT T1.molecule_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'c'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "How many unique bonds are there in molecule TR022?",
+    "sql": "SELECT COUNT(DISTINCT T2.bond_id) FROM connected AS T2 WHERE T2.molecule_id = 'TR022'",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "List all bond types used in molecules with more than 5 atoms.",
+    "sql": "SELECT DISTINCT T1.bond_type FROM bond AS T1 INNER JOIN connected AS T2 ON T1.bond_id = T2.bond_id WHERE T2.molecule_id IN (SELECT molecule_id FROM atom GROUP BY molecule_id HAVING COUNT(*) > 5)",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Which molecule has the most bonds?",
+    "sql": "SELECT T1.molecule_id, COUNT(T2.bond_id) AS num_bonds FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id ORDER BY num_bonds DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "List the top 5 molecules with the highest number of heavy metal atoms (Cu, Sn).",
+    "sql": "SELECT T1.molecule_id, COUNT(T1.element) AS num_heavy_metals FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element IN ('cu', 'sn') GROUP BY T1.molecule_id ORDER BY num_heavy_metals DESC LIMIT 5",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Find the molecule with the fewest bonds.",
+    "sql": "SELECT T1.molecule_id, COUNT(T2.bond_id) AS num_bonds FROM molecule AS T1 LEFT JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id ORDER BY num_bonds ASC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "What is the average bond length among all molecules?",
+    "sql": "SELECT AVG(LENGTH(T1.bond_id)) AS avg_length FROM bond AS T1",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "List the top 3 molecules with the highest number of oxygen atoms.",
+    "sql": "SELECT T1.molecule_id, COUNT(T1.element) AS num_oxygen FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'o' GROUP BY T1.molecule_id ORDER BY num_oxygen DESC LIMIT 3",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Find the molecule with the longest bond.",
+    "sql": "SELECT T1.molecule_id, MAX(LENGTH(T1.bond_id)) AS max_length FROM bond AS T1",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "List the top 5 molecules with the highest number of nitrogen atoms.",
+    "sql": "SELECT T1.molecule_id, COUNT(T1.element) AS num_nitrogen FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'n' GROUP BY T1.molecule_id ORDER BY num_nitrogen DESC LIMIT 5",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "What is the average number of bonds per molecule?",
+    "sql": "SELECT AVG(num_bonds) FROM (SELECT COUNT(T2.bond_id) AS num_bonds FROM molecule AS T1 LEFT JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id) AS subquery",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Among the molecules with more than 3 atoms, how many unique bond types are present?",
+    "sql": "SELECT COUNT(DISTINCT T2.bond_type) FROM atom AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id HAVING COUNT(T1.atom_id) > 3",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "What is the total number of bonds involving elements other than hydrogen?",
+    "sql": "SELECT SUM(CASE WHEN T2.element != 'h' THEN 1 ELSE 0 END) AS total_bonds FROM connected AS T1 INNER JOIN atom AS T2 ON T1.atom_id = T2.atom_id",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "How many molecules contain exactly two different elements?",
+    "sql": "SELECT COUNT(DISTINCT T1.molecule_id) FROM atom AS T1 GROUP BY T1.molecule_id HAVING COUNT(DISTINCT T2.element) = 2",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Determine the average number of bonds per molecule that contains oxygen.",
+    "sql": "SELECT AVG(COUNT(T2.bond_id)) AS avg_bonds_per_molecule FROM atom AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'o'",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "How many molecules have all their atoms bonded to at least three other atoms?",
+    "sql": "SELECT COUNT(DISTINCT T1.molecule_id) FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id GROUP BY T1.molecule_id HAVING COUNT(T2.atom_id) >= 3",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Calculate the percentage of bonds that involve fluorine atoms.",
+    "sql": "SELECT CAST(SUM(CASE WHEN T2.element = 'f' THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) AS percent_fluorine_bonds FROM connected AS T1 INNER JOIN atom AS T2 ON T1.atom_id = T2.atom_id",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Find the number of distinct molecules that have both carbon and nitrogen atoms.",
+    "sql": "SELECT COUNT(DISTINCT T1.molecule_id) FROM atom AS T1 WHERE T1.element IN ('c', 'n') GROUP BY T1.molecule_id HAVING COUNT(DISTINCT T1.element) = 2",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Determine the most common bond type among molecules containing silicon atoms.",
+    "sql": "SELECT T2.bond_type FROM atom AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'si' GROUP BY T2.bond_type ORDER BY COUNT(*) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "What is the ratio of molecules labeled '+' to those labeled '-'?",
+    "sql": "SELECT CAST(SUM(CASE WHEN label = '+' THEN 1 ELSE 0 END) AS FLOAT) / SUM(CASE WHEN label = '-' THEN 1 ELSE 0 END) AS ratio FROM molecule",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What percentage of bonds are single bonds ('-') in molecules labeled '+ '?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T2.bond_type = '-' THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) AS percentage FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.label = '+'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "Among molecules labeled '-', what is the ratio of molecules with 4 atoms to those with more than 4 atoms?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T3.atom_id IS NOT NULL THEN 1 ELSE 0 END) AS FLOAT) / COUNT(*) AS ratio FROM molecule AS T1 LEFT JOIN (SELECT T1.molecule_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id HAVING COUNT(T2.atom_id) > 4) AS T3 ON T1.molecule_id = T3.molecule_id WHERE T1.label = '-'",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What is the percentage of carbon atoms among all atoms in molecules labeled '+ '?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T1.element = 'c' THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) AS percentage FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What is the ratio of molecules with exactly 3 connected atoms to those with fewer than 3 connected atoms?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T4.atom_id IS NOT NULL THEN 1 ELSE 0 END) AS FLOAT) / COUNT(*) AS ratio FROM molecule AS T1 LEFT JOIN (SELECT T1.molecule_id FROM molecule AS T1 INNER JOIN connected AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id HAVING COUNT(DISTINCT T2.atom_id) = 3) AS T4 ON T1.molecule_id = T4.molecule_id",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What percentage of oxygen atoms are part of molecules labeled '-'?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T1.element = 'o' THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) AS percentage FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '-'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "Among molecules labeled '+', what is the ratio of molecules with 5 or more bonds to those with fewer than 5 bonds?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T3.bond_id IS NOT NULL THEN 1 ELSE 0 END) AS FLOAT) / COUNT(*) AS ratio FROM molecule AS T1 LEFT JOIN (SELECT T1.molecule_id FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id HAVING COUNT(T2.bond_id) >= 5) AS T3 ON T1.molecule_id = T3.molecule_id WHERE T1.label = '+'",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What percentage of sulfur atoms are part of molecules labeled '+'?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T1.element = 's' THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) AS percentage FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "Which molecules have a single bond?",
+    "sql": "SELECT DISTINCT T1.molecule_id FROM bond AS T1 WHERE T1.bond_type = '-'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "What molecules contain both carbon and hydrogen atoms?",
+    "sql": "SELECT T1.molecule_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element IN ('c', 'h') GROUP BY T1.molecule_id HAVING COUNT(DISTINCT T2.element) > 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Find all molecules with a double bond.",
+    "sql": "SELECT DISTINCT T1.molecule_id FROM bond AS T1 WHERE T1.bond_type = '='",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "List molecules that do not contain any oxygen atoms.",
+    "sql": "SELECT T1.molecule_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element != 'o'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Identify all molecules that are not labeled as carcinogenic.",
+    "sql": "SELECT molecule_id FROM molecule WHERE label = '-'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Find all molecules that contain exactly three different elements.",
+    "sql": "SELECT molecule_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY molecule_id HAVING COUNT(DISTINCT element) = 3",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Which molecules have a single bond and are labeled as non-carcinogenic?",
+    "sql": "SELECT DISTINCT T1.molecule_id FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '-' AND T1.bond_type = '-'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Find all molecules that contain both nitrogen and fluorine atoms.",
+    "sql": "SELECT T1.molecule_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element IN ('n', 'f') GROUP BY T1.molecule_id HAVING COUNT(DISTINCT T2.element) > 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "What is the average number of atoms per molecule?",
+    "sql": "SELECT AVG(num_atoms) FROM (SELECT molecule_id, COUNT(*) as num_atoms FROM atom GROUP BY molecule_id) AS T;",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "How many molecules contain more than 10 atoms?",
+    "sql": "SELECT COUNT(*) FROM molecule WHERE molecule_id IN (SELECT molecule_id FROM atom GROUP BY molecule_id HAVING COUNT(*) > 10);",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Find the total number of bonds of type '-' in each molecule.",
+    "sql": "SELECT T2.molecule_id, COUNT(*) FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.bond_type = '-' GROUP BY T2.molecule_id;",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "What is the maximum number of bonds in any single molecule?",
+    "sql": "SELECT MAX(num_bonds) FROM (SELECT molecule_id, COUNT(*) as num_bonds FROM bond GROUP BY molecule_id) AS T;",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "List the molecule IDs of all molecules that have exactly 5 atoms.",
+    "sql": "SELECT molecule_id FROM atom GROUP BY molecule_id HAVING COUNT(*) = 5;",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Calculate the average number of atoms per molecule for each label (+/-).",
+    "sql": "SELECT T2.label, AVG(num_atoms) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.label;",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Find the sum of the number of atoms in all molecules.",
+    "sql": "SELECT SUM(num_atoms) FROM (SELECT molecule_id, COUNT(*) as num_atoms FROM atom GROUP BY molecule_id) AS T;",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Determine the number of unique molecules that have a bond of type '#'.",
+    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.bond_type = '#';",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "What are the elements of atoms connected to molecule TR000?",
+    "sql": "SELECT DISTINCT T3.element FROM connected AS T1 INNER JOIN atom AS T2 ON T1.atom_id = T2.atom_id INNER JOIN atom AS T3 ON T1.atom_id2 = T3.atom_id WHERE T2.molecule_id = 'TR000'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Find all molecules that have both carbon and oxygen atoms.",
+    "sql": "SELECT DISTINCT T2.molecule_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element IN ('c', 'o') GROUP BY T2.molecule_id HAVING COUNT(DISTINCT T1.element) > 1",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Which molecules have bonds involving a single covalent bond?",
+    "sql": "SELECT DISTINCT T2.molecule_id FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.bond_type = '-'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "List all bond types present in the database.",
+    "sql": "SELECT DISTINCT bond_type FROM bond",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "How many distinct molecules have at least one bond of type '#'?",
+    "sql": "SELECT COUNT(DISTINCT molecule_id) FROM bond WHERE bond_type = '#'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Find all atoms connected to molecule TR001 through a single bond.",
+    "sql": "SELECT DISTINCT T3.element FROM connected AS T1 INNER JOIN bond AS T2 ON T1.bond_id = T2.bond_id INNER JOIN atom AS T3 ON T1.atom_id = T3.atom_id WHERE T2.molecule_id = 'TR001' AND T2.bond_type = '-'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "What are the labels of molecules that have at least one bond involving an oxygen atom?",
+    "sql": "SELECT DISTINCT T2.label FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'o'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "How many unique molecules are there with a bond involving both hydrogen and fluorine atoms?",
+    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element IN ('h', 'f') GROUP BY T2.molecule_id HAVING COUNT(DISTINCT T1.element) > 1",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "What is the label of the molecule with the highest number of atoms?",
+    "sql": "SELECT T2.label FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.label ORDER BY COUNT(T1.atom_id) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Find the molecule IDs of molecules containing more than 5 different elements.",
+    "sql": "SELECT T2.molecule_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id HAVING COUNT(DISTINCT T1.element) > 5",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "List the top 3 most common bond types in the database.",
+    "sql": "SELECT bond_type FROM bond GROUP BY bond_type ORDER BY COUNT(*) DESC LIMIT 3",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Which molecule has the most connected atoms, and how many?",
+    "sql": "SELECT T2.molecule_id, COUNT(T1.atom_id) AS num_atoms FROM connected AS T1 INNER JOIN molecule AS T2 ON T1.bond_id = T2.bond_id GROUP BY T2.molecule_id ORDER BY num_atoms DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Rank the molecules based on the total number of bonds they contain, from most to least.",
+    "sql": "SELECT T2.molecule_id, COUNT(T1.bond_id) AS total_bonds FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id ORDER BY total_bonds DESC",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Identify the elements used most frequently in molecules with a positive label.",
+    "sql": "SELECT T1.element FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+' GROUP BY T1.element ORDER BY COUNT(*) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Determine the number of unique molecules that have exactly 3 atoms.",
+    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id HAVING COUNT(T1.atom_id) = 3",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "Retrieve the molecule IDs of molecules that contain at least 2 different bond types.",
+    "sql": "SELECT T2.molecule_id FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id HAVING COUNT(DISTINCT T1.bond_type) >= 2",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT"
+  },
+  {
+    "question": "What is the total number of atoms in molecule TR000?",
+    "sql": "SELECT COUNT(*) FROM atom WHERE molecule_id = 'TR000'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Which bond type is most common in molecule TR000?",
+    "sql": "SELECT bond_type FROM bond WHERE molecule_id = 'TR000' GROUP BY bond_type ORDER BY COUNT(*) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "What is the percentage of atoms that are carbon in molecule TR000?",
+    "sql": "SELECT CAST(SUM(CASE WHEN element = 'c' THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM atom WHERE molecule_id = 'TR000'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "How many molecules contain at least one bond of type '#'",
+    "sql": "SELECT COUNT(DISTINCT molecule_id) FROM bond WHERE bond_type = '#'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "What is the average number of bonds per molecule?",
+    "sql": "SELECT AVG(bond_count) FROM (SELECT molecule_id, COUNT(*) AS bond_count FROM bond GROUP BY molecule_id) AS subquery",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "How many unique molecules are there with at least one carbon atom?",
+    "sql": "SELECT COUNT(DISTINCT molecule_id) FROM atom WHERE element = 'c'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "What is the most frequent bond type involving carbon atoms?",
+    "sql": "SELECT bond_type FROM bond WHERE molecule_id IN (SELECT molecule_id FROM atom WHERE element = 'c') GROUP BY bond_type ORDER BY COUNT(*) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "What is the ratio of oxygen atoms to hydrogen atoms in molecule TR000?",
+    "sql": "SELECT CAST(COUNT(CASE WHEN element = 'o' THEN 1 ELSE NULL END) AS FLOAT) / COUNT(CASE WHEN element = 'h' THEN 1 ELSE NULL END) FROM atom WHERE molecule_id = 'TR000'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter"
+  },
+  {
+    "question": "Which molecule has the highest ratio of carbon atoms to total atoms?",
+    "sql": "SELECT T2.molecule_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'c' GROUP BY T2.molecule_id ORDER BY SUM(CASE WHEN T1.element = 'c' THEN 1 ELSE 0 END) * 100 / COUNT(T1.element) DESC LIMIT 1",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What is the ratio of molecules labeled as '+', to those labeled as '-', that contain nitrogen atoms?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T2.label = '+' THEN 1 ELSE 0 END) AS FLOAT) * 100 / SUM(CASE WHEN T2.label = '-' THEN 1 ELSE 0 END) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'n'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "Which bond type is most common among molecules labeled as '+'?",
+    "sql": "SELECT T1.bond_type FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+' GROUP BY T1.bond_type ORDER BY COUNT(*) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What percentage of atoms in the database are oxygen atoms?",
+    "sql": "SELECT CAST(SUM(CASE WHEN element = 'o' THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM atom",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "Among molecules containing hydrogen atoms, what is the ratio of molecules labeled as '+' to those labeled as '-'?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T2.label = '+' THEN 1 ELSE 0 END) AS FLOAT) * 100 / SUM(CASE WHEN T2.label = '-' THEN 1 ELSE 0 END) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'h'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "What is the ratio of molecules labeled as '+' to those labeled as '-' that contain sulfur atoms?",
+    "sql": "SELECT CAST(SUM(CASE WHEN T2.label = '+' THEN 1 ELSE 0 END) AS FLOAT) * 100 / SUM(CASE WHEN T2.label = '-' THEN 1 ELSE 0 END) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 's'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "Which molecule has the highest ratio of chlorine atoms to total atoms?",
+    "sql": "SELECT DISTINCT T1.molecule_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'cl' GROUP BY T2.molecule_id ORDER BY SUM(CASE WHEN T1.element = 'cl' THEN 1 ELSE 0 END) * 100 / COUNT(T1.element) DESC LIMIT 1",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities"
+  },
+  {
+    "question": "Which molecules have a '+' label?",
+    "sql": "SELECT molecule_id FROM molecule WHERE label = '+'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "What is the bond type between atoms TR000_1 and TR000_2?",
+    "sql": "SELECT T3.bond_type FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id INNER JOIN bond AS T3 ON T2.bond_id = T3.bond_id WHERE T1.atom_id = 'TR000_1' AND T2.atom_id2 = 'TR000_2'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Which molecule contains the atom with ID TR001_1?",
+    "sql": "SELECT molecule_id FROM atom WHERE atom_id = 'TR001_1'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "What are the labels of molecules TR000, TR001, and TR002?",
+    "sql": "SELECT molecule_id, label FROM molecule WHERE molecule_id IN ('TR000', 'TR001', 'TR002')",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Is the molecule with ID TR004 carcinogenic?",
+    "sql": "SELECT CASE WHEN label = '+' THEN 'Yes' ELSE 'No' END AS is_carcinogenic FROM molecule WHERE molecule_id = 'TR004'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "What is the bond type between atoms TR000_2 and TR000_3?",
+    "sql": "SELECT T3.bond_type FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id INNER JOIN bond AS T3 ON T2.bond_id = T3.bond_id WHERE T1.atom_id = 'TR000_2' AND T2.atom_id2 = 'TR000_3'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "Which molecules have a '-' label?",
+    "sql": "SELECT molecule_id FROM molecule WHERE label = '-'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter"
+  },
+  {
+    "question": "What is the average number of atoms per molecule?",
+    "sql": "SELECT AVG(COUNT(*)) FROM (SELECT molecule_id FROM atom GROUP BY molecule_id) AS T",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Which molecule has the highest number of carbon atoms?",
+    "sql": "SELECT T1.molecule_id FROM molecule AS T1 JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'c' GROUP BY T1.molecule_id ORDER BY COUNT(*) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "How many molecules have more than 10 atoms?",
+    "sql": "SELECT COUNT(*) FROM (SELECT molecule_id FROM atom GROUP BY molecule_id HAVING COUNT(*) > 10) AS T",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "What is the total number of bonds involving molecules labeled as '+ '?",
+    "sql": "SELECT SUM(COUNT(*)) FROM (SELECT molecule_id FROM bond WHERE molecule_id IN (SELECT molecule_id FROM molecule WHERE label = '+ ') GROUP BY molecule_id) AS T",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Which molecule has the most diverse set of elements?",
+    "sql": "SELECT T1.molecule_id FROM molecule AS T1 JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id ORDER BY COUNT(DISTINCT T2.element) DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Calculate the sum of all bond lengths in molecule TR058.",
+    "sql": "SELECT SUM(CASE WHEN T1.molecule_id = 'TR058' THEN 1 ELSE 0 END) FROM bond AS T1 JOIN connected AS T2 ON T1.bond_id = T2.bond_id",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "How many unique bonds are there in molecules that contain both 'C' and 'O' atoms?",
+    "sql": "SELECT COUNT(DISTINCT T1.bond_id) FROM bond AS T1 JOIN connected AS T2 ON T1.bond_id = T2.bond_id WHERE T2.atom_id IN (SELECT atom_id FROM atom WHERE molecule_id IN (SELECT molecule_id FROM atom WHERE element IN ('C', 'O')))",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "Find the average number of bonds per molecule, grouped by their labels.",
+    "sql": "SELECT T2.label, AVG(COUNT(*)) FROM bond AS T1 JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.label",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY"
+  },
+  {
+    "question": "What elements are involved in bonds of type '#'?",
+    "sql": "SELECT DISTINCT T3.element FROM bond AS T1 INNER JOIN connected AS T2 ON T1.bond_id = T2.bond_id INNER JOIN atom AS T3 ON T2.atom_id = T3.atom_id WHERE T1.bond_type = '#'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Find all molecules with both '+' and '-' labels.",
+    "sql": "SELECT T1.molecule_id FROM molecule AS T1 WHERE T1.label = '+' INTERSECT SELECT T1.molecule_id FROM molecule AS T1 WHERE T1.label = '-'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Which molecules have bonds involving more than two atoms?",
+    "sql": "SELECT T2.molecule_id FROM connected AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id HAVING COUNT(DISTINCT T1.atom_id) > 2",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "List all molecules connected to a specific atom with ID 'TR000_1'.",
+    "sql": "SELECT DISTINCT T2.molecule_id FROM connected AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.atom_id = 'TR000_1'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Count the number of distinct molecules with single bond types.",
+    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.bond_type = '-'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "Find molecules that have both 'c' and 'o' atoms.",
+    "sql": "SELECT T2.molecule_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'c' INTERSECT SELECT T2.molecule_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'o'",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
+  },
+  {
+    "question": "List all molecules that do not have any bonds of type '='.",
+    "sql": "SELECT T1.molecule_id FROM molecule AS T1 LEFT JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.bond_type != '=' OR T2.bond_type IS NULL",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys"
   }
 ]
