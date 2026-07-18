@@ -77,7 +77,12 @@ def run_evaluation(predictions: Dict[str, str], answer_file: str, db_url: str):
         try:
             # predicted_sql = sqlite_to_postgres(predicted_sql)
             gold_sql = sqlite_to_postgres(gold_sql)
-            engine = create_engine(db_uri)
+            # A predicted query can be accidentally quadratic (cross join, bad
+            # subquery) and hang the whole evaluation; cap every statement.
+            engine = create_engine(
+                db_uri,
+                connect_args={"options": "-c statement_timeout=30000"},
+            )
 
             with engine.connect() as conn:
 
