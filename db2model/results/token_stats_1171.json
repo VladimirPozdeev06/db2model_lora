@@ -1,0 +1,14 @@
+{
+  "baseline": {
+    "file": "/kaggle/working/query_results_baseline.json",
+    "avg_prompt_tokens": 288.2087912087912
+  },
+  "lora": {
+    "file": "/kaggle/working/query_results_lora.json",
+    "avg_prompt_tokens": 90.64835164835165
+  },
+  "zeroshot": {
+    "file": "/kaggle/working/query_results_zeroshot.json",
+    "avg_prompt_tokens": 90.64835164835165
+  }
+}
