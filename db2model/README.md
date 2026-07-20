@@ -130,8 +130,11 @@ uv run python db2model/build_ablation.py       # варианты для ablatio
 Залить `db2model/kaggle_input/` как Kaggle Dataset, включить GPU + Internet, поправить `DATA_DIR`
 в первой ячейке под путь своего датасета. Затем запустить один из ноутбуков:
 
-- `kaggle_train_lora.ipynb` — основной замер: baseline (со схемой) и lora (без) в одном прогоне.
+- `kaggle_train_lora.ipynb` — основной замер (target 3B): baseline, lora, zeroshot в одном прогоне.
+- `kaggle_train_7b.ipynb` — тот же замер на **плановом target 7B** (batch 1 + gradient checkpointing,
+  тег адаптера `synth1171_7b`); даёт строку 7B в лидерборде.
 - `kaggle_ablation.ipynb` — пять вариантов данных, по адаптеру на каждый.
+- `kaggle_seeds.ipynb` — повтор главного замера на 3 сидах (±σ).
 
 Забрать домой `query_results_*.json` (и адаптер, если нужен артефакт).
 
@@ -158,7 +161,9 @@ db2model/
   check_leakage.py      аудит утечки train→eval (точный gold-SQL твин)
   build_ablation.py     варианты датасета для ablation
   extract_sql.py        извлечение SQL из ответа модели перед оценкой
-  kaggle_train_lora.ipynb   основной замер (baseline vs lora)
+  kaggle_train_lora.ipynb   основной замер 3B (baseline vs lora vs zeroshot)
+  kaggle_train_7b.ipynb     тот же замер на плановом target 7B
+  kaggle_seeds.ipynb        повтор на 3 сидах (±σ)
   kaggle_ablation.ipynb     ablation (5 вариантов данных)
   profiles/  raw/  clean/  dataset/  results/   артефакты этапов
   kaggle_input/         то, что заливается на Kaggle

@@ -96,6 +96,8 @@ lora усреднена по 3 сидам (σ = 0.64 п.п.); разрыв кр�
 
 ## 6. План развития
 
+- **Плановый target 7B**: ноутбук `kaggle_train_7b.ipynb` готов (QLoRA 4-bit, batch 1 + gradient
+  checkpointing под 16 ГБ) — прогнать и добавить строку 7B в лидерборд; сейчас замер только на 3B.
 - Больше синтетики (кривая растёт) и повторы ablation с сидами для доказательности.
 - Сильный teacher (API GPT-класса) — проверить, добавляет ли реальная дистилляция.
 - doc2lora (Text-to-LoRA) как альтернатива SFT: генерировать адаптер из описания БД.
@@ -106,7 +108,7 @@ lora усреднена по 3 сидам (σ = 0.64 п.п.); разрыв кр�
 
 `collect_profile / build_mschema / generate_pairs / filter_pairs / build_dataset (с
 деконтаминацией) / build_ablation / check_leakage`, Kaggle-ноутбуки (`kaggle_train_lora /
-kaggle_ablation / kaggle_seeds`), `extract_sql`, оценщик с EX+VES; профили баз и
+kaggle_train_7b / kaggle_ablation / kaggle_seeds`), `extract_sql`, оценщик с EX+VES; профили баз и
 M-Schema (`mschema/<db>.txt`), датасеты (+ `manifest.json` с хешами, `train_clean.json`),
 предсказания всех армов, адаптер (`adapters/synth1171/` + `adapter_card.json`),
 `leaderboard.md`, `EXPERIMENTS.md` (журнал всех прогонов). MCP-сервер

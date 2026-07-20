@@ -13,7 +13,8 @@ target — **Qwen2.5-Coder-3B-Instruct** (4-bit), один исполнител�
 |---|---|---|---|---|---|
 | zeroshot (контроль) | — | нет | 5.49% | 5.35% | 90 |
 | baseline | — | да | 23.08% | 23.51% | 288 |
-| **lora (synth_1171)** | SFT/LoRA | нет | **27.84% ± 0.64** | ≈ EX | **90** |
+| **lora 3B (synth_1171)** | SFT/LoRA | нет | **27.84% ± 0.64** | ≈ EX | **90** |
+| lora 7B (synth_1171) | SFT/LoRA | нет | _TBD_ (`kaggle_train_7b.ipynb`) | _TBD_ | ~90 |
 | lora (synth_347) | SFT/LoRA | нет | 16.85% ± 1.37 | 16.91% ± 1.35 | 91 |
 | light-RAG | RAG (напарница) | подграф | _TBD_ | _TBD_ | _TBD_ |
 
