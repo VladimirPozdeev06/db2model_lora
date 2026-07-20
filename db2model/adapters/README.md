@@ -5,11 +5,11 @@
 
 Адаптеры обучаются на Kaggle (базы из Kaggle не видно, туда едет только датасет).
 После прогона `kaggle_train_lora.ipynb` забери из выхода ноутбука
-`adapter_synth347.zip` и распакуй сюда:
+`adapter_synth1171.zip` и распакуй сюда:
 
 ```
 db2model/adapters/
-  synth347/
+  synth1171/
     adapter_model.safetensors
     adapter_config.json
     adapter_card.json      # base_model, seed, LoRA-конфиг, хеш данных — провенанс

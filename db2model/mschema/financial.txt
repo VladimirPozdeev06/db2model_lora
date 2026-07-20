@@ -1,0 +1,90 @@
+【DB_ID】 financial
+【Schema】
+# Table: district
+[
+(district_id:BIGINT, Primary Key, NOT NULL. Examples: [74, 54, 29]),
+(a2:TEXT. Examples: ['Karlovy Vary', 'Litomerice', 'Rakovnik']),
+(a3:TEXT. Examples: ['north Bohemia', 'south Moravia', 'west Bohemia']),
+(a4:TEXT. Examples: ['161227', '95616', '228848']),
+(a5:TEXT. Examples: ['50', '60', '151']),
+(a6:TEXT. Examples: ['49', '70', '8']),
+(a7:TEXT. Examples: ['1', '9', '4']),
+(a8:BIGINT. Examples: [0, 1, 3]),
+(a9:BIGINT. Examples: [3, 11, 8]),
+(a10:REAL. Examples: [81.8, 72.8, 50.9]),
+(a11:BIGINT. Examples: [9832, 9317, 8720]),
+(a12:REAL. Examples: [1.8, 5.7, 0.4]),
+(a13:REAL. Examples: [2.26, 7.07, 2.66]),
+(a14:BIGINT. Examples: [99, 87, 116]),
+(a15:BIGINT. Examples: [6445, 4063, 18782]),
+(a16:BIGINT. Examples: [99107, 4433, 1525]),
+]
+# Table: account
+[
+(account_id:BIGINT, Primary Key, NOT NULL. Examples: [1, 2, 3]),
+(district_id:BIGINT. Examples: [74, 29, 54]),
+(frequency:TEXT. Examples: ['POPLATEK PO OBRATU', 'POPLATEK TYDNE', 'POPLATEK MESICNE']),
+(date:DATE. Examples: ['1996-10-11', '1994-03-20', '1995-02-27']),
+]
+# Table: disp
+[
+(disp_id:BIGINT, Primary Key, NOT NULL. Examples: [1, 2, 3]),
+(client_id:BIGINT. Examples: [6114, 1489, 4790]),
+(account_id:BIGINT. Examples: [273, 3936, 2574]),
+(type:TEXT. Examples: ['DISPONENT', 'OWNER']),
+]
+# Table: card
+[
+(card_id:BIGINT, Primary Key, NOT NULL. Examples: [1, 2, 3]),
+(disp_id:BIGINT. Examples: [3938, 7576, 4353]),
+(type:TEXT. Examples: ['classic', 'junior', 'gold']),
+(issued:DATE. Examples: ['1998-05-16', '1994-02-05', '1997-10-28']),
+]
+# Table: client
+[
+(client_id:BIGINT, Primary Key, NOT NULL. Examples: [1, 2, 3]),
+(gender:TEXT. Examples: ['M', 'F']),
+(birth_date:DATE. Examples: ['1939-03-13', '1921-09-29', '1943-09-29']),
+(district_id:BIGINT. Examples: [74, 29, 54]),
+]
+# Table: loan
+[
+(loan_id:BIGINT, Primary Key, NOT NULL. Examples: [4959, 4961, 4962]),
+(account_id:BIGINT. Examples: [5541, 10963, 6678]),
+(date:DATE. Examples: ['1998-09-27', '1996-09-09', '1997-05-09']),
+(amount:BIGINT. Examples: [111384, 84120, 162576]),
+(duration:BIGINT. Examples: [24, 60, 48]),
+(payments:REAL. Examples: [1860.0, 2501.0, 7984.0]),
+(status:TEXT. Examples: ['D', 'A', 'C']),
+]
+# Table: order
+[
+(order_id:BIGINT, Primary Key, NOT NULL. Examples: [29401, 29402, 29403]),
+(account_id:BIGINT. Examples: [273, 3936, 2574]),
+(bank_to:TEXT. Examples: ['MN', 'UV', 'QR']),
+(account_to:BIGINT. Examples: [48774606, 34151840, 23767364]),
+(amount:REAL. Examples: [1860.0, 6704.0, 9884.0]),
+(k_symbol:TEXT. Examples: ['', 'POJISTNE', 'LEASING']),
+]
+# Table: trans
+[
+(trans_id:BIGINT, Primary Key, NOT NULL. Examples: [1, 5, 6]),
+(account_id:BIGINT. Examples: [273, 3936, 2574]),
+(date:DATE. Examples: ['1995-02-27', '1996-09-09', '1996-06-04']),
+(type:TEXT. Examples: ['PRIJEM', 'VYBER', 'VYDAJ']),
+(operation:TEXT. Examples: ['PREVOD NA UCET', 'PREVOD Z UCTU', 'VKLAD']),
+(amount:BIGINT. Examples: [39224, 11233, 44127]),
+(balance:BIGINT. Examples: [-9172, 44127, 26264]),
+(k_symbol:TEXT. Examples: [' ', 'DUCHOD', 'POJISTNE']),
+(bank:TEXT. Examples: ['AB', 'CD', 'EF']),
+(account:BIGINT. Examples: [12137484, 89210205, 92639082]),
+]
+【Foreign keys】
+account.district_id = district.district_id
+disp.account_id = account.account_id
+disp.client_id = client.client_id
+card.disp_id = disp.disp_id
+client.district_id = district.district_id
+loan.account_id = account.account_id
+order.account_id = account.account_id
+trans.account_id = account.account_id

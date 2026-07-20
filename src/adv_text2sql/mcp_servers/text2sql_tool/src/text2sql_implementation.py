@@ -14,6 +14,7 @@ from sqlglot.errors import ParseError
 from .prompts import (
     AMBIGUITY_PROMPT_TEMPLATE,
     SQL_PROMPT_TEMPLATE,
+    SYSTEM_PROMPT_NOSCHEMA_TEMPLATE,
     SYSTEM_PROMPT_TEMPLATE,
     VERIFICATION_PROMPT_TEMPLATE,
 )
@@ -27,13 +28,22 @@ logger = logging.getLogger("text2sql_tool")
 
 
 class Text2SQLGenerator:
-    def __init__(self, db_uri: str, llm_client: OpenAIChatCompletionClient):
+    def __init__(
+        self,
+        db_uri: str,
+        llm_client: OpenAIChatCompletionClient,
+        with_schema: bool = True,
+    ):
         """
         Initializes the Text2SQL generator with a database URI.
 
         Args:
             db_uri (str): SQL database URI.
             llm_client (openai.AsyncOpenAI): An initialized asynchronous OpenAI client.
+            with_schema (bool): If True, the DB schema is injected into the system
+                prompt (baseline / RAG arm). If False, the schema is NOT sent and the
+                model is expected to know it from its weights (LoRA "knowledge in
+                weights" arm) — this is what keeps the LoRA arm's token budget small.
         """
         self.db_uri = db_uri
         self.engine: Engine = create_engine(
@@ -42,11 +52,15 @@ class Text2SQLGenerator:
         )
 
         self.llm_client = llm_client
+        self.with_schema = with_schema
 
-        logger.info("Initialized Text2SQLGenerator")
+        logger.info("Initialized Text2SQLGenerator (with_schema=%s)", with_schema)
 
-    def build(self):
-        self.db_schema = self._get_db_schema_light()
+    def build(self, with_schema: bool | None = None):
+        if with_schema is not None:
+            self.with_schema = with_schema
+        # Schema-less arm sends no schema at all — knowledge comes from the adapter.
+        self.db_schema = self._get_db_schema_light() if self.with_schema else None
         # self.db_schema = self._get_db_schema_heavy()
         self.system_prompt = self._create_system_prompt()
 
@@ -182,17 +196,19 @@ class Text2SQLGenerator:
         return "\n".join(schema_parts).strip()
 
     def _create_system_prompt(self) -> str:
-        """Создает системный промпт с описанием схемы БД"""
-        return SYSTEM_PROMPT_TEMPLATE.format(
-            db_schema=self.db_schema, sql_dialect="PostgreSQL"
-        )
+        """Системный промпт: со схемой (baseline) или без неё (арм весов)."""
+        if self.with_schema:
+            return SYSTEM_PROMPT_TEMPLATE.format(
+                db_schema=self.db_schema, sql_dialect="PostgreSQL"
+            )
+        return SYSTEM_PROMPT_NOSCHEMA_TEMPLATE.format(sql_dialect="PostgreSQL")
 
     async def _check_ambiguity(self, user_query: str) -> dict[str, Any]:
         """
         Проверяет пользовательский запрос на неоднозначность с помощью LLM.
         """
         ambiguity_prompt = AMBIGUITY_PROMPT_TEMPLATE.format(
-            db_schema=self.db_schema,
+            db_schema=self.db_schema or "(схема в весах модели, в промпте не приводится)",
             user_query=user_query,
         )
 
@@ -454,34 +470,42 @@ class Text2SQLGenerator:
     async def query(
         self,
         user_query: str,
+        check_ambiguity: bool = True,
+        check_sql_query: bool = False,
     ) -> dict[str, Any]:
         """
-        Полный цикл: генерация SQL + выполнение
+        Полный цикл: (опц.) проверка неоднозначности → генерация SQL →
+        (опц.) верификация → исполнение.
+
         Args:
-            user_query (str): Запрос на естественном языке
-            check_sql_query (bool): Флаг, требуется ли проверять SQL-запрос на корректность
+            user_query (str): Запрос на естественном языке.
+            check_ambiguity (bool): Прогонять ли проверку неоднозначности (для арма
+                весов обычно False — схемы в промпте нет).
+            check_sql_query (bool): Прогонять ли LLM-верификацию сгенерированного SQL.
         Returns:
-            Dict[str, Any]: Объединенные результаты генерации и выполнения
+            Dict[str, Any]: {status, query, execution} либо {status: ambiguous|error}.
         """
 
-        # Ambiguity checking
-        logger.info("Проверяю запрос на неоднозначность...")
-        ambiguity_check = await self._check_ambiguity(user_query)
-
-        if ambiguity_check["status"] == "success" and ambiguity_check["ambiguous"]:
-            logger.info(f"Запрос неоднозначен. Требуется уточнение по причине: {ambiguity_check['clarification_needed']}")
-            return {"status": "ambiguous"}
-
-        if ambiguity_check["status"] == "error":
-            logger.info("Произошла ошибка при проверка неоднозначности.")
-            return {"status": "error"}
-
+        if check_ambiguity:
+            logger.info("Проверяю запрос на неоднозначность...")
+            ambiguity_check = await self._check_ambiguity(user_query)
+            if ambiguity_check["status"] == "error":
+                logger.info("Произошла ошибка при проверке неоднозначности.")
+                return {"status": "error", "message": "ошибка проверки неоднозначности"}
+            if ambiguity_check["ambiguous"]:
+                logger.info(
+                    "Запрос неоднозначен: %s",
+                    ambiguity_check.get("clarification_needed"),
+                )
+                return {
+                    "status": "ambiguous",
+                    "message": ambiguity_check.get("clarification_needed"),
+                }
 
         # Main query generation
         retries = 0
         success = False
         raw_sql = ""
-        final_result = {"status": "error"}
 
         while not success and retries < MAX_RETRIES:
             logger.info(
@@ -502,8 +526,17 @@ class Text2SQLGenerator:
                     raw_sql.strip(),
                     flags=re.IGNORECASE,
                 )
-
-            final_result = {"status": "success", "query": raw_sql}
             success = True
 
-        return final_result
+        if not success:
+            return {"status": "error", "message": "не удалось сгенерировать валидный SQL"}
+
+        if check_sql_query:
+            verification = await self._verify_sql_against_query(user_query, raw_sql)
+            if verification.get("status") == "success" and not verification.get(
+                "is_correct", True
+            ):
+                logger.info("Верификация не прошла: %s", verification.get("reason"))
+
+        execution = self.execute_safe(raw_sql)
+        return {"status": "success", "query": raw_sql, "execution": execution}

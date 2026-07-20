@@ -1,0 +1,29 @@
+【DB_ID】 toxicology
+【Schema】
+# Table: molecule
+[
+(molecule_id:TEXT, Primary Key, NOT NULL. Examples: ['TR000', 'TR001', 'TR002']),
+(label:TEXT. Examples: ['-', '+']),
+]
+# Table: bond
+[
+(bond_id:TEXT, Primary Key, NOT NULL. Examples: ['TR000_1_2', 'TR000_2_3', 'TR000_2_4']),
+(molecule_id:TEXT. Examples: ['TR239', 'TR424', 'TR165']),
+(bond_type:TEXT. Examples: ['#', '=', '-']),
+]
+# Table: connected
+[
+(atom_id:TEXT, Primary Key, NOT NULL. Examples: ['TR000_1', 'TR000_2', 'TR000_3']),
+(atom_id2:TEXT, Primary Key, NOT NULL. Examples: ['TR124_3', 'TR204_10', 'TR210_2']),
+(bond_id:TEXT. Examples: ['TR330_9_25', 'TR362_7_19', 'TR023_6_9']),
+]
+# Table: atom
+[
+(atom_id:TEXT, Primary Key, NOT NULL. Examples: ['TR000_1', 'TR000_2', 'TR000_3']),
+(molecule_id:TEXT. Examples: ['TR239', 'TR424', 'TR165']),
+(element:TEXT. Examples: ['sn', 'si', 'k']),
+]
+【Foreign keys】
+connected.atom_id2 = atom.atom_id
+connected.atom_id = atom.atom_id
+connected.bond_id = bond.bond_id

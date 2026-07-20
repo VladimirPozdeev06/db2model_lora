@@ -1,0 +1,111 @@
+【DB_ID】 codebase_community
+【Schema】
+# Table: postlinks
+[
+(id:BIGINT, Primary Key, NOT NULL. Examples: [108, 145, 217]),
+(creationdate:TIMESTAMP. Examples: ['2012-07-23 07:59:53+00:00', '2011-06-14 13:31:35+00:00', '2011-01-03 13:13:27+00:00']),
+(postid:BIGINT. Examples: [39224, 11233, 76190]),
+(relatedpostid:BIGINT. Examples: [31190, 103067, 11233]),
+(linktypeid:BIGINT. Examples: [1, 3]),
+]
+# Table: badges
+[
+(id:BIGINT, Primary Key, NOT NULL. Examples: [1, 2, 3]),
+(userid:BIGINT. Examples: [44342, 9180, 35599]),
+(name:TEXT. Examples: ['Excavator', 'kolmogorov-smirnov', 'Curious']),
+(date:TIMESTAMP. Examples: ['2013-10-08 20:01:30+00:00', '2013-05-05 02:39:11+00:00', '2012-12-31 13:36:10+00:00']),
+]
+# Table: comments
+[
+(id:BIGINT, Primary Key, NOT NULL. Examples: [1, 2, 3]),
+(postid:BIGINT. Examples: [7004, 68453, 73152]),
+(score:BIGINT. Examples: [0, 1, 2]),
+(text:TEXT. Examples: ['@¢aracal, then how to see the pages you told me in "Fox & Weisberg (2011), An R Companion to Applied Regression." ? I sa...', '$$\\beta|(\\hat{\\beta} -\\beta)^TX^TX(\\hat{\\beta} -\\beta)\\leq \\sigma ^2\\chi ^2$$', '$$\\chi^2=\\frac{1}{N}\\sum_{i=1}^{N}\\frac{(T_{exp}-T_{fit})^2}{\\sigma^2_{exp}}$$']),
+(creationdate:TIMESTAMP. Examples: ['2009-02-02 14:45:19+00:00', '2009-02-02 14:46:04+00:00', '2009-02-02 14:47:12+00:00']),
+(userid:BIGINT. Examples: [34841, 22344, 11233]),
+(userdisplayname:TEXT. Examples: ['jkg', 'user10525', 'David Thornley']),
+]
+# Table: posthistory
+[
+(id:BIGINT, Primary Key, NOT NULL. Examples: [1, 2, 3]),
+(posthistorytypeid:BIGINT. Examples: [1, 2, 3]),
+(postid:BIGINT. Examples: [53347, 1014, 79163]),
+(revisionguid:TEXT. Examples: ['00000000-0000-0000-0000-000000000000', '00001027-a5dc-4f10-b178-30bf59ffe649', '0000232e-1cd7-43ce-991a-4810c1d81e86']),
+(creationdate:TIMESTAMP. Examples: ['2009-02-02 14:21:12+00:00', '2009-02-02 14:24:31+00:00', '2009-02-02 14:24:58+00:00']),
+(userid:BIGINT. Examples: [49768, 44127, 22344]),
+(text:TEXT. Examples: ['', '...............................................', '................................................']),
+(comment:TEXT. Examples: ['deleted 123 characters in body; edited tags', 'Proposed by 16297 approved by 2116, 686 edit id of 2284', '247']),
+(userdisplayname:TEXT. Examples: ['', '1800 INFORMATION', 'aardvarkk']),
+]
+# Table: tags
+[
+(id:BIGINT, Primary Key, NOT NULL. Examples: [1, 2, 3]),
+(tagname:TEXT. Examples: ['kolmogorov-smirnov', 'forestry', 'convolution']),
+(count:BIGINT. Examples: [87, 116, 184]),
+(excerptpostid:BIGINT. Examples: [69044, 40912, 92270]),
+(wikipostid:BIGINT. Examples: [14608, 68560, 28410]),
+]
+# Table: posts
+[
+(id:BIGINT, Primary Key, NOT NULL. Examples: [1, 2, 3]),
+(posttypeid:BIGINT. Examples: [7, 1, 5]),
+(acceptedanswerid:BIGINT. Examples: [30052, 92865, 72397]),
+(creaiondate:TIMESTAMP. Examples: ['2014-03-28 16:56:10+00:00', '2014-05-20 23:13:26+00:00', '2012-03-26 06:31:48+00:00']),
+(score:BIGINT. Examples: [87, 184, 71]),
+(viewcount:BIGINT. Examples: [1489, 273, 3936]),
+(body:TEXT. Examples: ['A bar plot or bar chart, is a graph of the frequency of categorical data. It is differentiated from a histogram because ...', 'A basic forecasting technique for time series data, optionally including trend and/or seasonality, but (usually) excludi...', 'ABC stands for Approximate Bayesian Computation. It is a computational technique for approximately simulating from a pos...']),
+(owneruserid:BIGINT. Examples: [22344, 49768, 44127]),
+(lasactivitydate:TIMESTAMP. Examples: ['2013-11-01 12:30:55+00:00', '2013-03-06 22:03:22+00:00', '2013-07-22 16:22:21+00:00']),
+(title:TEXT. Examples: ['nonparametric MARS regression', 'Discrete variables in regression model?', 'How to calculate the pairwise LD for the given data?']),
+(tags:TEXT. Examples: ['<sem><model><measurement>', '<hypothesis-testing><pca><variance><inference>', '<probability><central-limit-theorem><intuition>']),
+(answercount:BIGINT. Examples: [42, 4, 0]),
+(commentcount:BIGINT. Examples: [29, 4, 34]),
+(favoritecount:BIGINT. Examples: [8, 74, 54]),
+(lasteditoruserid:BIGINT. Examples: [34841, 44127, 11233]),
+(lasteditdate:TIMESTAMP. Examples: ['2011-09-10 20:03:13+00:00', '2013-02-19 04:44:56+00:00', '2014-08-19 14:52:38+00:00']),
+(communityowneddate:TIMESTAMP. Examples: ['2010-07-21 22:13:19+00:00', '2010-07-27 08:42:23+00:00', '2014-02-11 00:59:26+00:00']),
+(parentid:BIGINT. Examples: [44342, 790, 106095]),
+(closeddate:TIMESTAMP. Examples: ['2010-07-19 20:19:46+00:00', '2010-07-20 00:21:48+00:00', '2010-07-29 12:38:50+00:00']),
+(ownerdisplayname:TEXT. Examples: ['user20002', 'user3791304', 'RoyalTS']),
+(lasteditordisplayname:TEXT. Examples: ['asd123', 'Bluey The Dog', 'Chuangye']),
+]
+# Table: users
+[
+(id:BIGINT, Primary Key, NOT NULL. Examples: [-1, 2, 3]),
+(reputation:BIGINT. Examples: [273, 37083, 51]),
+(creationdate:TIMESTAMP. Examples: ['2011-12-28 15:11:15+00:00', '2013-10-02 20:44:40+00:00', '2014-07-28 12:52:38+00:00']),
+(displayname:TEXT. Examples: ['user1930901', 'user44498', 'user43849']),
+(lastaccessdate:TIMESTAMP. Examples: ['2014-07-23 23:37:03+00:00', '2012-07-11 15:54:10+00:00', '2013-09-25 01:14:38+00:00']),
+(websiteurl:TEXT. Examples: ['http://pathintegral.org/blog', 'http://www.2nci.com', 'https://twitter.com/benjaminlmoore']),
+(location:TEXT. Examples: ['Torrance, CA', 'paris', 'jaipur']),
+(aboutme:TEXT. Examples: ['<p>My name is John Tolle. I'm an engineer who also does a lot of computer programming.</p>
+
+<p>My main area of programmi...', '<p>Mathematician interested in all things computer science. </p>
+', '<p>C# .Net developer: BizTalk,WPF
+interesed in Mono development
+familiar with NUnit,xUnit, CruiseControl etc</p>
+']),
+(views:BIGINT. Examples: [1145, 87, 273]),
+(upvotes:BIGINT. Examples: [625, 2468, 116]),
+(downvotes:BIGINT. Examples: [351, 54, 4]),
+(accountid:BIGINT. Examples: [4045195, 103729, 44127]),
+(age:BIGINT. Examples: [74, 54, 29]),
+(profileimageurl:TEXT. Examples: ['https://www.gravatar.com/avatar/5004d66c31ca5e38f624ab4d0f31acaf?s=128&d=identicon&r=PG', 'https://www.gravatar.com/avatar/8c6dd0af5f3631cc71527918124af47f?s=128&d=identicon&r=PG&f=1', 'https://www.gravatar.com/avatar/a0ec4794382f30ae5a7ea07787fa8db8?s=128&d=identicon&r=PG']),
+]
+# Table: votes
+[
+(id:BIGINT, Primary Key, NOT NULL. Examples: [1, 2, 3]),
+(postid:BIGINT. Examples: [6114, 4790, 273]),
+(votetypeid:BIGINT. Examples: [11, 8, 10]),
+(creationdate:DATE. Examples: ['2010-11-12', '2011-01-29', '2010-09-28']),
+(userid:BIGINT. Examples: [87, 1580, 3309]),
+(bountyamount:BIGINT. Examples: [0, 25, 50]),
+]
+【Foreign keys】
+badges.userid = users.id
+comments.userid = users.id
+posthistory.userid = users.id
+posts.lasteditoruserid = users.id
+posts.owneruserid = users.id
+votes.postid = posts.id
+votes.userid = users.id

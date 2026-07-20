@@ -27,22 +27,33 @@ PYTHONIOENCODING=utf-8 uv run --env-file .env python -m adv_text2sql.mcp_servers
 ```bash
 vllm serve Qwen/Qwen2.5-Coder-3B-Instruct \
     --enable-lora \
-    --lora-modules db2model=db2model/adapters/synth347 \
+    --lora-modules db2model=db2model/adapters/synth1171 \
     --port 8001
 ```
 
-`.env`:
+`.env` (плюс `DB_USER`, `DB_PASS`, `BENCHMARK_DB_URL` для исполнения SQL через туннель):
 
 ```
 LLM_BASE_URL=http://localhost:8001/v1
 LLM_MODEL_NAME=db2model
+TARGET_DB=financial            # какую из 3 баз обслуживает сервер
+TEXT2SQL_WITH_SCHEMA=false     # арм весов: схема НЕ подаётся, берётся из адаптера
 ```
 
-Одно изменение в коде: `Text2SQLGenerator.build()` всегда кладёт схему в
-`system_prompt`. Для арма весов нужен режим без схемы — добавить флаг
-`with_schema=False` (пустой блок Schema), иначе теряется весь смысл «знание в весах».
-Это единственная правка; ambiguity-check и ретраи и так отключены в `main.py`
-(`check_ambiguity=False`, `check_sql_query=False`).
+Режим без схемы реализован: `Text2SQLGenerator(..., with_schema=False)` (или флаг
+в `build(with_schema=False)`) собирает системный промпт из `SYSTEM_PROMPT_NOSCHEMA_TEMPLATE`
+— без блока Schema, знание берётся из весов. `main.py` читает `TEXT2SQL_WITH_SCHEMA`
+и `TARGET_DB` из `.env`, строит `db_uri`, вызывает `build()` и исполняет SQL (`execute_safe`,
+только SELECT). ambiguity-check и ретраи отключены (`check_ambiguity=False`).
+
+Запуск сервера:
+
+```bash
+PYTHONIOENCODING=utf-8 uv run --env-file .env python -m adv_text2sql.mcp_servers.text2sql_tool.main
+```
+
+Путь исполнения проверен через туннель (schema-less промпт + `execute_safe`); не проверён
+только сам вызов LLM — нужен поднятый vLLM с адаптером.
 
 Требует GPU (локально или Kaggle-сессия с ssh-туннелем к БД для исполнения SQL) —
 поэтому это демо-выход, а не то, что двигает числа в отчёте.

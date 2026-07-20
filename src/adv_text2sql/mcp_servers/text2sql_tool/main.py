@@ -16,8 +16,6 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-LLM_URL = os.getenv("LLM_URL")
-
 server = FastMCP("text2sql_tool_server")
 
 llm_client = OpenAIChatCompletionClient(
@@ -34,14 +32,25 @@ llm_client = OpenAIChatCompletionClient(
     },
 )
 
-processed_path = "processed_documents"
-db_path = "text2sql_generated.db"
-
-logger.info("Инициализация инструмента ...")
-text2sql_agent = Text2SQLGenerator(
-    db_path=db_path,
-    llm_client=llm_client,
+# Which database this server serves, and how knowledge about it is supplied.
+# WITH_SCHEMA=false is the winning LoRA arm: schema comes from the adapter weights,
+# not the prompt (set LLM_MODEL_NAME to the served adapter, e.g. `db2model`).
+# WITH_SCHEMA=true is the baseline / RAG arm: schema is injected into the prompt.
+TARGET_DB = os.getenv("TARGET_DB", "financial")
+WITH_SCHEMA = os.getenv("TEXT2SQL_WITH_SCHEMA", "false").lower() in ("1", "true", "yes")
+DB_HOST = os.getenv("BENCHMARK_DB_URL", "localhost:5444")
+db_uri = (
+    f"postgresql+psycopg://{os.environ['DB_USER']}:{os.environ['DB_PASS']}"
+    f"@{DB_HOST}/{TARGET_DB}"
 )
+
+logger.info("Инициализация инструмента (db=%s, with_schema=%s) ...", TARGET_DB, WITH_SCHEMA)
+text2sql_agent = Text2SQLGenerator(
+    db_uri=db_uri,
+    llm_client=llm_client,
+    with_schema=WITH_SCHEMA,
+)
+text2sql_agent.build()
 
 logger.info("Генерация описания ...")
 
@@ -81,21 +90,19 @@ async def text2sql(
         check_sql_query=False,
     )
 
-    root = result.get("params", result) if isinstance(result, dict) else {}
-    details = root.get("data", {}).get("details", {})
-    exec_info = details.get("execution", {})
+    if result.get("status") == "ambiguous":
+        return f"_Запрос неоднозначен_: {result.get('message') or 'уточните формулировку'}"
 
-    if exec_info.get("status") == "success":
-        data = exec_info.get("results", [])
-        markdown_table = (
-            tabulate(data, headers="keys", tablefmt="pipe") if data else "Нет данных"
-        )
-        return markdown_table
+    if result.get("status") == "success":
+        exec_info = result.get("execution", {})
+        if exec_info.get("status") == "success":
+            data = exec_info.get("results", [])
+            return (
+                tabulate(data, headers="keys", tablefmt="pipe") if data else "Нет данных"
+            )
+        return f"_Ошибка выполнения_: {exec_info.get('error', 'запрос не выполнен')}"
 
-    error_msg = (
-        details.get("error") or root.get("message") or "Выполнение запроса неуспешно"
-    )
-    return f"_Ошибка_: {error_msg}"
+    return f"_Ошибка_: {result.get('message', 'Выполнение запроса неуспешно')}"
 
 
 logger.info("Tool description: %s", text2sql.description)
