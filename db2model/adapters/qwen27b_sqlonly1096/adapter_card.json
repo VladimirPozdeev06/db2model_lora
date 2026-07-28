@@ -1,0 +1,63 @@
+{
+  "base_model": "Qwen/Qwen2.5-Coder-3B-Instruct",
+  "compute_dtype": "torch.bfloat16",
+  "lora": {
+    "r": 16,
+    "alpha": 32,
+    "dropout": 0.05,
+    "target_modules": [
+      "gate_proj",
+      "up_proj",
+      "v_proj",
+      "o_proj",
+      "q_proj",
+      "down_proj",
+      "k_proj"
+    ]
+  },
+  "train": {
+    "epochs": 3,
+    "lr": 0.0002,
+    "seed": 42,
+    "n_train": 1096,
+    "n_val": 193,
+    "dbs": [
+      "codebase_community",
+      "financial",
+      "toxicology"
+    ]
+  },
+  "data": {
+    "train_json_sha1": "2bda84db197c",
+    "manifest_sha1": "1e4a55b52d4a",
+    "manifest": {
+      "built": "2026-07-28",
+      "seed": 0,
+      "val_fraction": 0.15,
+      "n_train": 1096,
+      "n_val": 193,
+      "eval_leaks_removed": 1,
+      "multitask": false,
+      "n_multitask": 0,
+      "by_db": {
+        "financial": 408,
+        "toxicology": 421,
+        "codebase_community": 460
+      },
+      "by_difficulty": {
+        "simple": 584,
+        "moderate": 480,
+        "challenging": 197,
+        "unknown": 28
+      },
+      "by_task": {
+        "sql_generation": 1096
+      },
+      "source_files": {
+        "financial": "e8b0dbb605a58afe",
+        "toxicology": "fda5075a6aae2922",
+        "codebase_community": "313f8fc14da16f2c"
+      }
+    }
+  }
+}
