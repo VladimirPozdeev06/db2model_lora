@@ -27,6 +27,12 @@ TEMPERATURE = 0.8
 """Diversity matters more than precision here: bad pairs get filtered out later,
 but pairs that are all variations of one query cannot be recovered."""
 
+# The teacher is a Qwen3-series model (Qwen3.6-27B), which reasons by default and
+# would otherwise burn the whole reply on a <think> block and return empty content.
+# enable_thinking=false is Qwen3's own switch; other models on the gateway ignore
+# the flag rather than error, so it is safe to send unconditionally.
+EXTRA_BODY = {"chat_template_kwargs": {"enable_thinking": False}}
+
 FLAVOURS = [
     "simple lookups with a WHERE filter",
     "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
@@ -185,7 +191,8 @@ async def generate(db_id: str, target: int) -> list[dict]:
             tables=", ".join(focus), fewshot=_fewshot(db_id),
         )
         result = await client.create(
-            [SystemMessage(content=system), UserMessage(source="user", content=user)]
+            [SystemMessage(content=system), UserMessage(source="user", content=user)],
+            extra_create_args={"extra_body": EXTRA_BODY},
         )
         batch = _parse(result.content)
         for item in batch:

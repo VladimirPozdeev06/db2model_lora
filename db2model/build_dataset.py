@@ -6,8 +6,13 @@ project and their results are only meaningful if you can say which data produced
 them. It records the input hashes, the split seed and the composition, so a run
 can be traced back to its dataset.
 
+Pass --multitask to mix in the ROUTE auxiliary tasks (schema linking, noise
+correction). They are derived from the train split only, so no validation
+question leaks into training through an auxiliary task.
+
 Usage:
     uv run python db2model/build_dataset.py
+    uv run python db2model/build_dataset.py --multitask
     uv run python db2model/build_dataset.py toxicology financial
 """
 
@@ -19,6 +24,7 @@ from collections import Counter
 from datetime import date
 from pathlib import Path
 
+from build_multitask import derive
 from check_leakage import norm_sql
 
 CLEAN_DIR = Path(__file__).parent / "clean"
@@ -63,12 +69,15 @@ def load(db_ids: list[str]) -> tuple[list[dict], dict]:
                 "sql": pair["sql"],
                 "difficulty": pair.get("difficulty", "unknown"),
                 "source": "synthetic",
+                "task": "sql_generation",
             })
     return records, sources
 
 
 def main() -> None:
-    db_ids = sys.argv[1:] or TARGET_DBS
+    args = sys.argv[1:]
+    with_multitask = "--multitask" in args
+    db_ids = [a for a in args if not a.startswith("--")] or TARGET_DBS
     records, sources = load(db_ids)
     if not records:
         print("нечего собирать — сначала generate_pairs.py и filter_pairs.py")
@@ -89,6 +98,14 @@ def main() -> None:
         cut = max(1, round(len(rows) * VAL_FRACTION))
         val.extend(rows[:cut])
         train.extend(rows[cut:])
+
+    n_multitask = 0
+    if with_multitask:
+        # Derive from the train split only: an aux example built from a val
+        # question would put that question on both sides of the split.
+        aux = derive(train)
+        n_multitask = len(aux)
+        train.extend(aux)
     rng.shuffle(train)
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -104,14 +121,20 @@ def main() -> None:
         "n_train": len(train),
         "n_val": len(val),
         "eval_leaks_removed": n_leaks,
+        "multitask": with_multitask,
+        "n_multitask": n_multitask,
         "by_db": dict(Counter(r["db_id"] for r in records)),
         "by_difficulty": dict(Counter(r["difficulty"] for r in records)),
+        "by_task": dict(Counter(r.get("task", "sql_generation") for r in train)),
         "source_files": sources,
     }
     (OUT_DIR / "manifest.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
 
     print(f"train {len(train)} | val {len(val)}")
+    if with_multitask:
+        print(f"мультизадачных в train: {n_multitask}")
+        print("по задаче:     ", manifest["by_task"])
     print("по базам:      ", manifest["by_db"])
     print("по сложности:  ", manifest["by_difficulty"])
     print(f"-> {OUT_DIR}")
