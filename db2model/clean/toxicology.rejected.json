@@ -1,1818 +1,23 @@
 [
   {
-    "question": "How many different bond types are present in molecules with more than 10 atoms?",
-    "sql": "SELECT COUNT(DISTINCT T1.bond_type) FROM bond AS T1 INNER JOIN atom AS T2 ON T1.bond_id = T2.bond_id WHERE T2.molecule_id IN (SELECT molecule_id FROM atom WHERE molecule_id IN (SELECT molecule_id FROM atom GROUP BY molecule_id HAVING COUNT(*) > 10))",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "simple lookups with a WHERE filter",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.bond_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the average number of bonds per molecule?",
-    "sql": "SELECT AVG(COUNT(T2.bond_id)) FROM molecule AS T1 LEFT JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Find the maximum number of bonds any single atom is involved in.",
-    "sql": "SELECT MAX(COUNT(T2.bond_id)) FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "For each molecule, find the number of distinct atoms and the sum of bond lengths between them.",
-    "sql": "SELECT T2.molecule_id, COUNT(DISTINCT T1.atom_id) AS num_atoms, SUM(LENGTH(T1.atom_id) - LENGTH(T2.atom_id)) AS sum_bond_lengths FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id INNER JOIN bond AS T3 ON T3.bond_id = T2.bond_id GROUP BY T2.molecule_id",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What elements are present in the molecule TR005?",
-    "sql": "SELECT DISTINCT T1.element FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.molecule_id = 'TR005'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "reject_reason": "пустой результат"
-  },
-  {
-    "question": "Identify the molecule with the longest chain of carbon atoms.",
-    "sql": "WITH RECURSIVE CarbonChain AS ( SELECT T1.molecule_id, T1.label, T1.atom_id AS start_atom, T1.atom_id AS end_atom FROM molecule AS T1 JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'c' UNION ALL SELECT C.molecule_id, C.label, T1.atom_id AS start_atom, T1.atom_id AS end_atom FROM CarbonChain AS C JOIN connected AS L ON C.end_atom = L.atom_id JOIN atom AS T1 ON L.atom_id2 = T1.atom_id ) SELECT molecule_id, label FROM CarbonChain WHERE LENGTH(end_atom) - LENGTH(start_atom) + 1 = ( SELECT MAX(LENGTH(end_atom) - LENGTH(start_atom) + 1) FROM CarbonChain )",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "error": "(psycopg.errors.UndefinedColumn) column t1.atom_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What fraction of connected atom pairs involve hydrogen atoms?",
-    "sql": "SELECT CAST(SUM(CASE WHEN T1.element = 'h' OR T2.element = 'h' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(*) FROM atom AS T1 JOIN connected AS T2 ON T1.atom_id = T2.atom_id JOIN atom AS T3 ON T3.atom_id = T2.atom_id_id2",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.atom_id_id2 does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the ratio of oxygen atoms to nitrogen atoms in molecule TR000?",
-    "sql": "SELECT CAST(SUM(CASE WHEN element = 'o' THEN 1 ELSE 0 END) AS REAL) / SUM(CASE WHEN element = 'n' THEN 1 ELSE 0 END) FROM atom WHERE molecule_id = 'TR000'",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "error": "(psycopg.errors.DivisionByZero) division by zero",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the ratio of sulfur atoms to phosphorus atoms in molecule TR000?",
-    "sql": "SELECT CAST(SUM(CASE WHEN element = 's' THEN 1 ELSE 0 END) AS REAL) / SUM(CASE WHEN element = 'p' THEN 1 ELSE 0 END) FROM atom WHERE molecule_id = 'TR000'",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "error": "(psycopg.errors.DivisionByZero) division by zero",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Which molecules are single-bonded in the 'TR006' molecule?",
-    "sql": "SELECT T2.bond_id FROM connected AS T1 INNER JOIN bond AS T2 ON T1.bond_id = T2.bond_id WHERE T1.molecule_id = 'TR006' AND T2.bond_type = '-'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "simple lookups with a WHERE filter",
-    "error": "(psycopg.errors.UndefinedColumn) column t1.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the average number of bonds per molecule?",
-    "sql": "SELECT AVG(COUNT(*)) FROM bond GROUP BY molecule_id",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "How many atoms are there in total across all molecules?",
-    "sql": "SELECT SUM(COUNT(*)) FROM atom GROUP BY molecule_id",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the maximum number of atoms in a single molecule?",
-    "sql": "SELECT MAX(COUNT(*)) FROM atom GROUP BY molecule_id",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Count the number of unique atoms in molecules with more than five bonds.",
-    "sql": "SELECT COUNT(DISTINCT T1.atom_id) FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id WHERE T2.molecule_id IN (SELECT molecule_id FROM bond GROUP BY molecule_id HAVING COUNT(bond_id) > 5)",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "List the top 5 molecules with the most connected atoms.",
-    "sql": "SELECT T1.molecule_id FROM molecule AS T1 INNER JOIN connected AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id ORDER BY COUNT(T2.atom_id) DESC LIMIT 5",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "List the top 3 molecules with the most connected pairs of atoms.",
-    "sql": "SELECT T1.molecule_id FROM molecule AS T1 INNER JOIN connected AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id ORDER BY COUNT(DISTINCT T2.atom_id) DESC LIMIT 3",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Find the average number of bonds per molecule that has a single bond.",
-    "sql": "SELECT AVG(COUNT(*)) FROM (SELECT T1.molecule_id FROM bond AS T1 WHERE T1.bond_type = '-' GROUP BY T1.molecule_id)",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "error": "(psycopg.errors.SyntaxError) subquery in FROM must have an alias",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Determine the average number of bonds per molecule containing either a single or double bond.",
-    "sql": "SELECT AVG(COUNT(*)) FROM (SELECT T1.molecule_id FROM bond AS T1 WHERE T1.bond_type IN ('-', '=') GROUP BY T1.molecule_id)",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "error": "(psycopg.errors.SyntaxError) subquery in FROM must have an alias",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Determine the average number of bonds per molecule containing at least one triple bond.",
-    "sql": "SELECT AVG(COUNT(*)) FROM (SELECT T1.molecule_id FROM bond AS T1 WHERE T1.bond_type = '#' GROUP BY T1.molecule_id)",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "error": "(psycopg.errors.SyntaxError) subquery in FROM must have an alias",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the total number of atoms in molecules that have at least one double bond?",
-    "sql": "SELECT SUM(COUNT(T1.atom_id)) FROM atom AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.bond_type = '=' GROUP BY T1.molecule_id",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "simple lookups with a WHERE filter",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the average number of bonds per molecule?",
-    "sql": "SELECT AVG(COUNT(*)) FROM (SELECT molecule_id FROM bond GROUP BY molecule_id) AS T",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Which molecule has the most connected atoms?",
-    "sql": "SELECT T1.molecule_id FROM (SELECT T2.molecule_id, COUNT(*) FROM connected AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id) AS T ORDER BY T.count DESC LIMIT 1",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.UndefinedColumn) column t1.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the total number of atoms in all molecules?",
-    "sql": "SELECT SUM(COUNT(*)) FROM (SELECT molecule_id FROM atom GROUP BY molecule_id) AS T",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the maximum number of bonds a single molecule can have?",
-    "sql": "SELECT MAX(COUNT(*)) FROM (SELECT molecule_id FROM bond GROUP BY molecule_id) AS T",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the average number of bonds per molecule for carcinogenic molecules?",
-    "sql": "SELECT AVG(COUNT(*)) FROM (SELECT molecule_id FROM bond WHERE molecule_id IN (SELECT molecule_id FROM molecule WHERE label = '+') GROUP BY molecule_id) AS T",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What elements are present in molecules labeled as positive?",
-    "sql": "SELECT DISTINCT T1.element FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "Which molecules have bonds of type '-' and involve atom 'TR000_2'?",
-    "sql": "SELECT T2.molecule_id FROM bond AS T1 INNER JOIN connected AS T2 ON T1.bond_id = T2.bond_id WHERE T1.bond_type = '-' AND T1.molecule_id = 'TR000' AND T2.atom_id = 'TR000_2'",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Find the molecule with the highest number of distinct connected atoms.",
-    "sql": "SELECT T1.molecule_id, COUNT(DISTINCT T2.atom_id) AS distinct_atom_count FROM molecule AS T1 INNER JOIN connected AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id ORDER BY distinct_atom_count DESC LIMIT 1",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Identify the molecule(s) with the most atoms of element 'C'.",
-    "sql": "SELECT T1.molecule_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'C' GROUP BY T1.molecule_id ORDER BY COUNT(*) DESC LIMIT 1",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "reject_reason": "пустой результат"
-  },
-  {
-    "question": "Rank molecules by the number of carbon atoms they contain.",
-    "sql": "SELECT T1.molecule_id, COUNT(*) AS carbon_count FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'C' GROUP BY T1.molecule_id ORDER BY carbon_count DESC",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "reject_reason": "пустой результат"
-  },
-  {
-    "question": "List the top 3 molecules with the most heavy atoms (elements with atomic number > 10).",
-    "sql": "SELECT T1.molecule_id, COUNT(*) AS heavy_atom_count FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element IN ('Br', 'Cl', 'I', 'Fe', 'Ni', 'Cu') GROUP BY T1.molecule_id ORDER BY heavy_atom_count DESC LIMIT 3",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "reject_reason": "пустой результат"
-  },
-  {
-    "question": "Find the molecule(s) with the most connected pairs of atoms.",
-    "sql": "SELECT T1.molecule_id, COUNT(DISTINCT T2.atom_id) + COUNT(DISTINCT T2.atom_id2) AS total_connected_pairs FROM molecule AS T1 INNER JOIN connected AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id ORDER BY total_connected_pairs DESC LIMIT 1",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "How many molecules have a positive label?",
-    "sql": "SELECT COUNT(*) FROM molecule WHERE label = '+'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "What is the average number of bonds per molecule?",
-    "sql": "SELECT AVG(COUNT(*)) FROM bond GROUP BY molecule_id",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "How many molecules contain more than 5 bonds?",
-    "sql": "SELECT COUNT(*) FROM (SELECT molecule_id FROM bond GROUP BY molecule_id HAVING COUNT(*) > 5)",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "error": "(psycopg.errors.SyntaxError) subquery in FROM must have an alias",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "How many molecules have exactly three carbon atoms?",
-    "sql": "SELECT COUNT(*) FROM (SELECT T1.molecule_id FROM atom AS T1 WHERE T1.element = 'c' GROUP BY T1.molecule_id HAVING COUNT(*) = 3)",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "error": "(psycopg.errors.SyntaxError) subquery in FROM must have an alias",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Calculate the maximum number of bonds between any two molecules.",
-    "sql": "SELECT MAX(COUNT(*)) FROM (SELECT T1.molecule_id, T2.molecule_id FROM bond AS T1 INNER JOIN connected AS T2 ON T1.bond_id = T2.bond_id GROUP BY T1.molecule_id, T2.molecule_id)",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "error": "(psycopg.errors.SyntaxError) subquery in FROM must have an alias",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Which molecule has a single bond between atoms TR025_2 and TR025_3?",
-    "sql": "SELECT T2.label FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id INNER JOIN bond AS T3 ON T2.bond_id = T3.bond_id WHERE T1.atom_id = 'TR025_2' AND T2.atom_id2 = 'TR025_3' AND T3.bond_type = '-'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "simple lookups with a WHERE filter",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.label does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What elements are involved in bonds of type '#' in molecule TR054?",
-    "sql": "SELECT DISTINCT T1.element FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id INNER JOIN bond AS T3 ON T2.bond_id = T3.bond_id WHERE T3.bond_type = '#' AND T3.molecule_id = 'TR054'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "simple lookups with a WHERE filter",
-    "reject_reason": "пустой результат"
-  },
-  {
-    "question": "What is the bond type between atoms TR001_5 and TR001_6?",
-    "sql": "SELECT T3.bond_type FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id INNER JOIN bond AS T3 ON T2.bond_id = T3.bond_id WHERE T1.atom_id = 'TR001_5' AND T2.atom_id2 = 'TR001_6'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "simple lookups with a WHERE filter",
-    "reject_reason": "пустой результат"
-  },
-  {
-    "question": "Which molecules have a double bond involving atom TR023_8?",
-    "sql": "SELECT T2.label FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id INNER JOIN bond AS T3 ON T2.bond_id = T3.bond_id WHERE T1.atom_id = 'TR023_8' AND T3.bond_type = '='",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "simple lookups with a WHERE filter",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.label does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the element at the end of bond TR017_10_11?",
-    "sql": "SELECT T2.element FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id INNER JOIN bond AS T3 ON T2.bond_id = T3.bond_id WHERE T3.bond_id = 'TR017_10_11'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "simple lookups with a WHERE filter",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.element does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the average number of bonds per molecule?",
-    "sql": "SELECT AVG(COUNT(*)) FROM (SELECT molecule_id FROM bond GROUP BY molecule_id)",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.SyntaxError) subquery in FROM must have an alias",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Determine the maximum number of bonds a single molecule has.",
-    "sql": "SELECT MAX(COUNT(*)) FROM (SELECT molecule_id FROM bond GROUP BY molecule_id)",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.SyntaxError) subquery in FROM must have an alias",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Find the average number of bonds per atom across all molecules.",
-    "sql": "SELECT AVG(COUNT(*)) FROM (SELECT atom_id FROM connected GROUP BY atom_id)",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.SyntaxError) subquery in FROM must have an alias",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "List all unique bond types present in the molecule with molecule ID TR000.",
-    "sql": "SELECT DISTINCT T2.bond_type FROM connected AS T1 INNER JOIN bond AS T2 ON T1.bond_id = T2.bond_id WHERE T1.molecule_id = 'TR000'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "error": "(psycopg.errors.UndefinedColumn) column t1.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "How many bonds of type '#' are there in the molecule with molecule ID TR008?",
-    "sql": "SELECT COUNT(*) FROM connected AS T1 INNER JOIN bond AS T2 ON T1.bond_id = T2.bond_id WHERE T1.molecule_id = 'TR008' AND T2.bond_type = '#'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "error": "(psycopg.errors.UndefinedColumn) column t1.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "How many molecules have exactly four bonds of any type?",
-    "sql": "SELECT COUNT(DISTINCT T1.molecule_id) FROM connected AS T1 INNER JOIN bond AS T2 ON T1.bond_id = T2.bond_id GROUP BY T1.molecule_id HAVING COUNT(T1.bond_id) = 4",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "error": "(psycopg.errors.UndefinedColumn) column t1.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "List the labels of molecules with exactly 10 bonds.",
-    "sql": "SELECT T1.label FROM molecule AS T1 JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.label HAVING COUNT(*) = 10",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "reject_reason": "пустой результат"
-  },
-  {
-    "question": "How many unique molecules contain at least three atoms of type 'o'?",
-    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'o' GROUP HAVING COUNT(*) >= 3",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "reject_reason": "не парсится"
-  },
-  {
-    "question": "How many different elements are present in molecules labeled '+' with more than 10 atoms?",
-    "sql": "SELECT COUNT(DISTINCT T1.element) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+' GROUP HAVING COUNT(*) > 10",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "reject_reason": "не парсится"
-  },
-  {
-    "question": "List all molecules that have exactly four atoms of type 'c' and calculate the average bond length of these molecules.",
-    "sql": "SELECT T2.molecule_id, AVG(CASE WHEN T1.element = 'c' THEN 1 ELSE 0 END) OVER () FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id HAVING COUNT(*) = 4",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "error": "(psycopg.errors.GroupingError) column \"t1.element\" must appear in the GROUP BY clause or be used in an aggregate function",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Among molecules with a '-' label, find those that have at least one atom of each of the elements 'c', 'o', and 'h'. How many such molecules exist?",
-    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '-' AND T1.element IN ('c', 'o', 'h') GROUP HAVING COUNT(DISTINCT T1.element) = 3",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "reject_reason": "не парсится"
-  },
-  {
-    "question": "Calculate the number of distinct molecules that have at least one bond of type '#' and one bond of type '-' within the same molecule.",
-    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM bond AS T WHERE T2.molecule_id IN (SELECT molecule_id FROM bond WHERE bond_type = '#') AND T2.molecule_id IN (SELECT molecule_id FROM bond WHERE bond_type = '-')",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "error": "(psycopg.errors.UndefinedTable) missing FROM-clause entry for table \"t2\"",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Among atoms that are part of molecules with at least one double bond, what percentage are carbon atoms?",
-    "sql": "SELECT CAST(SUM(CASE WHEN T1.element = 'c' THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM atom AS T1 INNER JOIN bond AS T2 ON T1.atom_id = T2.atom_id WHERE T2.bond_type = '='",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.atom_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What molecules have a single bond between two chlorine atoms?",
-    "sql": "SELECT T2.molecule_id FROM connected AS T1 INNER JOIN bond AS T3 ON T1.bond_id = T3.bond_id INNER JOIN molecule AS T2 ON T3.molecule_id = T2.molecule_id WHERE T1.atom_id LIKE '%cl%' AND T1.atom_id2 LIKE '%cl%' AND T3.bond_type = '-'",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "simple lookups with a WHERE filter",
-    "reject_reason": "пустой результат"
-  },
-  {
-    "question": "What molecules have a bond between an oxygen atom and a hydrogen atom?",
-    "sql": "SELECT T2.molecule_id FROM connected AS T1 INNER JOIN bond AS T3 ON T1.bond_id = T3.bond_id INNER JOIN molecule AS T2 ON T3.molecule_id = T2.molecule_id WHERE T1.atom_id LIKE '%o%' AND T1.atom_id2 LIKE '%h%' OR T1.atom_id LIKE '%h%' AND T1.atom_id2 LIKE '%o%'",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "simple lookups with a WHERE filter",
-    "reject_reason": "пустой результат"
-  },
-  {
-    "question": "What molecules have a double bond involving a sulfur atom?",
-    "sql": "SELECT T2.molecule_id FROM connected AS T1 INNER JOIN bond AS T3 ON T1.bond_id = T3.bond_id INNER JOIN molecule AS T2 ON T3.molecule_id = T2.molecule_id WHERE T1.atom_id LIKE '%s%' AND T3.bond_type = '#'",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "simple lookups with a WHERE filter",
-    "reject_reason": "пустой результат"
-  },
-  {
-    "question": "What is the count of molecules with the label '+'?",
-    "sql": "SELECT COUNT(*) FROM molecule WHERE label = '+'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "simple lookups with a WHERE filter",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "How many molecules contain the element carbon?",
-    "sql": "SELECT COUNT(DISTINCT T1.molecule_id) FROM atom AS T1 WHERE T1.element = 'c'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "simple lookups with a WHERE filter",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "List all elements present in molecules labeled as '-'",
-    "sql": "SELECT DISTINCT T1.element FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '-'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "simple lookups with a WHERE filter",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "Calculate the sum of bond lengths for all bonds of type '='.",
-    "sql": "SELECT SUM(T2.length) as total_length FROM bond AS T2 WHERE T2.bond_type = '='",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.length does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Find the number of distinct molecules containing atoms of carbon and hydrogen.",
-    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element IN ('c', 'h')",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "List the top 5 molecules with the highest number of connected atoms.",
-    "sql": "SELECT T1.molecule_id, COUNT(T2.atom_id) AS num_atoms FROM molecule AS T1 JOIN connected AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id ORDER BY num_atoms DESC LIMIT 5",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What are the labels of molecules that have exactly two distinct bond types?",
-    "sql": "SELECT T1.label FROM molecule AS T1 JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.label HAVING COUNT(DISTINCT T2.bond_type) = 2",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "reject_reason": "пустой результат"
-  },
-  {
-    "question": "Find the molecule with the highest degree of connectivity (number of unique connected atoms).",
-    "sql": "SELECT T1.molecule_id, COUNT(DISTINCT T3.atom_id) AS degree_of_connectivity FROM molecule AS T1 JOIN connected AS T2 ON T1.molecule_id = T2.molecule_id JOIN atom AS T3 ON T2.atom_id = T3.atom_id GROUP BY T1.molecule_id ORDER BY degree_of_connectivity DESC LIMIT 1",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Among the molecules with a bond type of '#', what is the count of distinct molecule IDs?",
-    "sql": "SELECT COUNT(DISTINCT molecule_id) FROM bond WHERE bond_type = '#'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "Among molecules with a bond type of '=', calculate the average number of atoms per molecule.",
-    "sql": "SELECT AVG(COUNT(*)) OVER () FROM (SELECT T1.molecule_id, T2.atom_id FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.bond_type = '=') AS bonded_atoms",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.atom_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "How many molecules have exactly three atoms of any element?",
-    "sql": "SELECT COUNT(DISTINCT molecule_id) FROM atom GROUP BY molecule_id HAVING COUNT(*) = 3",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "reject_reason": "пустой результат"
-  },
-  {
-    "question": "How many molecules contain at least one carbon atom?",
-    "sql": "SELECT COUNT(DISTINCT T1.molecule_id) FROM atom AS T1 WHERE T1.element = 'c'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "What percentage of atoms in the molecule 'TR041' are oxygen elements?",
-    "sql": "SELECT CAST(SUM(CASE WHEN T2.element = 'o' THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.molecule_id = 'TR041'",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.element does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "How many molecules have more than three atoms bonded together?",
-    "sql": "SELECT COUNT(DISTINCT T1.molecule_id) FROM connected AS T1 GROUP BY T1.molecule_id HAVING COUNT(*) > 3",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "error": "(psycopg.errors.UndefinedColumn) column t1.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Among the molecules with a label of '+', what percentage have at least one nitrogen atom?",
-    "sql": "SELECT CAST(SUM(CASE WHEN T2.element = 'n' THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+'",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.element does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "How many different molecules have exactly four atoms bonded together?",
-    "sql": "SELECT COUNT(DISTINCT T1.molecule_id) FROM connected AS T1 GROUP BY T1.molecule_id HAVING COUNT(*) = 4",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "error": "(psycopg.errors.UndefinedColumn) column t1.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "How many molecules have the label '+ '?",
-    "sql": "SELECT COUNT(*) FROM molecule WHERE label = '+'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "simple lookups with a WHERE filter",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "Find the total number of molecules with a positive label.",
-    "sql": "SELECT COUNT(*) FROM molecule WHERE label = '+'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "What is the most common bond type among all bonds?",
-    "sql": "SELECT bond_type FROM bond GROUP BY bond_type ORDER BY COUNT(*) DESC LIMIT 1",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "Find the average bond length for bonds with a bond type of '#'.",
-    "sql": "SELECT AVG(length) FROM bond WHERE bond_type = '#'",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.UndefinedColumn) column \"length\" does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Calculate the sum of all possible unique pairs of atoms within each molecule.",
-    "sql": "SELECT molecule_id, SUM(COUNT(*)) OVER () AS total_pairs FROM connected GROUP BY molecule_id",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.UndefinedColumn) column \"molecule_id\" does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "How many unique atoms are involved in molecule 'TR000'?",
-    "sql": "SELECT COUNT(DISTINCT T1.atom_id) FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id WHERE T2.molecule_id = 'TR000'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "List the top 5 molecules with the most number of connected atoms.",
-    "sql": "SELECT T2.molecule_id, COUNT(T1.atom_id) as atom_count FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id GROUP BY T2.molecule_id ORDER BY atom_count DESC LIMIT 5",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Which molecules have exactly 3 bonds involving atoms of element 'c'?",
-    "sql": "SELECT T2.molecule_id FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id WHERE T1.element = 'c' GROUP BY T2.molecule_id HAVING COUNT(T2.bond_id) = 3",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Rank the molecules based on the number of connected atoms, showing only the top 3.",
-    "sql": "SELECT T2.molecule_id, COUNT(T1.atom_id) as atom_count FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id GROUP BY T2.molecule_id ORDER BY atom_count DESC LIMIT 3",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "List the top 5 molecules with the highest number of distinct bond types.",
-    "sql": "SELECT T2.molecule_id, COUNT(DISTINCT T3.bond_type) as bond_type_count FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id INNER JOIN bond AS T3 ON T3.bond_id = T2.bond_id GROUP BY T2.molecule_id ORDER BY bond_type_count DESC LIMIT 5",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the total number of atoms in molecules that contain at least one carbon atom?",
-    "sql": "SELECT SUM(COUNT(*)) FROM atom WHERE molecule_id IN (SELECT molecule_id FROM atom WHERE element = 'c' GROUP BY molecule_id)",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Find the average number of bonds per molecule for molecules with labels '-'",
-    "sql": "SELECT AVG(COUNT(*)) FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.label = '-'",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Calculate the total number of atoms in molecules that have more than five bonds",
-    "sql": "SELECT SUM(COUNT(*)) FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.molecule_id IN (SELECT molecule_id FROM bond GROUP BY molecule_id HAVING COUNT(*) > 5)",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What fraction of bonds in molecule TR002 are single bonds?",
-    "sql": "SELECT CAST(SUM(CASE WHEN T2.bond_type = '-' THEN 1 ELSE 0 END) AS REAL) / NULLIF(COUNT(*), 0) FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id INNER JOIN bond AS T3 ON T2.bond_id = T3.bond_id WHERE T1.molecule_id = 'TR002'",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.bond_type does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Find the maximum number of distinct atoms per molecule.",
-    "sql": "SELECT MAX(COUNT(DISTINCT T2.atom_id)) FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id INNER JOIN connected AS T3 ON T2.atom_id = T3.atom_id",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "List the molecule IDs of molecules with more than two bonds of type '#'.",
-    "sql": "SELECT molecule_id FROM bond WHERE bond_type = '#' GROUP BY molecule_id HAVING COUNT(*) > 2",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "reject_reason": "пустой результат"
-  },
-  {
-    "question": "How many molecules have at least one bond of type '-' and one of type '='?",
-    "sql": "SELECT COUNT(*) FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.bond_type = '-' INTERSECT SELECT COUNT(*) FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.bond_type = '='",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "reject_reason": "пустой результат"
-  },
-  {
-    "question": "What is the total number of molecules with a positive label?",
-    "sql": "SELECT COUNT(*) FROM molecule WHERE label = '+'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "Find all molecules that have both carbon ('C') and hydrogen ('H') atoms.",
-    "sql": "SELECT T1.molecule_id FROM molecule AS T1 JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element IN ('C', 'H') GROUP BY T1.molecule_id HAVING COUNT(DISTINCT T2.element) = 2",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "reject_reason": "пустой результат"
-  },
-  {
-    "question": "How many distinct molecules have at least one bond connecting atoms of type 'O' and 'N'?",
-    "sql": "SELECT COUNT(DISTINCT T1.molecule_id) FROM connected AS T1 JOIN atom AS T2 ON T1.atom_id = T2.atom_id JOIN atom AS T3 ON T1.atom_id2 = T3.atom_id WHERE (T2.element = 'O' AND T3.element = 'N') OR (T2.element = 'N' AND T3.element = 'O')",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "error": "(psycopg.errors.UndefinedColumn) column t1.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Find the molecules that contain at least 10 different elements.",
-    "sql": "SELECT T2.molecule_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id HAVING COUNT(DISTINCT T1.element) >= 10;",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "reject_reason": "пустой результат"
-  },
-  {
-    "question": "What is the molecule ID of the molecule with the most connected pairs?",
-    "sql": "SELECT T2.molecule_id, COUNT(T1.bond_id) as num_connected_pairs FROM connected AS T1 INNER JOIN molecule AS T2 ON T1.bond_id = T2.molecule_id GROUP BY T2.molecule_id ORDER BY num_connected_pairs DESC LIMIT 1;",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "reject_reason": "пустой результат"
-  },
-  {
-    "question": "Calculate the average number of bonds per molecule.",
-    "sql": "SELECT AVG(CAST(COUNT(*) AS REAL)) AS avg_bonds_per_molecule FROM (SELECT T1.molecule_id, COUNT(T2.bond_id) AS num_bonds FROM bond AS T1 INNER JOIN connected AS T2 ON T1.bond_id = T2.bond_id GROUP BY T1.molecule_id) AS subquery",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "How many atoms are part of molecules with more than 5 bonds?",
-    "sql": "SELECT SUM(CAST(COUNT(*) AS REAL)) AS total_atoms FROM (SELECT T1.molecule_id, COUNT(T2.bond_id) AS num_bonds FROM bond AS T1 INNER JOIN connected AS T2 ON T1.bond_id = T2.bond_id GROUP BY T1.molecule_id HAVING COUNT(T2.bond_id) > 5) AS subquery",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the percentage of molecules labeled '+'?",
-    "sql": "SELECT CAST(SUM(CASE WHEN label = '+' THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM molecule",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "What proportion of molecules contain more than three bonds?",
-    "sql": "SELECT CAST(SUM(CASE WHEN COUNT(*) > 3 THEN 1 ELSE 0 END) AS FLOAT) / COUNT(*) FROM (SELECT molecule_id FROM bond GROUP BY molecule_id) AS T",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the ratio of the number of single bonds to the total number of bonds?",
-    "sql": "SELECT CAST(SUM(CASE WHEN bond_type = '-' THEN 1 ELSE 0 END) AS FLOAT) / COUNT(*) FROM bond",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "What fraction of molecules have exactly four bonds?",
-    "sql": "SELECT CAST(SUM(CASE WHEN COUNT(*) = 4 THEN 1 ELSE 0 END) AS FLOAT) / COUNT(*) FROM (SELECT molecule_id FROM bond GROUP BY molecule_id) AS T",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What percentage of molecules contain more than four atoms?",
-    "sql": "SELECT CAST(SUM(CASE WHEN COUNT(*) > 4 THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM (SELECT molecule_id FROM atom GROUP BY molecule_id) AS T",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the element of the atom connected to atom id TR000_2 via bond id TR001_1_7?",
-    "sql": "SELECT T3.element FROM connected AS T1 INNER JOIN atom AS T2 ON T1.atom_id2 = T2.atom_id INNER JOIN atom AS T3 ON T1.atom_id = T3.atom_id WHERE T1.bond_id = 'TR001_1_7' AND T2.atom_id = 'TR000_2'",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "simple lookups with a WHERE filter",
-    "reject_reason": "пустой результат"
-  },
-  {
-    "question": "What is the average number of atoms per molecule among the non-toxic molecules?",
-    "sql": "SELECT AVG(COUNT(*)) FROM (SELECT T2.molecule_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.label = '-' GROUP BY T2.molecule_id) AS T",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Find the maximum number of atoms in any single molecule.",
-    "sql": "SELECT MAX(COUNT(*)) FROM (SELECT T2.molecule_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id) AS T",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the average number of bonds per molecule?",
-    "sql": "SELECT AVG(COUNT(*)) FROM bond AS T GROUP BY T.molecule_id",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Find the molecule with the longest chain of bonded atoms.",
-    "sql": "WITH RECURSIVE Chain AS (SELECT atom_id, atom_id2, bond_id FROM connected UNION ALL SELECT c1.atom_id, c2.atom_id2, c2.bond_id FROM Chain c1 JOIN connected c2 ON c1.atom_id2 = c2.atom_id) SELECT molecule_id FROM Chain WHERE atom_id IN (SELECT atom_id FROM atom WHERE element = 'c') GROUP BY molecule_id ORDER BY MAX(LENGTH(REPLACE(chain_id, ',', ''))) DESC LIMIT 1",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "error": "(psycopg.errors.UndefinedColumn) column \"molecule_id\" does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Find the molecule with the longest sequence of consecutive bonds.",
-    "sql": "WITH RECURSIVE BondSequence AS (SELECT atom_id, atom_id2, bond_id, 1 AS length FROM connected UNION ALL SELECT b.atom_id, b.atom_id2, b.bond_id, bs.length + 1 FROM BondSequence bs JOIN connected b ON bs.atom_id2 = b.atom_id) SELECT molecule_id FROM BondSequence WHERE atom_id IN (SELECT atom_id FROM atom WHERE element = 'c') GROUP BY molecule_id ORDER BY MAX(length) DESC LIMIT 1",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "error": "(psycopg.errors.UndefinedColumn) column \"molecule_id\" does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the average number of bonds per molecule for those with a '+' label?",
-    "sql": "SELECT AVG(COUNT(*)) AS avg_bonds FROM bond AS T1 JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+' GROUP BY T2.molecule_id",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "How many unique molecules are there that contain both 'c' and 'o' elements?",
-    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM atom AS T1 JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'c' INTERSECT SELECT COUNT(DISTINCT T2.molecule_id) FROM atom AS T1 JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'o'",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "reject_reason": "пустой результат"
-  },
-  {
-    "question": "What is the ratio of atoms in molecules labeled as '+' to those labeled as '-'?",
-    "sql": "SELECT SUM(CASE WHEN T2.label = '+' THEN 1 ELSE 0 END) * 1.0 / SUM(CASE WHEN T2.label = '-' THEN 1 ELSE 0 END) AS ratio FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id;",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "How many distinct molecules have at least one bond of type '#'",
-    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.bond_type = '#';",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "What is the percentage of single bond molecules out of all bond molecules?",
-    "sql": "SELECT CAST(SUM(CASE WHEN T1.bond_type = '-' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(*) AS percentage FROM bond AS T1;",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "What is the element of the first atom in molecule TR000?",
-    "sql": "SELECT element FROM atom WHERE molecule_id = 'TR000' ORDER BY atom_id ASC LIMIT 1;",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "simple lookups with a WHERE filter",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "Which molecules have exactly three bonds?",
-    "sql": "SELECT T2.molecule_id FROM bond AS T2 INNER JOIN connected AS T1 ON T2.bond_id = T1.bond_id GROUP BY T2.molecule_id HAVING COUNT(*) = 3;",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "simple lookups with a WHERE filter",
-    "reject_reason": "пустой результат"
-  },
-  {
-    "question": "What is the average number of bonds per molecule?",
-    "sql": "SELECT AVG(COUNT(*)) FROM (SELECT T1.molecule_id FROM bond AS T1 INNER JOIN connected AS T2 ON T1.bond_id = T2.bond_id GROUP BY T1.molecule_id) AS subquery",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the maximum number of atoms in any single molecule?",
-    "sql": "SELECT MAX(COUNT(*)) FROM (SELECT T1.molecule_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id) AS subquery",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the average number of different molecules each bond connects?",
-    "sql": "SELECT AVG(COUNT(DISTINCT T1.molecule_id)) FROM connected AS T1 INNER JOIN bond AS T2 ON T1.bond_id = T2.bond_id",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.UndefinedColumn) column t1.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the minimum number of bonds per molecule?",
-    "sql": "SELECT MIN(COUNT(*)) FROM (SELECT T1.molecule_id FROM bond AS T1 INNER JOIN connected AS T2 ON T1.bond_id = T2.bond_id GROUP BY T1.molecule_id) AS subquery",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Which molecules contain both carbon ('C') and hydrogen ('H') atoms?",
-    "sql": "SELECT DISTINCT T2.molecule_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element IN ('C', 'H') GROUP BY T2.molecule_id HAVING COUNT(DISTINCT T1.element) > 1",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "reject_reason": "пустой результат"
-  },
-  {
-    "question": "What is the average bond length for molecules containing the element fluorine ('F')?",
-    "sql": "SELECT AVG(T1.bond_length) FROM bond AS T1 INNER JOIN connected AS T2 ON T1.bond_id = T2.bond_id INNER JOIN atom AS T3 ON T2.atom_id = T3.atom_id WHERE T3.element = 'F'",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "error": "(psycopg.errors.UndefinedColumn) column t1.bond_length does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Find the molecule IDs of molecules that are both connected to 'TR000_2' and 'TR000_4'.",
-    "sql": "SELECT T2.molecule_id FROM connected AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.atom_id = 'TR000_2' INTERSECT SELECT T2.molecule_id FROM connected AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.atom_id = 'TR000_4'",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "error": "(psycopg.errors.UndefinedColumn) column t1.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Identify the molecule with the longest chain of carbon atoms.",
-    "sql": "WITH recursive atom_chain AS (SELECT T1.atom_id, T1.molecule_id, T1.element, 1 AS length FROM atom AS T1 JOIN connected AS C ON T1.atom_id = C.atom_id WHERE T1.element = 'c' UNION ALL SELECT T2.atom_id, T2.molecule_id, T2.element, AC.length + 1 FROM atom AS T2 JOIN connected AS C ON T2.atom_id = C.atom_id JOIN atom_chain AS AC ON C.atom_id = AC.atom_id WHERE T2.element = 'c') SELECT T1.molecule_id FROM atom AS T1 JOIN atom_chain AS AC ON T1.atom_id = AC.atom_id ORDER BY AC.length DESC LIMIT 1",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "error": "(psycopg.errors.QueryCanceled) canceling statement due to statement timeout",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Which molecule has the most bonds involving carbon atoms?",
-    "sql": "SELECT T2.molecule_id FROM connected AS T1 INNER JOIN atom AS T3 ON T1.atom_id = T3.atom_id INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T3.element = 'c' GROUP BY T2.molecule_id ORDER BY COUNT(*) DESC LIMIT 1",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "error": "(psycopg.errors.UndefinedColumn) column t1.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "How many different molecules contain both carbon and hydrogen atoms?",
-    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element IN ('c', 'h')",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "What is the average number of bonds per molecule for molecules labeled '+'?",
-    "sql": "SELECT AVG(COUNT(*)) FROM (SELECT T1.molecule_id FROM connected AS T1 INNER JOIN bond AS T2 ON T1.bond_id = T2.bond_id INNER JOIN molecule AS T3 ON T2.molecule_id = T3.molecule_id WHERE T3.label = '+' GROUP BY T1.molecule_id) AS T",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "error": "(psycopg.errors.UndefinedColumn) column t1.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Which molecule has the highest percentage of bonds involving oxygen atoms?",
-    "sql": "SELECT T2.molecule_id FROM connected AS T1 INNER JOIN atom AS T3 ON T1.atom_id = T3.atom_id INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T3.element = 'o' GROUP BY T2.molecule_id ORDER BY COUNT(*) * 1.0 / (SELECT COUNT(*) FROM connected AS T4 INNER JOIN molecule AS T5 ON T4.molecule_id = T5.molecule_id WHERE T5.molecule_id = T2.molecule_id) DESC LIMIT 1",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "error": "(psycopg.errors.UndefinedColumn) column t1.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the sum of the bond counts for all molecules with more than two carbon atoms?",
-    "sql": "SELECT SUM(COUNT(*)) FROM (SELECT T1.molecule_id FROM connected AS T1 INNER JOIN atom AS T2 ON T1.atom_id = T2.atom_id WHERE T2.element = 'c' GROUP BY T1.molecule_id HAVING COUNT(*) > 2) AS T",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "error": "(psycopg.errors.UndefinedColumn) column t1.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "How many molecules have a label of '+'?",
-    "sql": "SELECT COUNT(*) FROM molecule WHERE label = '+'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "simple lookups with a WHERE filter",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "List all unique elements found in molecules with labels '-' sorted alphabetically.",
-    "sql": "SELECT DISTINCT T.element FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.label = '-' ORDER BY T.element",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "simple lookups with a WHERE filter",
-    "error": "(psycopg.errors.UndefinedTable) missing FROM-clause entry for table \"t\"",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Find the minimum number of bonds any single molecule has, but only consider molecules that have at least one oxygen atom.",
-    "sql": "SELECT MIN(COUNT(*)) OVER () FROM bond AS T1 INNER JOIN atom AS T2 ON T1.atom_id = T2.atom_id WHERE T2.element = 'o' GROUP BY T1.molecule_id HAVING COUNT(*) >= 1",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.UndefinedColumn) column t1.atom_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Find the number of unique bonds involving molecules labeled as '+'.",
-    "sql": "SELECT COUNT(DISTINCT T1.bond_id) FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "Retrieve the IDs of all molecules that have at least one bond of type '#'.",
-    "sql": "SELECT DISTINCT T2.molecule_id FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.bond_type = '#'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "List the labels of all molecules that contain exactly two different types of atoms.",
-    "sql": "SELECT DISTINCT T2.label FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.label HAVING COUNT(DISTINCT T1.element) = 2",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "reject_reason": "пустой результат"
-  },
-  {
-    "question": "Determine the most common bond type among all molecules.",
-    "sql": "SELECT bond_type FROM bond GROUP BY bond_type ORDER BY COUNT(*) DESC LIMIT 1",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "What is the ratio of connected atoms within molecules labeled '+' to those in molecules labeled '-'?",
-    "sql": "SELECT CAST(COUNT(DISTINCT CASE WHEN T2.label = '+' THEN T1.atom_id ELSE NULL END) AS REAL) / COUNT(DISTINCT CASE WHEN T2.label = '-' THEN T1.atom_id ELSE NULL END) AS ratio_connected_atoms FROM connected AS T1 INNER JOIN molecule AS T2 ON T1.bond_id = T2.bond_id",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.bond_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What percentage of atoms in molecules labeled '+' are part of a bond of type '#'",
-    "sql": "SELECT CAST(SUM(CASE WHEN T1.atom_id IN (SELECT atom_id FROM connected WHERE bond_id IN (SELECT bond_id FROM bond WHERE molecule_id IN (SELECT molecule_id FROM molecule WHERE label = '+')))) AS REAL) * 100 / NULLIF(COUNT(T1.atom_id), 0) AS percentage_in_bonds FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+'",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "reject_reason": "не парсится"
-  },
-  {
-    "question": "What is the ratio of molecules labeled '+' to those labeled '-' in terms of their number of bonds?",
-    "sql": "SELECT CAST(SUM(CASE WHEN T2.label = '+' THEN 1 ELSE 0 END) AS REAL) / SUM(CASE WHEN T2.label = '-' THEN 1 ELSE 0 END) AS ratio_molecules_with_bonds FROM bond AS T2",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.label does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "How many distinct molecules are associated with the bond type '#'",
-    "sql": "SELECT COUNT(DISTINCT T1.molecule_id) FROM bond AS T1 WHERE T1.bond_type = '#'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "simple lookups with a WHERE filter",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "What is the average number of bonds per molecule among those labeled as '-'?",
-    "sql": "SELECT AVG(COUNT(T1.bond_id)) FROM bond AS T1 WHERE T1.molecule_id IN (SELECT T2.molecule_id FROM molecule AS T2 WHERE T2.label = '-')",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "How many different elements are found in molecules labeled as '+'?",
-    "sql": "SELECT COUNT(DISTINCT T2.element) FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.label = '+'",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "Which element is most commonly found in molecules labeled as '-'?",
-    "sql": "SELECT T2.element FROM (SELECT T2.element, COUNT(DISTINCT T2.molecule_id) AS cnt FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.label = '-' GROUP BY T2.element ORDER BY cnt DESC LIMIT 1) AS t",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.UndefinedTable) missing FROM-clause entry for table \"t2\"",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the maximum number of unique atoms in a single molecule labeled as '+'?",
-    "sql": "SELECT MAX(COUNT(DISTINCT T2.element)) FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.label = '+'",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "List all molecules that have a single bond with hydrogen.",
-    "sql": "SELECT DISTINCT T1.molecule_id FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id INNER JOIN atom AS T3 ON T2.bond_id = T3.bond_id WHERE T3.element = 'h'",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "error": "(psycopg.errors.UndefinedColumn) column t3.bond_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "List all molecules with a single bond between silicon and copper atoms.",
-    "sql": "SELECT DISTINCT T1.molecule_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id INNER JOIN connected AS T3 ON T2.molecule_id = T3.bond_id INNER JOIN atom AS T4 ON T3.atom_id2 = T4.atom_id WHERE T2.element = 'si' AND T4.element = 'cu'",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "reject_reason": "пустой результат"
-  },
-  {
-    "question": "What is the most common element in molecule TR004?",
-    "sql": "SELECT T1.element FROM (SELECT T1.element, COUNT(*) AS count FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.molecule_id = 'TR004' GROUP BY T1.element ORDER BY count DESC LIMIT 1) AS T",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "error": "(psycopg.errors.UndefinedTable) missing FROM-clause entry for table \"t1\"",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Which molecule has the most bonds of type '#'",
-    "sql": "SELECT T2.molecule_id FROM (SELECT T2.molecule_id, COUNT(T1.bond_id) AS count FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.bond_type = '#' GROUP BY T2.molecule_id ORDER BY count DESC LIMIT 1) AS T",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "error": "(psycopg.errors.UndefinedTable) missing FROM-clause entry for table \"t2\"",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Find the molecule(s) with the longest chain of consecutive carbon atoms.",
-    "sql": "WITH RECURSIVE carbon_chain AS (SELECT T1.molecule_id, T1.atom_id, T1.element, 1 AS length FROM atom AS T1 WHERE T1.element = 'c' UNION ALL SELECT T1.molecule_id, T1.atom_id, T1.element, CC.length + 1 FROM atom AS T1 JOIN connected AS C ON T1.atom_id = C.atom_id JOIN carbon_chain AS CC ON C.atom_id2 = CC.atom_id WHERE T1.element = 'c') SELECT T2.molecule_id FROM carbon_chain AS CC INNER JOIN molecule AS T2 ON CC.molecule_id = T2.molecule_id GROUP BY T2.molecule_id ORDER BY SUM(CC.length) DESC LIMIT 1",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "error": "(psycopg.errors.QueryCanceled) canceling statement due to statement timeout",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Which molecule has the most bonds involving nitrogen atoms?",
-    "sql": "SELECT T2.molecule_id FROM (SELECT T2.molecule_id, COUNT(*) AS num_nitrogen_bonds FROM atom AS T1 INNER JOIN connected AS C ON T1.atom_id = C.atom_id INNER JOIN bond AS B ON C.bond_id = B.bond_id INNER JOIN molecule AS T2 ON B.molecule_id = T2.molecule_id WHERE T1.element = 'n' GROUP BY T2.molecule_id ORDER BY num_nitrogen_bonds DESC LIMIT 1) AS T",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "error": "(psycopg.errors.UndefinedTable) missing FROM-clause entry for table \"t2\"",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Find the average bond length of all bonds in the molecule with ID 'TR002'.",
-    "sql": "SELECT AVG(T.bond_length) FROM bond AS T WHERE T.molecule_id = 'TR002'",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "error": "(psycopg.errors.UndefinedColumn) column t.bond_length does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the maximum number of bonds connected to any single atom in the molecule with ID 'TR003'?",
-    "sql": "SELECT MAX(COUNT(*)) FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id WHERE T1.molecule_id = 'TR003'",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the sum of bond lengths for all double bonds in the molecule with ID 'TR005'?",
-    "sql": "SELECT SUM(T.bond_length) FROM bond AS T WHERE T.molecule_id = 'TR005' AND T.bond_type = '='",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "error": "(psycopg.errors.UndefinedColumn) column t.bond_length does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "How many unique molecules contain at least one bond of type '-'?",
-    "sql": "SELECT COUNT(DISTINCT T.molecule_id) FROM bond AS T WHERE T.bond_type = '-'",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "Find the minimum bond length among all single bonds in the molecule with ID 'TR006'.",
-    "sql": "SELECT MIN(T.bond_length) FROM bond AS T WHERE T.molecule_id = 'TR006' AND T.bond_type = '-'",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "error": "(psycopg.errors.UndefinedColumn) column t.bond_length does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What percentage of molecules in the database are labeled as carcinogenic?",
-    "sql": "SELECT CAST(SUM(CASE WHEN label = '+' THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM molecule",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "What percentage of connected pairs involve atoms from different molecules?",
-    "sql": "SELECT CAST(SUM(CASE WHEN T1.molecule_id <> T2.molecule_id THEN 1 ELSE 0 END) AS FLOAT) * 100 / COUNT(*) FROM connected AS T1 JOIN atom AS T2 ON T1.atom_id = T2.atom_id JOIN molecule AS T3 ON T2.molecule_id = T3.molecule_id",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "error": "(psycopg.errors.UndefinedColumn) column t1.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the ratio of connected pairs involving atoms from different molecules to those involving atoms from the same molecule?",
-    "sql": "SELECT CAST(SUM(CASE WHEN T1.molecule_id <> T2.molecule_id THEN 1 ELSE 0 END) AS FLOAT) / SUM(CASE WHEN T1.molecule_id = T2.molecule_id THEN 1 ELSE 0 END) AS ratio FROM connected AS T1 JOIN atom AS T2 ON T1.atom_id = T2.atom_id JOIN molecule AS T3 ON T2.molecule_id = T3.molecule_id",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "error": "(psycopg.errors.UndefinedColumn) column t1.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Find all the distinct elements present in molecules with label '+'.",
-    "sql": "SELECT DISTINCT T1.element FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "simple lookups with a WHERE filter",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "How many molecules have a single bond type?",
-    "sql": "SELECT COUNT(DISTINCT molecule_id) FROM bond WHERE bond_type = '-'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "simple lookups with a WHERE filter",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "Which molecules have at least one bond of type '#'?]\"",
-    "sql": "SELECT DISTINCT molecule_id FROM bond WHERE bond_type = '#'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "simple lookups with a WHERE filter",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "Find the number of unique molecules that contain at least one atom of element 'o'.",
-    "sql": "SELECT COUNT(DISTINCT molecule_id) FROM atom WHERE element = 'o'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "simple lookups with a WHERE filter",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "Which elements are present in molecules with a label of '-'?",
-    "sql": "SELECT DISTINCT T1.element FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '-'",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "How many unique molecules contain at least one bond of type '#'?",
-    "sql": "SELECT COUNT(DISTINCT T1.molecule_id) FROM bond AS T1 WHERE T1.bond_type = '#'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "What is the maximum number of bonds any single molecule has?",
-    "sql": "SELECT MAX(COUNT(*)) FROM bond GROUP BY molecule_id",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the sum of all bond types in the database?",
-    "sql": "SELECT SUM(CASE WHEN bond_type = '-' THEN 1 ELSE 0 END) + SUM(CASE WHEN bond_type = '=' THEN 1 ELSE 0 END) + SUM(CASE WHEN bond_type = '#' THEN 1 ELSE 0 END) AS total_bonds FROM bond",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "Identify the most common element in molecules labeled as '+'.",
-    "sql": "SELECT T2.element FROM (SELECT T2.element, COUNT(DISTINCT T2.molecule_id) AS cnt FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.label = '+' GROUP BY T2.element ORDER BY cnt DESC LIMIT 1) AS t",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "error": "(psycopg.errors.UndefinedTable) missing FROM-clause entry for table \"t2\"",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Count the number of unique molecules each element appears in.",
-    "sql": "SELECT T2.element, COUNT(DISTINCT T1.molecule_id) AS molecule_count FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.element",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.element does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Find the average number of atoms per molecule for those labeled '-'.",
-    "sql": "SELECT AVG(COUNT(*)) AS avg_atom_count FROM (SELECT T2.molecule_id, COUNT(*) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '-' GROUP BY T2.molecule_id) AS subquery",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "List all molecules with a specific atom connection pattern: A-B-C-D-E-F-G-H-I-J-K-L-M-N-O-P-Q-R-S-T-U-V-W-X-Y-Z.",
-    "sql": "SELECT T1.molecule_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id INNER JOIN connected AS T3 ON T2.atom_id = T3.atom_id WHERE T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'a' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'b' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'c' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'd' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'e' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'f' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'g' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'h' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'i' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'j' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'k' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'l' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'm' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'n' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'o' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'p' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'q' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'r' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 's' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 't' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'u' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'v' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'w' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'x' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'y' LIMIT 1), T3.atom_id2 IN (SELECT T2.atom_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.element = 'z' LIMIT 1)",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "reject_reason": "не парсится"
-  },
-  {
-    "question": "List the top 3 molecules with the most connected atoms.",
-    "sql": "SELECT T1.molecule_id, COUNT(DISTINCT T2.atom_id) AS atom_count FROM molecule AS T1 INNER JOIN connected AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id ORDER BY atom_count DESC LIMIT 3",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Find the elements of atoms connected to molecule TR004 with bond type '#'.",
-    "sql": "SELECT DISTINCT T1.element FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id INNER JOIN bond AS T3 ON T2.bond_id = T3.bond_id WHERE T3.molecule_id = 'TR004' AND T3.bond_type = '#'",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "reject_reason": "пустой результат"
-  },
-  {
-    "question": "Rank molecules by the number of unique atoms they contain, showing the top 5.",
-    "sql": "SELECT T1.molecule_id, COUNT(DISTINCT T2.atom_id) AS atom_count FROM molecule AS T1 INNER JOIN connected AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id ORDER BY atom_count DESC LIMIT 5",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Find the elements of atoms directly connected to molecule TR002.",
-    "sql": "SELECT DISTINCT T1.element FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id WHERE T2.molecule_id = 'TR002'",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Which molecules have at least one bond type of '#'",
-    "sql": "SELECT DISTINCT T2.molecule_id FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.bond_type = '#'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "Find the count of unique elements in molecules with exactly two bonds.",
-    "sql": "SELECT COUNT(DISTINCT T1.element) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id INNER JOIN bond AS T3 ON T2.molecule_id = T3.molecule_id WHERE T3.bond_type = '-' GROUP BY T2.molecule_id HAVING COUNT(T3.bond_id) = 2",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "reject_reason": "пустой результат"
-  },
-  {
-    "question": "Which elements make up 50% or more of the atoms in molecule TR002?",
-    "sql": "WITH element_counts AS (SELECT element, COUNT(*) AS count FROM atom WHERE molecule_id = 'TR002' GROUP BY element), total_atoms AS (SELECT SUM(count) AS total FROM element_counts) SELECT element FROM element_counts WHERE count * 100 / total >= 50;",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "error": "(psycopg.errors.UndefinedColumn) column \"total\" does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Which bond types account for over 10% of the bonds in molecule TR003?",
-    "sql": "WITH bond_percentages AS (SELECT bond_type, COUNT(*) * 100.0 / (SELECT COUNT(*) FROM bond WHERE molecule_id = 'TR003') AS percentage FROM bond WHERE molecule_id = 'TR003' GROUP BY bond_type HAVING percentage > 10) SELECT bond_type, percentage FROM bond_percentages;",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "error": "(psycopg.errors.UndefinedColumn) column \"percentage\" does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the ratio of the number of oxygen atoms to hydrogen atoms in molecule TR001?",
-    "sql": "WITH oxygen_count AS (SELECT COUNT(*) AS count FROM atom WHERE molecule_id = 'TR001' AND element = 'o'), hydrogen_count AS (SELECT COUNT(*) AS count FROM atom WHERE molecule_id = 'TR001' AND element = 'h') SELECT CAST(oxygen_count.count AS FLOAT) / hydrogen_count.count AS ratio FROM oxygen_count, hydrogen_count;",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "error": "(psycopg.errors.DivisionByZero) division by zero",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Which element makes up the smallest percentage of atoms in molecule TR007?",
-    "sql": "WITH element_counts AS (SELECT element, COUNT(*) AS count FROM atom WHERE molecule_id = 'TR007' GROUP BY element), total_atoms AS (SELECT SUM(count) AS total FROM element_counts) SELECT element FROM element_counts WHERE count * 100 / total = (SELECT MIN(count * 100.0 / total) FROM element_counts, total_atoms);",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "error": "(psycopg.errors.UndefinedColumn) column \"total\" does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "How many molecules have the label '+'?",
-    "sql": "SELECT COUNT(DISTINCT molecule_id) FROM molecule WHERE label = '+'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "simple lookups with a WHERE filter",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "What is the average number of bonds per molecule?",
-    "sql": "SELECT AVG(T2.bond_id) AS avg_bonds_per_molecule FROM molecule AS T1 LEFT JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.UndefinedFunction) function avg(text) does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Calculate the sum of all bond IDs as integers.",
-    "sql": "SELECT SUM(CAST(SUBSTRING_INDEX(bond_id, '_', -1) AS UNSIGNED)) AS sum_of_bond_ids FROM bond",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.UndefinedObject) type \"unsigned\" does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the maximum number of bonds any molecule has?",
-    "sql": "SELECT MAX(COUNT(T2.bond_id)) AS max_bonds FROM molecule AS T1 LEFT JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Find the average bond length of all molecules with more than 10 bonds.",
-    "sql": "SELECT AVG(COUNT(T2.bond_id)) AS avg_bond_length FROM molecule AS T1 LEFT JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id HAVING COUNT(T2.bond_id) > 10",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Find the total number of unique atom pairs involved in double bonds within non-carcinogenic molecules.",
-    "sql": "SELECT COUNT(DISTINCT T1.atom_id, T1.atom_id2) AS unique_atom_pairs FROM connected AS T1 INNER JOIN bond AS T2 ON T1.bond_id = T2.bond_id INNER JOIN molecule AS T3 ON T2.molecule_id = T3.molecule_id WHERE T2.bond_type = '=' AND T3.label = '-'",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.UndefinedFunction) function count(text, text) does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "How many unique bonds are there in molecule TR022?",
-    "sql": "SELECT COUNT(DISTINCT T2.bond_id) FROM connected AS T2 WHERE T2.molecule_id = 'TR022'",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "List all bond types used in molecules with more than 5 atoms.",
-    "sql": "SELECT DISTINCT T1.bond_type FROM bond AS T1 INNER JOIN connected AS T2 ON T1.bond_id = T2.bond_id WHERE T2.molecule_id IN (SELECT molecule_id FROM atom GROUP BY molecule_id HAVING COUNT(*) > 5)",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Find the molecule with the longest bond.",
-    "sql": "SELECT T1.molecule_id, MAX(LENGTH(T1.bond_id)) AS max_length FROM bond AS T1",
+    "question": "Which molecule has the most atoms, and how many atoms does it contain?",
+    "sql": "SELECT molecule_id, COUNT(*) as atom_count FROM atom GROUP BY molecule_id ORDER BY atom_count DESC LIMIT 1",
     "difficulty": "simple",
     "db_id": "toxicology",
     "flavour": "ranking questions using ORDER BY with LIMIT",
-    "error": "(psycopg.errors.GroupingError) column \"t1.molecule_id\" must appear in the GROUP BY clause or be used in an aggregate function",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "How many molecules contain exactly two different elements?",
-    "sql": "SELECT COUNT(DISTINCT T1.molecule_id) FROM atom AS T1 GROUP BY T1.molecule_id HAVING COUNT(DISTINCT T2.element) = 2",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "error": "(psycopg.errors.UndefinedTable) missing FROM-clause entry for table \"t2\"",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Determine the average number of bonds per molecule that contains oxygen.",
-    "sql": "SELECT AVG(COUNT(T2.bond_id)) AS avg_bonds_per_molecule FROM atom AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'o'",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the ratio of molecules labeled '+' to those labeled '-'?",
-    "sql": "SELECT CAST(SUM(CASE WHEN label = '+' THEN 1 ELSE 0 END) AS FLOAT) / SUM(CASE WHEN label = '-' THEN 1 ELSE 0 END) AS ratio FROM molecule",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
     "reject_reason": "дубликат"
   },
   {
-    "question": "Among molecules labeled '-', what is the ratio of molecules with 4 atoms to those with more than 4 atoms?",
-    "sql": "SELECT CAST(SUM(CASE WHEN T3.atom_id IS NOT NULL THEN 1 ELSE 0 END) AS FLOAT) / COUNT(*) AS ratio FROM molecule AS T1 LEFT JOIN (SELECT T1.molecule_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id HAVING COUNT(T2.atom_id) > 4) AS T3 ON T1.molecule_id = T3.molecule_id WHERE T1.label = '-'",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "error": "(psycopg.errors.UndefinedColumn) column t3.atom_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "What is the ratio of molecules with exactly 3 connected atoms to those with fewer than 3 connected atoms?",
-    "sql": "SELECT CAST(SUM(CASE WHEN T4.atom_id IS NOT NULL THEN 1 ELSE 0 END) AS FLOAT) / COUNT(*) AS ratio FROM molecule AS T1 LEFT JOIN (SELECT T1.molecule_id FROM molecule AS T1 INNER JOIN connected AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id HAVING COUNT(DISTINCT T2.atom_id) = 3) AS T4 ON T1.molecule_id = T4.molecule_id",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.molecule_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Among molecules labeled '+', what is the ratio of molecules with 5 or more bonds to those with fewer than 5 bonds?",
-    "sql": "SELECT CAST(SUM(CASE WHEN T3.bond_id IS NOT NULL THEN 1 ELSE 0 END) AS FLOAT) / COUNT(*) AS ratio FROM molecule AS T1 LEFT JOIN (SELECT T1.molecule_id FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T1.molecule_id HAVING COUNT(T2.bond_id) >= 5) AS T3 ON T1.molecule_id = T3.molecule_id WHERE T1.label = '+'",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "error": "(psycopg.errors.UndefinedColumn) column t3.bond_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Which molecules have a single bond?",
-    "sql": "SELECT DISTINCT T1.molecule_id FROM bond AS T1 WHERE T1.bond_type = '-'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "simple lookups with a WHERE filter",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "Find all molecules with a double bond.",
-    "sql": "SELECT DISTINCT T1.molecule_id FROM bond AS T1 WHERE T1.bond_type = '='",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "simple lookups with a WHERE filter",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "Find all molecules that contain exactly three different elements.",
-    "sql": "SELECT molecule_id FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY molecule_id HAVING COUNT(DISTINCT element) = 3",
+    "question": "Among molecules labeled as toxic (+), what is the average number of atoms per molecule?",
+    "sql": "SELECT AVG(atom_count) FROM (SELECT molecule_id, COUNT(*) as atom_count FROM atom INNER JOIN molecule ON atom.molecule_id = molecule.molecule_id WHERE molecule.label = '+' GROUP BY molecule_id) AS subquery",
     "difficulty": "moderate",
     "db_id": "toxicology",
-    "flavour": "simple lookups with a WHERE filter",
+    "flavour": "questions about ratios or percentages between two quantities",
     "error": "(psycopg.errors.AmbiguousColumn) column reference \"molecule_id\" is ambiguous",
     "reject_reason": "не исполняется"
   },
   {
-    "question": "List the molecule IDs of all molecules that have exactly 5 atoms.",
-    "sql": "SELECT molecule_id FROM atom GROUP BY molecule_id HAVING COUNT(*) = 5;",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "Calculate the average number of atoms per molecule for each label (+/-).",
-    "sql": "SELECT T2.label, AVG(num_atoms) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.label;",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.UndefinedColumn) column \"num_atoms\" does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Determine the number of unique molecules that have a bond of type '#'.",
-    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.bond_type = '#';",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "Find all molecules that have both carbon and oxygen atoms.",
-    "sql": "SELECT DISTINCT T2.molecule_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element IN ('c', 'o') GROUP BY T2.molecule_id HAVING COUNT(DISTINCT T1.element) > 1",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "Which molecules have bonds involving a single covalent bond?",
-    "sql": "SELECT DISTINCT T2.molecule_id FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.bond_type = '-'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "List all bond types present in the database.",
-    "sql": "SELECT DISTINCT bond_type FROM bond",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "How many distinct molecules have at least one bond of type '#'?",
-    "sql": "SELECT COUNT(DISTINCT molecule_id) FROM bond WHERE bond_type = '#'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "joins across two or three tables following the foreign keys",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "Which molecule has the most connected atoms, and how many?",
-    "sql": "SELECT T2.molecule_id, COUNT(T1.atom_id) AS num_atoms FROM connected AS T1 INNER JOIN molecule AS T2 ON T1.bond_id = T2.bond_id GROUP BY T2.molecule_id ORDER BY num_atoms DESC LIMIT 1",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "error": "(psycopg.errors.UndefinedColumn) column t2.bond_id does not exist",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Determine the number of unique molecules that have exactly 3 atoms.",
-    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id HAVING COUNT(T1.atom_id) = 3",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "ranking questions using ORDER BY with LIMIT",
-    "reject_reason": "пустой результат"
-  },
-  {
-    "question": "How many molecules contain at least one bond of type '#'",
-    "sql": "SELECT COUNT(DISTINCT molecule_id) FROM bond WHERE bond_type = '#'",
-    "difficulty": "simple",
-    "db_id": "toxicology",
-    "flavour": "questions combining a join with an aggregate and a filter",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "Which bond type is most common among molecules labeled as '+'?",
-    "sql": "SELECT T1.bond_type FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+' GROUP BY T1.bond_type ORDER BY COUNT(*) DESC LIMIT 1",
-    "difficulty": "moderate",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "reject_reason": "дубликат"
-  },
-  {
-    "question": "Which molecule has the highest ratio of chlorine atoms to total atoms?",
-    "sql": "SELECT DISTINCT T1.molecule_id FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'cl' GROUP BY T2.molecule_id ORDER BY SUM(CASE WHEN T1.element = 'cl' THEN 1 ELSE 0 END) * 100 / COUNT(T1.element) DESC LIMIT 1",
-    "difficulty": "challenging",
-    "db_id": "toxicology",
-    "flavour": "questions about ratios or percentages between two quantities",
-    "error": "(psycopg.errors.InvalidColumnReference) for SELECT DISTINCT, ORDER BY expressions must appear in select list",
-    "reject_reason": "не исполняется"
-  },
-  {
-    "question": "Which molecules have a '+' label?",
+    "question": "Which molecules have a label of '+'?",
     "sql": "SELECT molecule_id FROM molecule WHERE label = '+'",
     "difficulty": "simple",
     "db_id": "toxicology",
@@ -1820,78 +25,635 @@
     "reject_reason": "дубликат"
   },
   {
-    "question": "What is the bond type between atoms TR000_1 and TR000_2?",
-    "sql": "SELECT T3.bond_type FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id INNER JOIN bond AS T3 ON T2.bond_id = T3.bond_id WHERE T1.atom_id = 'TR000_1' AND T2.atom_id2 = 'TR000_2'",
+    "question": "Find the labels of molecules where there is a bond between two oxygen atoms.",
+    "sql": "SELECT DISTINCT m.label FROM molecule AS m JOIN atom AS a1 ON m.molecule_id = a1.molecule_id JOIN connected AS c ON a1.atom_id = c.atom_id JOIN atom AS a2 ON c.atom_id2 = a2.atom_id WHERE a1.element = 'o' AND a2.element = 'o'",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "What is the label of the molecule with ID TR000?",
+    "sql": "SELECT label FROM molecule WHERE molecule_id = 'TR000'",
     "difficulty": "simple",
     "db_id": "toxicology",
     "flavour": "simple lookups with a WHERE filter",
     "reject_reason": "дубликат"
   },
   {
-    "question": "Which molecules have a '-' label?",
-    "sql": "SELECT molecule_id FROM molecule WHERE label = '-'",
+    "question": "Which bonds in molecule TR000 are double bonds?",
+    "sql": "SELECT bond_id FROM bond WHERE molecule_id = 'TR000' AND bond_type = '='",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "How many single bonds are there in molecule TR000?",
+    "sql": "SELECT COUNT(*) FROM bond WHERE molecule_id = 'TR000' AND bond_type = '-'",
     "difficulty": "simple",
     "db_id": "toxicology",
     "flavour": "simple lookups with a WHERE filter",
     "reject_reason": "дубликат"
   },
   {
-    "question": "What is the average number of atoms per molecule?",
-    "sql": "SELECT AVG(COUNT(*)) FROM (SELECT molecule_id FROM atom GROUP BY molecule_id) AS T",
+    "question": "For each bond type, how many bonds exist in the database?",
+    "sql": "SELECT bond_type, COUNT(bond_id) FROM bond GROUP BY bond_type",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "How many single bonds ('-') are present in each molecule?",
+    "sql": "SELECT molecule_id, COUNT(bond_id) FROM bond WHERE bond_type = '-' GROUP BY molecule_id",
     "difficulty": "moderate",
     "db_id": "toxicology",
     "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "For each molecule, what is the maximum number of connections any single atom has within that molecule?",
+    "sql": "SELECT a.molecule_id, MAX(atom_connection_count) FROM (SELECT atom_id, COUNT(atom_id2) AS atom_connection_count, molecule_id FROM connected AS c JOIN atom AS a ON c.atom_id = a.atom_id GROUP BY atom_id, molecule_id) AS t GROUP BY a.molecule_id",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.AmbiguousColumn) column reference \"atom_id\" is ambiguous",
     "reject_reason": "не исполняется"
   },
   {
-    "question": "What is the total number of bonds involving molecules labeled as '+ '?",
-    "sql": "SELECT SUM(COUNT(*)) FROM (SELECT molecule_id FROM bond WHERE molecule_id IN (SELECT molecule_id FROM molecule WHERE label = '+ ') GROUP BY molecule_id) AS T",
+    "question": "List the bond types for bonds in molecule 'TR000' that connect two chlorine ('cl') atoms.",
+    "sql": "SELECT DISTINCT T4.bond_type FROM connected AS T1 INNER JOIN atom AS T2 ON T1.atom_id = T2.atom_id INNER JOIN atom AS T3 ON T1.atom_id2 = T3.atom_id INNER JOIN bond AS T4 ON T1.bond_id = T4.bond_id WHERE T2.molecule_id = 'TR000' AND T2.element = 'cl' AND T3.element = 'cl'",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "What are the top 5 most frequent chemical elements found in the database?",
+    "sql": "SELECT element, COUNT(*) as count FROM atom GROUP BY element ORDER BY count DESC LIMIT 5",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "List the molecule IDs and the count of triple bonds ('#') for molecules that have more than 5 triple bonds.",
+    "sql": "SELECT T1.molecule_id, COUNT(T1.bond_id) AS triple_bond_count FROM bond AS T1 WHERE T1.bond_type = '#' GROUP BY T1.molecule_id HAVING COUNT(T1.bond_id) > 5",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "What are the bond IDs connecting carbon atoms in molecule TR000?",
+    "sql": "SELECT DISTINCT C.bond_id FROM connected AS C INNER JOIN atom AS A1 ON C.atom_id = A1.atom_id INNER JOIN atom AS A2 ON C.atom_id2 = A2.atom_id WHERE A1.element = 'c' AND A2.element = 'c' AND A1.molecule_id = 'TR000'",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "Count the total number of atoms for each element type in the database.",
+    "sql": "SELECT element, COUNT(atom_id) FROM atom GROUP BY element",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "How many bonds of each type exist in the database?",
+    "sql": "SELECT bond_type, COUNT(bond_id) FROM bond GROUP BY bond_type",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "For each molecule, calculate the average number of atoms it contains.",
+    "sql": "SELECT molecule_id, COUNT(atom_id) FROM atom GROUP BY molecule_id",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "What is the label for molecule TR000?",
+    "sql": "SELECT label FROM molecule WHERE molecule_id = 'TR000'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "Find the atom IDs of all carbon atoms in molecule TR000.",
+    "sql": "SELECT atom_id FROM atom WHERE molecule_id = 'TR000' AND element = 'c'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "What are the bond types for the bonds in molecule TR001?",
+    "sql": "SELECT DISTINCT bond_type FROM bond WHERE molecule_id = 'TR001'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "How many atoms are there in total for each molecule? List the molecule ID and the count.",
+    "sql": "SELECT molecule_id, COUNT(atom_id) FROM atom GROUP BY molecule_id",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "For each molecule, how many bonds does it contain? Return the molecule ID and the bond count.",
+    "sql": "SELECT molecule_id, COUNT(bond_id) FROM bond GROUP BY molecule_id",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "How many single bonds ('-') are there in each molecule? Return the molecule ID and the count.",
+    "sql": "SELECT molecule_id, COUNT(bond_id) FROM bond WHERE bond_type = '-' GROUP BY molecule_id",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "For each element, what is the total number of atoms across all molecules? List the element and the count.",
+    "sql": "SELECT element, COUNT(atom_id) FROM atom GROUP BY element",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "List the molecule IDs and their labels for all molecules that contain at least one chlorine atom.",
+    "sql": "SELECT DISTINCT T2.molecule_id, T2.label FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.element = 'cl'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "For molecule TR000, list the bond types for bonds connecting any two chlorine atoms.",
+    "sql": "SELECT DISTINCT T3.bond_type FROM connected AS T1 INNER JOIN atom AS T2 ON T1.atom_id = T2.atom_id INNER JOIN bond AS T3 ON T1.bond_id = T3.bond_id INNER JOIN atom AS T4 ON T1.atom_id2 = T4.atom_id WHERE T2.molecule_id = 'TR000' AND T4.molecule_id = 'TR000' AND T2.element = 'cl' AND T4.element = 'cl'",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "List the molecule IDs of all molecules that have a positive toxicity label.",
+    "sql": "SELECT molecule_id FROM molecule WHERE label = '+'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "Find the bond IDs for all bonds that are double bonds.",
+    "sql": "SELECT bond_id FROM bond WHERE bond_type = '='",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "Get the bond ID for the connection between atom TR000_1 and atom TR000_2.",
+    "sql": "SELECT bond_id FROM connected WHERE atom_id = 'TR000_1' AND atom_id2 = 'TR000_2'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "List the bond IDs for all bonds in molecule TR000 that are single bonds.",
+    "sql": "SELECT bond_id FROM bond WHERE molecule_id = 'TR000' AND bond_type = '-'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "How many atoms of each element are present in the database?",
+    "sql": "SELECT element, COUNT(atom_id) FROM atom GROUP BY element",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "What is the count of molecules for each toxicological label?",
+    "sql": "SELECT label, COUNT(molecule_id) FROM molecule GROUP BY label",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "How many unique elements are present in each molecule?",
+    "sql": "SELECT molecule_id, COUNT(DISTINCT element) FROM atom GROUP BY molecule_id",
     "difficulty": "moderate",
     "db_id": "toxicology",
     "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
+    "reject_reason": "дубликат"
   },
   {
-    "question": "Find the average number of bonds per molecule, grouped by their labels.",
-    "sql": "SELECT T2.label, AVG(COUNT(*)) FROM bond AS T1 JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.label",
+    "question": "What is the total number of bonds of each type in the database?",
+    "sql": "SELECT bond_type, COUNT(bond_id) FROM bond GROUP BY bond_type",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "Which atoms are connected by the bond TR000_1_2?",
+    "sql": "SELECT atom_id, atom_id2 FROM connected WHERE bond_id = 'TR000_1_2'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "List all atoms in molecule TR000 that are Carbon (c).",
+    "sql": "SELECT atom_id FROM atom WHERE molecule_id = 'TR000' AND element = 'c'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "What is the element of the atom with ID TR000_1?",
+    "sql": "SELECT element FROM atom WHERE atom_id = 'TR000_1'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "How many atoms are there for each element type in the database?",
+    "sql": "SELECT element, COUNT(atom_id) FROM atom GROUP BY element",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "Count the number of molecules for each toxicity label.",
+    "sql": "SELECT label, COUNT(molecule_id) FROM molecule GROUP BY label",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "How many bonds of each type exist in the database?",
+    "sql": "SELECT bond_type, COUNT(bond_id) FROM bond GROUP BY bond_type",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "For each molecule, how many carbon atoms does it contain?",
+    "sql": "SELECT molecule_id, COUNT(atom_id) FROM atom WHERE element = 'c' GROUP BY molecule_id",
     "difficulty": "moderate",
     "db_id": "toxicology",
     "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
-    "error": "(psycopg.errors.GroupingError) aggregate function calls cannot be nested",
-    "reject_reason": "не исполняется"
+    "reject_reason": "дубликат"
   },
   {
-    "question": "Find all molecules with both '+' and '-' labels.",
-    "sql": "SELECT T1.molecule_id FROM molecule AS T1 WHERE T1.label = '+' INTERSECT SELECT T1.molecule_id FROM molecule AS T1 WHERE T1.label = '-'",
+    "question": "List the bond IDs and their types for all bonds connected to nitrogen atoms in molecule TR001.",
+    "sql": "SELECT DISTINCT T2.bond_id, T3.bond_type FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id INNER JOIN bond AS T3 ON T2.bond_id = T3.bond_id WHERE T1.molecule_id = 'TR001' AND T1.element = 'n'",
     "difficulty": "moderate",
     "db_id": "toxicology",
     "flavour": "joins across two or three tables following the foreign keys",
     "reject_reason": "пустой результат"
   },
   {
-    "question": "Which molecules have bonds involving more than two atoms?",
-    "sql": "SELECT T2.molecule_id FROM connected AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id GROUP BY T2.molecule_id HAVING COUNT(DISTINCT T1.atom_id) > 2",
+    "question": "Which molecule has the most atoms? Return the molecule_id and the count of atoms.",
+    "sql": "SELECT molecule_id, COUNT(atom_id) AS atom_count FROM atom GROUP BY molecule_id ORDER BY atom_count DESC LIMIT 1",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "List the top 3 molecules with the highest number of bonds, showing the molecule_id and bond count.",
+    "sql": "SELECT molecule_id, COUNT(bond_id) AS bond_count FROM bond GROUP BY molecule_id ORDER BY bond_count DESC LIMIT 3",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "List the molecule IDs of all molecules that are labeled as positive.",
+    "sql": "SELECT molecule_id FROM molecule WHERE label = '+'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "What is the distribution of bond types across all bonds in the database?",
+    "sql": "SELECT bond_type, COUNT(*) FROM bond GROUP BY bond_type",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "For each molecule, what is the maximum number of bonds connected to any single atom within that molecule?",
+    "sql": "SELECT b.molecule_id, MAX(atom_bond_count) FROM bond b JOIN connected c ON b.bond_id = c.bond_id GROUP BY b.molecule_id, c.atom_id ORDER BY b.molecule_id",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.UndefinedColumn) column \"atom_bond_count\" does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the molecule ID with the highest number of atoms, and how many atoms does it have?",
+    "sql": "SELECT molecule_id, count(*) as atom_count FROM atom GROUP BY molecule_id ORDER BY atom_count DESC LIMIT 1",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "For each element, what is the average number of bonds per atom in molecules labeled as toxic (+)?",
+    "sql": "SELECT T1.element, AVG(bond_count) FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id INNER JOIN molecule AS T3 ON T1.molecule_id = T3.molecule_id WHERE T3.label = '+' GROUP BY T1.element",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.UndefinedColumn) column \"bond_count\" does not exist",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the count of molecules where the most frequent element is oxygen?",
+    "sql": "SELECT COUNT(*) FROM (SELECT molecule_id FROM atom GROUP BY molecule_id HAVING element = (SELECT element FROM atom AS T1 WHERE T1.molecule_id = atom.molecule_id GROUP BY element ORDER BY COUNT(*) DESC LIMIT 1)) AS subq",
+    "difficulty": "challenging",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "error": "(psycopg.errors.GroupingError) column \"atom.element\" must appear in the GROUP BY clause or be used in an aggregate function",
+    "reject_reason": "не исполняется"
+  },
+  {
+    "question": "What is the toxicity label for molecule TR000?",
+    "sql": "SELECT label FROM molecule WHERE molecule_id = 'TR000'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "List all molecules that have a positive toxicity label.",
+    "sql": "SELECT molecule_id FROM molecule WHERE label = '+'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "What element is atom TR000_1?",
+    "sql": "SELECT element FROM atom WHERE atom_id = 'TR000_1'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "Find all carbon atoms in molecule TR000.",
+    "sql": "SELECT atom_id FROM atom WHERE molecule_id = 'TR000' AND element = 'c'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "Which bond connects atoms TR000_1 and TR000_2?",
+    "sql": "SELECT bond_id FROM connected WHERE atom_id = 'TR000_1' AND atom_id2 = 'TR000_2'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "List all atoms connected to atom TR000_2.",
+    "sql": "SELECT atom_id2 FROM connected WHERE atom_id = 'TR000_2'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "List the bond IDs for all connections between carbon atoms in molecule TR000.",
+    "sql": "SELECT DISTINCT T1.bond_id FROM connected AS T1 INNER JOIN atom AS T2 ON T1.atom_id = T2.atom_id INNER JOIN atom AS T3 ON T1.atom_id2 = T3.atom_id WHERE T2.molecule_id = 'TR000' AND T2.element = 'c' AND T3.element = 'c'",
     "difficulty": "challenging",
     "db_id": "toxicology",
     "flavour": "joins across two or three tables following the foreign keys",
-    "error": "(psycopg.errors.UndefinedColumn) column t1.molecule_id does not exist",
-    "reject_reason": "не исполняется"
+    "reject_reason": "пустой результат"
   },
   {
-    "question": "List all molecules connected to a specific atom with ID 'TR000_1'.",
-    "sql": "SELECT DISTINCT T2.molecule_id FROM connected AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.atom_id = 'TR000_1'",
+    "question": "What are the top 5 molecules with the highest number of atoms, listed from most to least?",
+    "sql": "SELECT molecule_id, COUNT(atom_id) AS atom_count FROM atom GROUP BY molecule_id ORDER BY atom_count DESC LIMIT 5",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "Which molecule has the most single bonds (bond_type '-')? Return the molecule_id and the count.",
+    "sql": "SELECT molecule_id, COUNT(bond_id) AS single_bond_count FROM bond WHERE bond_type = '-' GROUP BY molecule_id ORDER BY single_bond_count DESC LIMIT 1",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "ranking questions using ORDER BY with LIMIT",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "How many atoms belong to molecules labeled as toxic?",
+    "sql": "SELECT COUNT(T1.atom_id) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+'",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "What is the label of the molecule with ID TR000?",
+    "sql": "SELECT label FROM molecule WHERE molecule_id = 'TR000'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "List the element types of all atoms belonging to the molecule TR001.",
+    "sql": "SELECT element FROM atom WHERE molecule_id = 'TR001'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "Which molecules have a positive label?",
+    "sql": "SELECT molecule_id FROM molecule WHERE label = '+'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "List the distinct elements present in the molecule with ID TR006.",
+    "sql": "SELECT DISTINCT element FROM atom WHERE molecule_id = 'TR006'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "Get the atom IDs connected by the bond with ID TR000_1_2.",
+    "sql": "SELECT atom_id, atom_id2 FROM connected WHERE bond_id = 'TR000_1_2'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "How many atoms does each molecule contain? List the molecule ID and the count of atoms.",
+    "sql": "SELECT molecule_id, COUNT(atom_id) FROM atom GROUP BY molecule_id",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "For each element type present in the database, how many atoms of that element are there?",
+    "sql": "SELECT element, COUNT(atom_id) FROM atom GROUP BY element",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "How many bonds of each bond type (single, double, triple) exist in the database?",
+    "sql": "SELECT bond_type, COUNT(bond_id) FROM bond GROUP BY bond_type",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "For each molecule, what is the count of carbon atoms it contains? Only include molecules that have at least one carbon atom.",
+    "sql": "SELECT molecule_id, COUNT(atom_id) FROM atom WHERE element = 'c' GROUP BY molecule_id",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "For the molecule with ID TR000, list the elements of all atoms that are part of a double bond.",
+    "sql": "SELECT DISTINCT T3.element FROM connected AS T1 INNER JOIN bond AS T2 ON T1.bond_id = T2.bond_id INNER JOIN atom AS T3 ON T1.atom_id = T3.atom_id WHERE T2.molecule_id = 'TR000' AND T2.bond_type = '='",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "List the unique elements present in molecules that have a positive label.",
+    "sql": "SELECT DISTINCT T1.element FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+'",
     "difficulty": "simple",
     "db_id": "toxicology",
     "flavour": "joins across two or three tables following the foreign keys",
-    "error": "(psycopg.errors.UndefinedColumn) column t1.molecule_id does not exist",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "What is the average number of bonds per molecule for molecules labeled as toxic?",
+    "sql": "SELECT AVG(bond_count) FROM (SELECT T1.molecule_id, COUNT(T2.bond_id) AS bond_count FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.label = '+' GROUP BY T1.molecule_id) AS subquery",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "For toxic molecules, what is the most common bond type?",
+    "sql": "SELECT T2.bond_type FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.label = '+' GROUP BY T2.bond_type ORDER BY COUNT(T2.bond_id) DESC LIMIT 1",
+    "db_id": "toxicology",
+    "flavour": "questions combining a join with an aggregate and a filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "Calculate the ratio of double bonds (=) to triple bonds (#) across the entire database.",
+    "sql": "SELECT SUM(CASE WHEN bond_type = '=' THEN 1 ELSE 0 END) * 1.0 / NULLIF(SUM(CASE WHEN bond_type = '#' THEN 1 ELSE 0 END), 0) FROM bond",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "questions about ratios or percentages between two quantities",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "What is the toxicity label for the molecule with ID TR000?",
+    "sql": "SELECT label FROM molecule WHERE molecule_id = 'TR000'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "Find the element type of the atom with ID TR000_1.",
+    "sql": "SELECT element FROM atom WHERE atom_id = 'TR000_1'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "List all molecules that have a positive toxicity label.",
+    "sql": "SELECT molecule_id FROM molecule WHERE label = '+'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "What are the bond types found in molecule TR001?",
+    "sql": "SELECT DISTINCT bond_type FROM bond WHERE molecule_id = 'TR001'",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "Which bonds in molecule TR000 are double bonds?",
+    "sql": "SELECT bond_id FROM bond WHERE molecule_id = 'TR000' AND bond_type = '='",
+    "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "simple lookups with a WHERE filter",
+    "reject_reason": "пустой результат"
+  },
+  {
+    "question": "For each molecule, calculate the ratio of carbon atoms to total atoms. Return the molecule ID and the ratio (as a decimal), rounded to 2 decimal places.",
+    "sql": "SELECT molecule_id, ROUND(CAST(SUM(CASE WHEN element = 'c' THEN 1 ELSE 0 END) AS REAL) / COUNT(atom_id), 2) FROM atom GROUP BY molecule_id",
+    "difficulty": "moderate",
+    "db_id": "toxicology",
+    "flavour": "aggregations (COUNT, AVG, SUM, MAX) with GROUP BY",
+    "error": "(psycopg.errors.UndefinedFunction) function round(double precision, integer) does not exist",
     "reject_reason": "не исполняется"
   },
   {
-    "question": "Count the number of distinct molecules with single bond types.",
-    "sql": "SELECT COUNT(DISTINCT T2.molecule_id) FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.bond_type = '-'",
+    "question": "Find the element types of all atoms belonging to the molecule with ID TR000.",
+    "sql": "SELECT DISTINCT T1.element FROM atom AS T1 WHERE T1.molecule_id = 'TR000'",
     "difficulty": "simple",
+    "db_id": "toxicology",
+    "flavour": "joins across two or three tables following the foreign keys",
+    "reject_reason": "дубликат"
+  },
+  {
+    "question": "For each molecule labeled as positive, count the number of single bonds it contains.",
+    "sql": "SELECT T1.molecule_id, COUNT(T2.bond_id) AS single_bond_count FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.label = '+' AND T2.bond_type = '-' GROUP BY T1.molecule_id",
+    "difficulty": "moderate",
     "db_id": "toxicology",
     "flavour": "joins across two or three tables following the foreign keys",
     "reject_reason": "дубликат"
