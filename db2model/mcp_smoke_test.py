@@ -1,0 +1,100 @@
+"""Reproducible smoke test of the MCP Text2SQL server's live path.
+
+Exercises the REAL `Text2SQLGenerator.query()` used by the MCP tool:
+    вопрос → LLM (эндпоинт из .env) → SQL → исполнение на живой БД → результат.
+
+Covers all three target DBs in `with_schema=True` (baseline mode: the server pulls
+the schema and must return real rows) and one DB in `with_schema=False` (schema-less
+path — the plumbing runs; correct SQL there needs the fine-tuned adapter served via
+vLLM, so with the base endpoint model wrong table names are expected and reported,
+not asserted).
+
+Needs the ssh tunnel (localhost:5444) and the LLM endpoint (LLM_* in .env).
+Run:  PYTHONIOENCODING=utf-8 uv run --env-file .env python db2model/mcp_smoke_test.py
+
+The endpoint model (Qwen3) reasons by default, so enable_thinking=false is injected
+into every create() call — otherwise `content` comes back empty. The MCP server
+itself would need the same flag when pointed at a Qwen3 model.
+"""
+import asyncio
+import os
+import sys
+
+from autogen_ext.models.openai import OpenAIChatCompletionClient
+
+from adv_text2sql.mcp_servers.text2sql_tool.src.text2sql_implementation import (
+    Text2SQLGenerator,
+)
+
+DB_HOST = os.getenv("BENCHMARK_DB_URL", "localhost:5444")
+# (db, вопрос с заведомым ответом) — по одному на каждую целевую базу.
+CASES = [
+    ("toxicology", "List 3 distinct bond types."),
+    ("financial", "How many accounts are there in total?"),
+    ("codebase_community", "How many users are there in total?"),
+]
+
+
+def make_client() -> OpenAIChatCompletionClient:
+    client = OpenAIChatCompletionClient(
+        model=os.environ["LLM_MODEL_NAME"],
+        base_url=os.environ["LLM_BASE_URL"],
+        api_key=os.environ["LLM_API_KEY"],
+        temperature=0.0,
+        model_info={"json_output": False, "function_calling": True, "vision": False,
+                    "family": "unknown", "structured_output": False},
+    )
+    _orig = client.create
+
+    async def _create(messages, **kw):
+        ec = dict(kw.get("extra_create_args") or {})
+        ec.setdefault("extra_body", {"chat_template_kwargs": {"enable_thinking": False}})
+        kw["extra_create_args"] = ec
+        return await _orig(messages, **kw)
+
+    client.create = _create
+    return client
+
+
+def _agent(db: str, with_schema: bool, client) -> Text2SQLGenerator:
+    uri = (f"postgresql+psycopg://{os.environ['DB_USER']}:{os.environ['DB_PASS']}"
+           f"@{DB_HOST}/{db}")
+    agent = Text2SQLGenerator(db_uri=uri, llm_client=client, with_schema=with_schema)
+    agent.build()
+    return agent
+
+
+async def main() -> int:
+    client = make_client()
+    passed = 0
+
+    print("=== with_schema=True (baseline-режим): ждём реальные строки ===")
+    for db, question in CASES:
+        agent = _agent(db, True, client)
+        res = await agent.query(question, check_ambiguity=False, check_sql_query=False)
+        ex = res.get("execution", {})
+        ok = res.get("status") == "success" and ex.get("status") == "success" \
+            and ex.get("row_count", 0) > 0
+        passed += ok
+        print(f"[{'PASS' if ok else 'FAIL'}] {db}: {question}")
+        print(f"       SQL: {(res.get('query') or '').splitlines()[0][:90]}")
+        print(f"       -> {ex.get('row_count', 0)} строк | {str(ex.get('results', ex.get('error')))[:90]}")
+
+    print("\n=== with_schema=False (schema-less путь): проверяем, что код проходит ===")
+    db, question = CASES[0]
+    agent = _agent(db, False, client)
+    res = await agent.query(question, check_ambiguity=False, check_sql_query=False)
+    path_ok = res.get("status") in ("success", "error") and res.get("query") is not None
+    print(f"[{'PASS' if path_ok else 'FAIL'}] schema-less путь отработал: сгенерирован SQL "
+          f"{(res.get('query') or '')[:60]!r}")
+    print("       (верный SQL в этом арме даёт адаптер через vLLM; на базовой модели "
+          "имена таблиц могут быть неверны — это ожидаемо)")
+
+    total = len(CASES)
+    print(f"\nИТОГ: with_schema=True {passed}/{total} PASS; schema-less путь "
+          f"{'PASS' if path_ok else 'FAIL'}")
+    return 0 if (passed == total and path_ok) else 1
+
+
+if __name__ == "__main__":
+    sys.exit(asyncio.run(main()))

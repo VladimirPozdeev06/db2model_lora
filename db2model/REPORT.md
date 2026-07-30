@@ -150,10 +150,11 @@ M-Schema (`mschema/<db>.txt`), датасеты (+ `manifest.json` с хешам
 (`src/adv_text2sql/mcp_servers/text2sql_tool/`) поддерживает арм весов через
 `with_schema=False`; развёртывание — `MCP_SERVING.md`.
 
-**Smoke-тест MCP (живой).** Прогнан реальный путь `query()`: вопрос → LLM (эндпоинт
-МФТИ) → SQL → исполнение на живой БД через туннель → таблица. В режиме
-`with_schema=True` полный цикл отработал и вернул реальные строки (напр. «List 3
-distinct bond types» → `SELECT DISTINCT bond_type FROM bond LIMIT 3` → 3 строки).
+**Smoke-тест MCP (живой, воспроизводимый — `db2model/mcp_smoke_test.py`).** Прогнан
+реальный путь `query()`: вопрос → LLM (эндпоинт МФТИ) → SQL → исполнение на живой БД
+через туннель → таблица. В режиме `with_schema=True` — **3/3 PASS** по всем базам с
+реальными числами: toxicology `SELECT DISTINCT bond_type FROM bond` → 3 строки;
+financial `COUNT(*) FROM account` → 4500; codebase_community `COUNT(*) FROM users` → 40325.
 Режим `with_schema=False` тоже проходит по коду (промпт без схемы, SQL исполняется),
 но базовая модель эндпоинта без адаптера галлюцинирует имена таблиц — корректный
 SQL в этом арме даёт дообученный адаптер (его точность отдельно измерена — 38.09%).
