@@ -3,11 +3,13 @@
 Exercises the REAL `Text2SQLGenerator.query()` used by the MCP tool:
     вопрос → LLM (эндпоинт из .env) → SQL → исполнение на живой БД → результат.
 
-Covers all three target DBs in `with_schema=True` (baseline mode: the server pulls
-the schema and must return real rows) and one DB in `with_schema=False` (schema-less
-path — the plumbing runs; correct SQL there needs the fine-tuned adapter served via
-vLLM, so with the base endpoint model wrong table names are expected and reported,
-not asserted).
+Covers all three target DBs in BOTH arms, with the same bar in each: the query must
+execute and return real rows.
+  * `with_schema=True`  — baseline: the server pulls the schema into the prompt.
+  * `with_schema=False` — the defended arm: schema comes from the adapter's weights,
+    so this passes only against a vLLM serving the fine-tuned adapter
+    (`db2model/kaggle_vllm_serve.ipynb`). Against the plain endpoint model it FAILS
+    by design — the base model invents table names.
 
 Needs the ssh tunnel (localhost:5444) and the LLM endpoint (LLM_* in .env).
 Run:  PYTHONIOENCODING=utf-8 uv run --env-file .env python db2model/mcp_smoke_test.py
@@ -56,6 +58,11 @@ def make_client() -> OpenAIChatCompletionClient:
     return client
 
 
+def _first_line(sql: str | None) -> str:
+    lines = (sql or "").splitlines()
+    return lines[0][:90] if lines else "<пусто>"
+
+
 def _agent(db: str, with_schema: bool, client) -> Text2SQLGenerator:
     uri = (f"postgresql+psycopg://{os.environ['DB_USER']}:{os.environ['DB_PASS']}"
            f"@{DB_HOST}/{db}")
@@ -77,23 +84,32 @@ async def main() -> int:
             and ex.get("row_count", 0) > 0
         passed += ok
         print(f"[{'PASS' if ok else 'FAIL'}] {db}: {question}")
-        print(f"       SQL: {(res.get('query') or '').splitlines()[0][:90]}")
+        print(f"       SQL: {_first_line(res.get('query'))}")
         print(f"       -> {ex.get('row_count', 0)} строк | {str(ex.get('results', ex.get('error')))[:90]}")
 
-    print("\n=== with_schema=False (schema-less путь): проверяем, что код проходит ===")
-    db, question = CASES[0]
-    agent = _agent(db, False, client)
-    res = await agent.query(question, check_ambiguity=False, check_sql_query=False)
-    path_ok = res.get("status") in ("success", "error") and res.get("query") is not None
-    print(f"[{'PASS' if path_ok else 'FAIL'}] schema-less путь отработал: сгенерирован SQL "
-          f"{(res.get('query') or '')[:60]!r}")
-    print("       (верный SQL в этом арме даёт адаптер через vLLM; на базовой модели "
-          "имена таблиц могут быть неверны — это ожидаемо)")
+    print("\n=== with_schema=False (schema-less арм: знание в весах адаптера) ===")
+    schema_less = 0
+    for db, question in CASES:
+        agent = _agent(db, False, client)
+        res = await agent.query(question, check_ambiguity=False, check_sql_query=False)
+        ex = res.get("execution", {})
+        ok = res.get("status") == "success" and ex.get("status") == "success" \
+            and ex.get("row_count", 0) > 0
+        schema_less += ok
+        print(f"[{'PASS' if ok else 'FAIL'}] {db}: {question}")
+        print(f"       SQL: {_first_line(res.get('query'))}")
+        print(f"       -> {ex.get('row_count', 0)} строк | {str(ex.get('results', ex.get('error')))[:90]}")
 
     total = len(CASES)
-    print(f"\nИТОГ: with_schema=True {passed}/{total} PASS; schema-less путь "
-          f"{'PASS' if path_ok else 'FAIL'}")
-    return 0 if (passed == total and path_ok) else 1
+    print(f"\nИТОГ: with_schema=True {passed}/{total} PASS; "
+          f"schema-less {schema_less}/{total} PASS")
+    if schema_less < total:
+        print(
+            "\nSchema-less арм требует ДООБУЧЕННЫЙ адаптер: LLM_MODEL_NAME=db2model и\n"
+            "LLM_BASE_URL на vLLM из db2model/kaggle_vllm_serve.ipynb. На базовой модели\n"
+            "эндпоинта без адаптера имена таблиц будут выдуманы — это ожидаемо и не баг."
+        )
+    return 0 if (passed == total and schema_less == total) else 1
 
 
 if __name__ == "__main__":
