@@ -195,13 +195,19 @@ class Text2SQLGenerator:
 
         return "\n".join(schema_parts).strip()
 
+    def _db_name(self) -> str:
+        """Имя базы из URI — адаптер обучался с ним в системном промпте."""
+        return str(self.db_uri).rstrip("/").rsplit("/", 1)[-1].split("?")[0]
+
     def _create_system_prompt(self) -> str:
         """Системный промпт: со схемой (baseline) или без неё (арм весов)."""
         if self.with_schema:
             return SYSTEM_PROMPT_TEMPLATE.format(
                 db_schema=self.db_schema, sql_dialect="PostgreSQL"
             )
-        return SYSTEM_PROMPT_NOSCHEMA_TEMPLATE.format(sql_dialect="PostgreSQL")
+        return SYSTEM_PROMPT_NOSCHEMA_TEMPLATE.format(
+            sql_dialect="PostgreSQL", db_name=self._db_name()
+        )
 
     async def _check_ambiguity(self, user_query: str) -> dict[str, Any]:
         """
@@ -348,14 +354,21 @@ class Text2SQLGenerator:
         Returns:
             Dict[str, Any]: Результат в формате Model Context Protocol
         """
-        sql_prompt = SQL_PROMPT_TEMPLATE.format(
-            user_query=user_query, sql_dialect="PostgreSQL"
-        )
+        if self.with_schema:
+            user_content = dedent(
+                SQL_PROMPT_TEMPLATE.format(
+                    user_query=user_query, sql_dialect="PostgreSQL"
+                )
+            )
+        else:
+            # Schema-less арм: в обучении пользовательское сообщение — голый вопрос,
+            # без обёртки с требованиями. Обёртка сбивает адаптер (см. prompts.py).
+            user_content = user_query
         try:
             # Создаем цепочку обработки запроса
             messages = [
                 SystemMessage(content=self.system_prompt),
-                UserMessage(source="user", content=dedent(sql_prompt)),
+                UserMessage(source="user", content=user_content),
             ]
 
             # Прямой вызов LLM

@@ -37,9 +37,9 @@ CASES = [
 ]
 
 
-def make_client() -> OpenAIChatCompletionClient:
+def make_client(model: str | None = None) -> OpenAIChatCompletionClient:
     client = OpenAIChatCompletionClient(
-        model=os.environ["LLM_MODEL_NAME"],
+        model=model or os.environ["LLM_MODEL_NAME"],
         base_url=os.environ["LLM_BASE_URL"],
         api_key=os.environ["LLM_API_KEY"],
         temperature=0.0,
@@ -73,11 +73,19 @@ def _agent(db: str, with_schema: bool, client) -> Text2SQLGenerator:
 
 async def main() -> int:
     client = make_client()
+    # Арму со схемой нужна ОБЩАЯ instruct-модель: дообученный адаптер на длинный
+    # baseline-промпт не рассчитан. Когда vLLM отдаёт и базу, и адаптер (см.
+    # kaggle_vllm_serve.ipynb), базу видно под именем `base` — тогда оба арма
+    # честно проверяются на одном сервере.
+    baseline_model = os.getenv("LLM_MODEL_NAME_WITH_SCHEMA")
+    baseline_client = make_client(baseline_model) if baseline_model else client
     passed = 0
 
     print("=== with_schema=True (baseline-режим): ждём реальные строки ===")
+    if baseline_model:
+        print(f"    (модель арма со схемой: {baseline_model})")
     for db, question in CASES:
-        agent = _agent(db, True, client)
+        agent = _agent(db, True, baseline_client)
         res = await agent.query(question, check_ambiguity=False, check_sql_query=False)
         ex = res.get("execution", {})
         ok = res.get("status") == "success" and ex.get("status") == "success" \
