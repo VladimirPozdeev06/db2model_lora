@@ -8,6 +8,7 @@ import decimal
 import re
 
 from sqlalchemy import create_engine, text
+from sqlalchemy.engine import Engine
 from sqlalchemy.exc import SQLAlchemyError
 from typing import Dict
 
@@ -66,6 +67,11 @@ def run_evaluation(
     all_predicted = {}
     all_gold = {}
 
+    # Один engine на базу, а не на вопрос. Раньше engine создавался внутри цикла, и
+    # прогон открывал по новому TCP-соединению на каждый вопрос (~180 за арм) — через
+    # ssh-туннель это его же и роняло, а зависшие соединения потом висели часами.
+    engines: dict[str, Engine] = {}
+
     for question_id, predicted_sql in predictions.items():
         gold_query = gold_queries[question_id]
 
@@ -101,10 +107,18 @@ def run_evaluation(
             gold_sql = sqlite_to_postgres(gold_sql)
             # A predicted query can be accidentally quadratic (cross join, bad
             # subquery) and hang the whole evaluation; cap every statement.
-            engine = create_engine(
-                db_uri,
-                connect_args={"options": "-c statement_timeout=30000"},
-            )
+            # connect_timeout не даёт повиснуть навсегда, если туннель отвалился.
+            engine = engines.get(db_id)
+            if engine is None:
+                engine = create_engine(
+                    db_uri,
+                    connect_args={
+                        "options": "-c statement_timeout=30000",
+                        "connect_timeout": 15,
+                    },
+                    pool_pre_ping=True,
+                )
+                engines[db_id] = engine
 
             with engine.connect() as conn:
 
