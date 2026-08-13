@@ -4,7 +4,11 @@ __pycache__/
 *$py.class
 
 # Manual files added
+# Секреты: .env и любые его копии/бэкапы (.env.local, .env.before_vllm и т.п.).
+# Шаблон .env.example — единственное исключение, он без реальных значений.
 .env
+.env.*
+!.env.example
 db_schemas.json
 all_gold_results.json
 all_predicted_results.json
