@@ -1,0 +1,148 @@
+{
+  "db_id": "codebase_community",
+  "corpus": {
+    "queries": 69,
+    "planned": 69,
+    "failed": 0,
+    "files": [
+      "train_queries.json",
+      "bird_large.json"
+    ]
+  },
+  "table_frequency": {
+    "users": 48,
+    "posts": 34,
+    "comments": 17,
+    "badges": 10,
+    "posthistory": 10,
+    "votes": 6,
+    "postlinks": 3,
+    "tags": 3
+  },
+  "scan_methods": {
+    "users:Seq Scan": 30,
+    "posts:Seq Scan": 24,
+    "users:Index Scan": 18,
+    "comments:Seq Scan": 17,
+    "badges:Seq Scan": 10,
+    "posthistory:Seq Scan": 10,
+    "posts:Index Scan": 9,
+    "votes:Seq Scan": 6,
+    "postlinks:Seq Scan": 3,
+    "tags:Seq Scan": 3,
+    "posts:Index Only Scan": 1
+  },
+  "join_paths": {
+    "posts|users": 16,
+    "comments|users": 7,
+    "posthistory|posts": 7,
+    "posthistory|users": 7,
+    "comments|posts": 6,
+    "badges|users": 5,
+    "postlinks|posts": 3,
+    "posts|votes": 3,
+    "users|votes": 2,
+    "posts|tags": 1,
+    "badges|posthistory": 1,
+    "posthistory|votes": 1,
+    "tags|users": 1,
+    "posthistory|tags": 1
+  },
+  "join_operators": {
+    "Nested Loop": 30,
+    "Hash Join": 22
+  },
+  "join_keys": {
+    "posts.OwnerUserId = users.Id": 10,
+    "comments.UserId = users.Id": 6,
+    "postHistory.PostId = posts.Id": 6,
+    "postHistory.UserId = users.Id": 6,
+    "badges.UserId = users.Id": 5,
+    "comments.PostId = posts.Id": 4,
+    "postLinks.PostId = posts.Id": 3,
+    "posts.Id = votes.PostId": 2,
+    "posts.Id = tags.ExcerptPostId": 1,
+    "posts.LastEditorUserId = users.Id": 1,
+    "posts.OwnerUserId = votes.UserId": 1,
+    "badges.UserId = postHistory.UserId": 1,
+    "users.Id = votes.UserId": 1,
+    "postHistory.PostId = tags.ExcerptPostId": 1
+  },
+  "server_counters": {
+    "stats_reset": null,
+    "pg_stat_user_tables": [
+      {
+        "relname": "users",
+        "seq_scan": 13059,
+        "seq_tup_read": 523113703,
+        "idx_scan": 2053268,
+        "idx_tup_fetch": 2019332,
+        "n_live_tup": 0
+      },
+      {
+        "relname": "posts",
+        "seq_scan": 746402,
+        "seq_tup_read": 64785381003,
+        "idx_scan": 1239631,
+        "idx_tup_fetch": 9380588,
+        "n_live_tup": 0
+      },
+      {
+        "relname": "tags",
+        "seq_scan": 987584,
+        "seq_tup_read": 1019167340,
+        "idx_scan": 107,
+        "idx_tup_fetch": 12512,
+        "n_live_tup": 0
+      },
+      {
+        "relname": "votes",
+        "seq_scan": 52914,
+        "seq_tup_read": 1887153925,
+        "idx_scan": 17,
+        "idx_tup_fetch": 120,
+        "n_live_tup": 0
+      },
+      {
+        "relname": "badges",
+        "seq_scan": 15196,
+        "seq_tup_read": 609075221,
+        "idx_scan": 2,
+        "idx_tup_fetch": 1,
+        "n_live_tup": 0
+      },
+      {
+        "relname": "posthistory",
+        "seq_scan": 13954,
+        "seq_tup_read": 685540814,
+        "idx_scan": 233,
+        "idx_tup_fetch": 4,
+        "n_live_tup": 0
+      },
+      {
+        "relname": "comments",
+        "seq_scan": 11040,
+        "seq_tup_read": 683810419,
+        "idx_scan": 241,
+        "idx_tup_fetch": 6,
+        "n_live_tup": 0
+      },
+      {
+        "relname": "postlinks",
+        "seq_scan": 417,
+        "seq_tup_read": 4440861,
+        "idx_scan": 32,
+        "idx_tup_fetch": 65,
+        "n_live_tup": 0
+      }
+    ]
+  },
+  "pg_stat_statements": {
+    "shared_preload_libraries": "error: (psycopg.errors.InsufficientPrivilege) must be superuser or have privileges of p",
+    "available": null,
+    "is_superuser": "off",
+    "can_read_all_stats": false,
+    "rows_visible": "error: (psycopg.errors.UndefinedTable) relation \"pg_stat_statements\" does not exist\nLIN"
+  },
+  "failures": []
+}

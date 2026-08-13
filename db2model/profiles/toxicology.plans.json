@@ -1,0 +1,96 @@
+{
+  "db_id": "toxicology",
+  "corpus": {
+    "queries": 90,
+    "planned": 90,
+    "failed": 0,
+    "files": [
+      "train_queries.json",
+      "bird_large.json"
+    ]
+  },
+  "table_frequency": {
+    "atom": 55,
+    "molecule": 45,
+    "bond": 44,
+    "connected": 25
+  },
+  "scan_methods": {
+    "atom:Seq Scan": 47,
+    "molecule:Seq Scan": 43,
+    "bond:Seq Scan": 36,
+    "connected:Seq Scan": 18,
+    "bond:Index Scan": 8,
+    "atom:Index Scan": 7,
+    "connected:Index Scan": 5,
+    "atom:Index Only Scan": 1,
+    "connected:Index Only Scan": 1,
+    "molecule:Index Scan": 1,
+    "molecule:Index Only Scan": 1,
+    "connected:Bitmap Heap Scan": 1
+  },
+  "join_paths": {
+    "atom|molecule": 30,
+    "atom|bond": 17,
+    "bond|molecule": 17,
+    "atom|connected": 12,
+    "bond|connected": 12,
+    "connected|molecule": 1
+  },
+  "join_operators": {
+    "Hash Join": 54,
+    "Nested Loop": 24
+  },
+  "join_keys": {
+    "atom.molecule_id = molecule.molecule_id": 30,
+    "bond.molecule_id = molecule.molecule_id": 16,
+    "atom.atom_id = connected.atom_id": 12,
+    "bond.bond_id = connected.bond_id": 11,
+    "atom.molecule_id = bond.molecule_id": 9
+  },
+  "server_counters": {
+    "stats_reset": null,
+    "pg_stat_user_tables": [
+      {
+        "relname": "atom",
+        "seq_scan": 9592,
+        "seq_tup_read": 116954556,
+        "idx_scan": 520823,
+        "idx_tup_fetch": 514727,
+        "n_live_tup": 0
+      },
+      {
+        "relname": "bond",
+        "seq_scan": 30189,
+        "seq_tup_read": 67194944,
+        "idx_scan": 18293,
+        "idx_tup_fetch": 11538,
+        "n_live_tup": 0
+      },
+      {
+        "relname": "molecule",
+        "seq_scan": 10419,
+        "seq_tup_read": 3550006,
+        "idx_scan": 22824,
+        "idx_tup_fetch": 25483,
+        "n_live_tup": 0
+      },
+      {
+        "relname": "connected",
+        "seq_scan": 11090,
+        "seq_tup_read": 272279110,
+        "idx_scan": 9979,
+        "idx_tup_fetch": 32206,
+        "n_live_tup": 0
+      }
+    ]
+  },
+  "pg_stat_statements": {
+    "shared_preload_libraries": "error: (psycopg.errors.InsufficientPrivilege) must be superuser or have privileges of p",
+    "available": null,
+    "is_superuser": "off",
+    "can_read_all_stats": false,
+    "rows_visible": "error: (psycopg.errors.UndefinedTable) relation \"pg_stat_statements\" does not exist\nLIN"
+  },
+  "failures": []
+}

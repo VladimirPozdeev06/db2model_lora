@@ -1,0 +1,160 @@
+{
+  "db_id": "financial",
+  "corpus": {
+    "queries": 75,
+    "planned": 75,
+    "failed": 0,
+    "files": [
+      "train_queries.json",
+      "bird_large.json"
+    ]
+  },
+  "table_frequency": {
+    "account": 53,
+    "district": 41,
+    "disp": 29,
+    "client": 28,
+    "loan": 18,
+    "trans": 17,
+    "card": 8,
+    "order": 2
+  },
+  "scan_methods": {
+    "district:Seq Scan": 38,
+    "account:Seq Scan": 35,
+    "disp:Seq Scan": 28,
+    "loan:Seq Scan": 17,
+    "client:Seq Scan": 17,
+    "trans:Seq Scan": 16,
+    "account:Index Only Scan": 10,
+    "account:Index Scan": 8,
+    "card:Seq Scan": 8,
+    "client:Index Only Scan": 7,
+    "client:Index Scan": 4,
+    "district:Index Scan": 2,
+    "trans:Index Scan": 1,
+    "loan:Index Scan": 1,
+    "disp:Index Scan": 1,
+    "order:Index Scan": 1,
+    "district:Index Only Scan": 1,
+    "order:Seq Scan": 1
+  },
+  "join_paths": {
+    "account|district": 27,
+    "account|disp": 22,
+    "account|loan": 17,
+    "client|disp": 17,
+    "account|trans": 14,
+    "client|district": 13,
+    "account|client": 13,
+    "card|disp": 8,
+    "disp|district": 7,
+    "district|loan": 6,
+    "disp|loan": 6,
+    "disp|trans": 5,
+    "client|loan": 5,
+    "district|trans": 4,
+    "card|client": 4,
+    "client|trans": 3,
+    "account|order": 2,
+    "account|card": 1,
+    "card|trans": 1,
+    "district|order": 1,
+    "loan|trans": 1
+  },
+  "join_operators": {
+    "Hash Join": 75,
+    "Nested Loop": 40,
+    "Merge Join": 1
+  },
+  "join_keys": {
+    "account.district_id = district.district_id": 26,
+    "account.account_id = disp.account_id": 22,
+    "client.client_id = disp.client_id": 17,
+    "account.account_id = loan.account_id": 16,
+    "account.account_id = trans.account_id": 14,
+    "client.district_id = district.district_id": 11,
+    "card.disp_id = disp.disp_id": 8,
+    "Account.District_id = District.District_id": 1,
+    "Account.Account_id = Loan.Account_id": 1,
+    "account.account_id = order.account_id": 1,
+    "disp.account_id = loan.account_id": 1
+  },
+  "server_counters": {
+    "stats_reset": null,
+    "pg_stat_user_tables": [
+      {
+        "relname": "account",
+        "seq_scan": 7009,
+        "seq_tup_read": 30096426,
+        "idx_scan": 1076198,
+        "idx_tup_fetch": 67384,
+        "n_live_tup": 0
+      },
+      {
+        "relname": "disp",
+        "seq_scan": 192022,
+        "seq_tup_read": 1030256633,
+        "idx_scan": 5260,
+        "idx_tup_fetch": 1431,
+        "n_live_tup": 0
+      },
+      {
+        "relname": "client",
+        "seq_scan": 1996,
+        "seq_tup_read": 10478395,
+        "idx_scan": 57423,
+        "idx_tup_fetch": 11854,
+        "n_live_tup": 0
+      },
+      {
+        "relname": "district",
+        "seq_scan": 9631,
+        "seq_tup_read": 605453,
+        "idx_scan": 15836,
+        "idx_tup_fetch": 15836,
+        "n_live_tup": 0
+      },
+      {
+        "relname": "trans",
+        "seq_scan": 14202,
+        "seq_tup_read": 8668126743,
+        "idx_scan": 21,
+        "idx_tup_fetch": 1,
+        "n_live_tup": 0
+      },
+      {
+        "relname": "loan",
+        "seq_scan": 4565,
+        "seq_tup_read": 3085520,
+        "idx_scan": 743,
+        "idx_tup_fetch": 1429,
+        "n_live_tup": 0
+      },
+      {
+        "relname": "card",
+        "seq_scan": 2165,
+        "seq_tup_read": 1909001,
+        "idx_scan": 3,
+        "idx_tup_fetch": 18,
+        "n_live_tup": 0
+      },
+      {
+        "relname": "order",
+        "seq_scan": 526,
+        "seq_tup_read": 3248558,
+        "idx_scan": 241,
+        "idx_tup_fetch": 256,
+        "n_live_tup": 0
+      }
+    ]
+  },
+  "pg_stat_statements": {
+    "shared_preload_libraries": "error: (psycopg.errors.InsufficientPrivilege) must be superuser or have privileges of p",
+    "available": null,
+    "is_superuser": "off",
+    "can_read_all_stats": false,
+    "rows_visible": "error: (psycopg.errors.UndefinedTable) relation \"pg_stat_statements\" does not exist\nLIN"
+  },
+  "failures": []
+}

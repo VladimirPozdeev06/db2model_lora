@@ -30,6 +30,15 @@ collect_profile  generate_pairs        filter_pairs       build_dataset  kaggle_
 реальные значения. Размеры профилей: financial 12k, toxicology 2.8k,
 codebase_community 18.8k токенов.
 
+Третий источник exploration из карточки — логи и планы — снимается отдельно
+(`collect_query_stats.py` → `profiles/<db>.plans.json`): счётчики обращений к таблицам из
+`pg_stat_user_tables`, планы `EXPLAIN (FORMAT JSON)` по 234 реальным запросам (143 пары
+`train_queries.json` + 91 gold оценочного split) и join-пути с ключами. Настоящий лог
+запросов (`pg_stat_statements`) на инстанции недоступен: расширение не установлено, прав
+суперюзера и `pg_read_all_stats` у нас нет. В обучение адаптера эти артефакты не заведены —
+победитель обучен без них; применение (взвешивание синтетики по реальным join-путям)
+остаётся заделом.
+
 ## 3. Результаты
 
 ### Ранний замер (train 1171, учитель Qwen-7B) — исторический

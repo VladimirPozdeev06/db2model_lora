@@ -33,8 +33,9 @@ target — Qwen2.5-Coder-3B-Instruct в 4-bit. Подробности и ого�
 Прирост есть на обоих размерах, но он **разный** — на 3B заметно скромнее. (Прежняя
 формулировка «+9.5 п.п. на обоих» держалась на июльском замере и снята как совпадение.)
 Адаптеры — `adapters/qwen27b_7b_sqlonly1096/` (7B) и
-`qwen27b_sqlonly1096/` (3B); данные — `kaggle_input/` (sql_only; мультизадачи дали −4 п.п.
-и отключены, воспроизводятся флагом `build_dataset.py --multitask`).
+`qwen27b_sqlonly1096/` (3B); данные — `kaggle_input/` (sql_only; мультизадачи отключены как
+выбор по умолчанию — их эффект после пересчёта в пределах шума, а не доказанный вред;
+воспроизводятся флагом `build_dataset.py --multitask`).
 
 **Что пробовали сверх sql-only и отклонили** (обе техники — из опорных статей плана):
 
@@ -140,6 +141,17 @@ uv run --env-file .env python db2model/collect_profile.py
 uv run python db2model/build_mschema.py            # -> db2model/mschema/<db>.txt
 ```
 
+Логи и планы (третий источник exploration из карточки) — отдельным скриптом:
+
+```bash
+uv run --env-file .env python db2model/collect_query_stats.py   # -> profiles/<db>.plans.json
+```
+
+Снимает счётчики обращений к таблицам (`pg_stat_user_tables`), гоняет `EXPLAIN (FORMAT JSON)`
+по 234 реальным запросам (143 пары `train_queries.json` + 91 gold оценочного split) и
+вытаскивает join-пути и join-ключи. `pg_stat_statements` на инстанции **недоступен** (нет
+расширения, прав суперюзера тоже нет) — скрипт это фиксирует в отчёте.
+
 Проверить достаточность профиля (teacher отвечает по нему на реальные вопросы, без доступа к БД):
 
 ```bash
@@ -190,12 +202,25 @@ uv run python db2model/extract_sql.py query_results_lora.json
 uv run --env-file .env python bird_evaluate_only.py query_results_lora_extracted.json data/bird_large.json
 ```
 
+### 6. Воспроизведение лидерборда одной командой
+
+Весь лидерборд (все армы через единый оценщик, markdown-таблицы, ±σ по сидам) —
+одной командой; полный прогон ≈ 2 часа, нужен туннель:
+
+```bash
+uv run --env-file .env python db2model/reproduce_leaderboard.py
+```
+
+Флаги: `--only <подстрока>` — отдельные армы, `--group canon` — канонический замер,
+`--group curve` — кривая объёма данных, `--out <файл>` — куда положить таблицы.
+
 ## Структура
 
 ```
 db2model/
   collect_profile.py    профиль БД из PostgreSQL
   build_mschema.py      профиль -> M-Schema (mschema/<db>.txt), носитель знания о БД
+  collect_query_stats.py  планы EXPLAIN + join-пути + счётчики обращений (plans.json)
   validate_profile.py   проверка достаточности профиля
   generate_pairs.py     teacher генерирует пары по профилю
   filter_pairs.py       фильтр по исполнению (noise correction)
@@ -208,6 +233,7 @@ db2model/
   compare_predictions.py  подиффное сравнение армов
   measure_latency.py    латентность генерации (schema-less vs baseline)
   mcp_smoke_test.py     живой smoke-тест MCP: query() -> LLM -> SQL -> БД
+  reproduce_leaderboard.py  весь лидерборд одной командой (единый оценщик, ±σ по сидам)
   kaggle_train_lora.ipynb   основной замер 3B (baseline vs lora vs zeroshot)
   kaggle_train_7b.ipynb     тот же замер на плановом target 7B
   kaggle_seeds.ipynb        повтор на 3 сидах (±σ), _7b — то же для 7B

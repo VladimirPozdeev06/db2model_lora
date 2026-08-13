@@ -69,12 +69,13 @@ Text-to-LoRA (doc2lora).
 | Пункт плана | Статус | Чем закрыто |
 |---|---|---|
 | Exploration-pipeline | ✅ | `collect_profile.py` → `profiles/<db>.json`; `build_mschema.py` → `mschema/<db>.txt` |
+| Логи и планы (3-й источник карточки) | ✅ | `collect_query_stats.py` → `profiles/<db>.plans.json`: `EXPLAIN` по 234 реальным запросам, join-пути, `pg_stat_user_tables`. `pg_stat_statements` **недоступен** (нет расширения и прав) |
 | Baseline (со схемой) | ✅ | 3B и 7B; сведён с оценщиком напарницы |
 | Метрики EX / VES / токены | ✅ | `benchmarks/evaluate_bird.py` + латентность (`results/latency.json`) |
 | **SFT/LoRA (наша ветка)** | ✅ | победитель `qwen27b_sql_only`, оба target (3B+7B), 3 сида |
 | Учитель усилен | ✅ | **Qwen2.5-Coder-7B → Qwen3.6-27B** (пул МФТИ); брак фильтра упал 30–37% → 9–19% |
 | Execution-фильтр (Arctic) | ✅ | `filter_pairs.py` |
-| Мультизадачный SFT (ROUTE) | ✅ | ablation: мультизадачи **вредят** (−~2 п.п.), выключены |
+| Мультизадачный SFT (ROUTE) | ✅ | ablation доведён до числа: 28.57% — **внутри ±σ** победителя, эффект **не доказан**; выключены как выбор по умолчанию |
 | Кривая объёма данных | ✅ | 9.9 (50) → 11 (143) → 16.85 (347) → 27.84 (1171), плато нет |
 | Повторы с сидами (±σ) | ✅ | 3 сида на обоих target |
 | Утечка train→eval | ✅ | `check_leakage.py` — 2 вопроса найдено, вычищено, деконтаминация в пайплайне |
@@ -167,13 +168,15 @@ vs 22.47 = **+5.6 п.п.**. На нём отрабатывались сиды, �
 
 ## 5. Карта файлов
 
-- **Профиль/знание:** `collect_profile.py` → `profiles/<db>.json`; `build_mschema.py` → `mschema/<db>.txt`
+- **Профиль/знание:** `collect_profile.py` → `profiles/<db>.json`; `build_mschema.py` → `mschema/<db>.txt`;
+  `collect_query_stats.py` → `profiles/<db>.plans.json` (планы, join-пути, счётчики обращений)
 - **Генерация/фильтр/сборка:** `generate_pairs.py` (учитель через `LLM_*` в `.env`) → `filter_pairs.py`
   (execution-фильтр) → `build_dataset.py` (+ деконтаминация; флаг `--multitask` для ROUTE-задач)
 - **Аудит утечки:** `check_leakage.py` (гейт), `dataset/train_clean.json`
 - **Обучение (Kaggle):** `kaggle_train_lora.ipynb` (3B), `kaggle_train_7b.ipynb` (7B),
   `kaggle_seeds.ipynb` (±σ), `kaggle_ablation.ipynb`
 - **Оценка:** `extract_sql.py` → `bird_evaluate_only.py` / `benchmarks/evaluate_bird.py` (EX+VES);
+  весь лидерборд одной командой — `reproduce_leaderboard.py` (`--only` / `--group {canon,curve}`);
   канонические числа — через оценщик напарницы (`bird_large_filtered.json`)
 - **Адаптеры (провенанс в git, веса gitignored):** `adapters/qwen27b_7b_sqlonly1096/` (7B-победитель),
   `adapters/qwen27b_sqlonly1096/` (3B), `adapters/qwen27b_multitask2699/`, `adapters/synth1171/` (старый 7B-учитель)
