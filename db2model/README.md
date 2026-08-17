@@ -189,6 +189,9 @@ uv run python db2model/build_ablation.py       # варианты для ablatio
 - `kaggle_seeds.ipynb` / `kaggle_seeds_7b.ipynb` — повтор главного замера на 3 сидах (±σ), 3B и 7B.
 - `kaggle_infer_7b.ipynb` — инференс по готовому адаптеру, без обучения.
 - `kaggle_train_reasoning.ipynb` — ablation Think2SQL (CoT+SQL); отклонён, −10.3 п.п.
+- `kaggle_train_multitask_7b.ipynb` — ablation ROUTE (мультизадачный SFT) на 7B, 3 сида.
+  Закрывает дыру матрицы: на 3B приём мерился одним прогоном и попал внутрь ±σ победителя.
+  Данные — `train_multitask2695.json` (1096 sql + 1599 вспомогательных ROUTE).
 
 Забрать домой `query_results_*.json` (и адаптер, если нужен артефакт).
 

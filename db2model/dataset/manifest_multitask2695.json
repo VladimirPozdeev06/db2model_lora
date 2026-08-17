@@ -1,0 +1,32 @@
+{
+  "built": "2026-08-17",
+  "seed": 0,
+  "val_fraction": 0.15,
+  "n_train": 2695,
+  "n_val": 193,
+  "eval_leaks_removed": 1,
+  "multitask": true,
+  "n_multitask": 1599,
+  "by_db": {
+    "financial": 408,
+    "toxicology": 421,
+    "codebase_community": 460
+  },
+  "by_difficulty": {
+    "simple": 584,
+    "moderate": 480,
+    "challenging": 197,
+    "unknown": 28
+  },
+  "by_task": {
+    "sql_generation": 1096,
+    "schema_linking": 548,
+    "noise_correction": 547,
+    "continuation_writing": 504
+  },
+  "source_files": {
+    "financial": "e8b0dbb605a58afe",
+    "toxicology": "fda5075a6aae2922",
+    "codebase_community": "313f8fc14da16f2c"
+  }
+}

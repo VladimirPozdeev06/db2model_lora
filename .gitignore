@@ -16,3 +16,6 @@ query_results.json
 
 # IDE
 .idea/
+
+# LibreOffice/Excel: временные локи открытых книг
+.~lock.*#

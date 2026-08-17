@@ -51,6 +51,13 @@ ARMS: list[tuple[str, str, str, list[str]]] = [
         "query_results_qwen27b_7b_seed1.json",
         "query_results_qwen27b_7b_seed2.json",
     ]),
+    # Мультизадачность ROUTE на 7B: закрывает дыру матрицы (на 3B мерилась одним
+    # сидом и попала внутрь ±σ победителя). Файлов может ещё не быть — арм скипнется.
+    ("canon", "multitask ROUTE (3 сида)", "7B", [
+        "query_results_multitask7b_seed0.json",
+        "query_results_multitask7b_seed1.json",
+        "query_results_multitask7b_seed2.json",
+    ]),
     # Кривая объёма данных — адаптеры на старом учителе (Qwen-7B), target 3B.
     ("curve", "synth_50", "3B", ["query_results_synth_50.json"]),
     ("curve", "synth_143", "3B", ["query_results_synth_143.json"]),
