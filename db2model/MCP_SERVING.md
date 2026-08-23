@@ -25,11 +25,19 @@ PYTHONIOENCODING=utf-8 uv run --env-file .env python -m adv_text2sql.mcp_servers
 через vLLM (не тащим `transformers`/`peft` внутрь MCP):
 
 ```bash
-vllm serve Qwen/Qwen2.5-Coder-3B-Instruct \
+vllm serve Qwen/Qwen2.5-Coder-7B-Instruct \
     --enable-lora \
-    --lora-modules db2model=db2model/adapters/synth1171 \
+    --lora-modules db2model=db2model/adapters/qwen27b_7b_sqlonly1096 \
+    --max-lora-rank 16 \
+    --tensor-parallel-size 2 \
     --port 8001
 ```
+
+Адаптер здесь — победитель лидерборда (7B, EX 41.03 ± 1.37). База обязана совпадать с
+той, на которой он обучен: 7B-адаптер на 3B-базе vLLM проглотит молча, а качество
+упадёт до мусора. На Kaggle это делает `kaggle_vllm_serve.ipynb` (там же cloudflared
+наружу). 3B-вариант — адаптер `qwen27b_sqlonly1096`, база `Qwen2.5-Coder-3B-Instruct`,
+`--tensor-parallel-size 1`.
 
 `.env` (плюс `DB_USER`, `DB_PASS`, `BENCHMARK_DB_URL` для исполнения SQL через туннель):
 

@@ -19,13 +19,12 @@ Usage:
     uv run python db2model/compare_predictions.py mine.json theirs.json --show 20
 """
 
-import json
 import re
 import sys
 from collections import Counter
 from pathlib import Path
 
-EVAL_FILE = Path(__file__).resolve().parent.parent / "data" / "bird_large.json"
+from utils import BIRD_EVAL_FILE, load_json
 
 
 def _norm(sql: str) -> str:
@@ -35,7 +34,7 @@ def _norm(sql: str) -> str:
 
 
 def _load(path: str) -> dict[str, str]:
-    raw = json.loads(Path(path).read_text(encoding="utf-8"))
+    raw = load_json(Path(path))
     # Accept both {id: sql} and {id: {"query": sql}} shapes.
     out = {}
     for k, v in raw.items():
@@ -49,15 +48,14 @@ def main() -> None:
     if "--show" in argv:
         i = argv.index("--show")
         show = int(argv[i + 1])
-        del argv[i:i + 2]  # drop the flag and its value before reading positionals
+        del argv[i : i + 2]  # drop the flag and its value before reading positionals
     args = [a for a in argv if not a.startswith("--")]
     if len(args) != 2:
         print("нужно два файла предсказаний: mine.json theirs.json")
         return
 
     a, b = _load(args[0]), _load(args[1])
-    db_of = {str(q["question_id"]): q["db_id"]
-             for q in json.loads(EVAL_FILE.read_text(encoding="utf-8"))}
+    db_of = {str(q["question_id"]): q["db_id"] for q in load_json(BIRD_EVAL_FILE)}
 
     keys = sorted(set(a) & set(b), key=int)
     only_a, only_b = set(a) - set(b), set(b) - set(a)

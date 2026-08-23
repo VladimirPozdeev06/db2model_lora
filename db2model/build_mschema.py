@@ -14,13 +14,11 @@ Usage:
     uv run python db2model/build_mschema.py toxicology
 """
 
-import json
-import sys
-from pathlib import Path
+import argparse
 
-PROFILE_DIR = Path(__file__).parent / "profiles"
-OUT_DIR = Path(__file__).parent / "mschema"
-TARGET_DBS = ["financial", "toxicology", "codebase_community"]
+from utils import DB2MODEL_DIR, PROFILES_DIR, TARGET_DBS, load_json
+
+OUT_DIR = DB2MODEL_DIR / "mschema"
 MAX_EXAMPLES = 3
 
 
@@ -85,14 +83,17 @@ def render(profile: dict) -> str:
 
 
 def main() -> None:
-    dbs = sys.argv[1:] or TARGET_DBS
+    parser = argparse.ArgumentParser(description="Собрать M-Schema из профилей баз")
+    parser.add_argument("db_ids", nargs="*", default=[], help=f"базы (по умолчанию {', '.join(TARGET_DBS)})")
+    args = parser.parse_args()
+
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    for db in dbs:
-        profile_path = PROFILE_DIR / f"{db}.json"
+    for db in args.db_ids or TARGET_DBS:
+        profile_path = PROFILES_DIR / f"{db}.json"
         if not profile_path.exists():
             print(f"  пропускаю {db}: нет {profile_path}")
             continue
-        profile = json.loads(profile_path.read_text(encoding="utf-8"))
+        profile = load_json(profile_path)
         out_path = OUT_DIR / f"{db}.txt"
         out_path.write_text(render(profile), encoding="utf-8")
         n_tables = len(profile["tables"])

@@ -18,19 +18,16 @@ Usage:
     uv run python db2model/build_multitask.py toxicology financial
 """
 
-import json
 import random
 import re
 import sys
 from collections import Counter
-from pathlib import Path
 
 from sqlglot import Dialects, exp, parse_one
 
-CLEAN_DIR = Path(__file__).parent / "clean"
-PROFILES = Path(__file__).parent / "profiles"
-OUT_DIR = Path(__file__).parent / "dataset"
-TARGET_DBS = ["financial", "toxicology", "codebase_community"]
+from utils import CLEAN_DIR, DATASET_DIR, PROFILES_DIR, TARGET_DBS, dump_json, load_json
+
+OUT_DIR = DATASET_DIR
 SEED = 0
 
 # Keep the auxiliary tasks a minority of the mix: they are a regulariser, not the
@@ -41,9 +38,8 @@ CONTINUATION_FRACTION = 0.5
 
 
 def _columns_by_table(db_id: str) -> dict[str, list[str]]:
-    profile = json.loads((PROFILES / f"{db_id}.json").read_text(encoding="utf-8"))
-    return {t: [c["name"] for c in info["columns"]]
-            for t, info in profile["tables"].items()}
+    profile = load_json(PROFILES_DIR / f"{db_id}.json")
+    return {t: [c["name"] for c in info["columns"]] for t, info in profile["tables"].items()}
 
 
 def _referenced(sql: str) -> tuple[list[str], list[str]]:
@@ -65,11 +61,12 @@ def schema_linking(pair: dict, db_id: str) -> dict | None:
         return None
     if not tables or not columns:
         return None
-    target = ("tables: " + ", ".join(tables)
-              + "\ncolumns: " + ", ".join(columns))
-    system = (f"You are a PostgreSQL expert for the database `{db_id}`. "
-              "Name only the tables and columns needed to answer the question, "
-              "as two lines:\ntables: ...\ncolumns: ...")
+    target = "tables: " + ", ".join(tables) + "\ncolumns: " + ", ".join(columns)
+    system = (
+        f"You are a PostgreSQL expert for the database `{db_id}`. "
+        "Name only the tables and columns needed to answer the question, "
+        "as two lines:\ntables: ...\ncolumns: ..."
+    )
     return {
         "db_id": db_id,
         "task": "schema_linking",
@@ -102,17 +99,17 @@ def _corrupt(sql: str, cols_by_table: dict[str, list[str]], rng: random.Random) 
     return broken if broken.strip().lower() != sql.strip().lower() else None
 
 
-def noise_correction(pair: dict, db_id: str,
-                     cols_by_table: dict[str, list[str]],
-                     rng: random.Random) -> dict | None:
+def noise_correction(pair: dict, db_id: str, cols_by_table: dict[str, list[str]], rng: random.Random) -> dict | None:
     """(question + a nearly-right SQL) -> the corrected SQL. The correct answer is
     the gold query that already passed the execution filter, so the label is clean
     by construction."""
     broken = _corrupt(pair["sql"], cols_by_table, rng)
     if not broken:
         return None
-    system = (f"You are a PostgreSQL expert for the database `{db_id}`. "
-              "The SQL below is close but wrong. Return only the corrected SQL.")
+    system = (
+        f"You are a PostgreSQL expert for the database `{db_id}`. "
+        "The SQL below is close but wrong. Return only the corrected SQL."
+    )
     user = f"question: {pair['question']}\nSQL: {broken}"
     return {
         "db_id": db_id,
@@ -124,8 +121,7 @@ def noise_correction(pair: dict, db_id: str,
     }
 
 
-_CLAUSE = re.compile(
-    r"\s+(WHERE|GROUP\s+BY|ORDER\s+BY|HAVING|LIMIT)\s+", re.IGNORECASE)
+_CLAUSE = re.compile(r"\s+(WHERE|GROUP\s+BY|ORDER\s+BY|HAVING|LIMIT)\s+", re.IGNORECASE)
 
 
 def continuation_writing(pair: dict, db_id: str) -> dict | None:
@@ -141,8 +137,10 @@ def continuation_writing(pair: dict, db_id: str) -> dict | None:
     prefix, suffix = sql[:cut].strip(), sql[cut:].strip()
     if not prefix or not suffix:
         return None
-    system = (f"You are a PostgreSQL expert for the database `{db_id}`. "
-              "Complete the SQL query. Return only the missing tail, nothing else.")
+    system = (
+        f"You are a PostgreSQL expert for the database `{db_id}`. "
+        "Complete the SQL query. Return only the missing tail, nothing else."
+    )
     user = f"question: {pair['question']}\nSQL so far: {prefix}"
     return {
         "db_id": db_id,
@@ -196,7 +194,7 @@ def _from_clean(db_ids: list[str]) -> list[dict]:
         if not path.exists():
             print(f"  пропускаю {db_id}: нет {path}")
             continue
-        for p in json.loads(path.read_text(encoding="utf-8")):
+        for p in load_json(path):
             records.append({"db_id": db_id, "question": p["question"], "sql": p["sql"]})
     return records
 
@@ -212,7 +210,7 @@ def main() -> None:
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     out = OUT_DIR / "multitask.json"
-    out.write_text(json.dumps(examples, ensure_ascii=False, indent=2), encoding="utf-8")
+    dump_json(out, examples)
 
     print(f"мультизадачных примеров: {len(examples)}")
     print("  по задаче:", dict(Counter(e["task"] for e in examples)))

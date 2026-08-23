@@ -18,17 +18,14 @@ Usage:
 Exit code is non-zero when leakage is found, so it can gate a pipeline.
 """
 
-import json
+import argparse
 import re
-import sys
 from collections import defaultdict
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-EVAL_FILE = ROOT / "data" / "bird_large.json"
-TRAIN_FILE = Path(__file__).parent / "dataset" / "train.json"
-CLEAN_OUT = Path(__file__).parent / "dataset" / "train_clean.json"
-TARGET_DBS = {"financial", "toxicology", "codebase_community"}
+from utils import BIRD_EVAL_FILE, DATASET_DIR, TARGET_DBS, dump_json, load_json
+
+TRAIN_FILE = DATASET_DIR / "train.json"
+CLEAN_OUT = DATASET_DIR / "train_clean.json"
 
 
 def norm_sql(s: str) -> str:
@@ -36,8 +33,8 @@ def norm_sql(s: str) -> str:
     s = s.lower()
     s = re.sub(r"```sql|```", " ", s)
     s = re.sub(r"\bdistinct\b", " ", s)
-    s = re.sub(r"\bas\s+[a-z_]\w*", " ", s)   # drop alias declarations, any alias name
-    s = re.sub(r"\b[a-z_]\w*\.", "", s)       # drop table qualifier before a column
+    s = re.sub(r"\bas\s+[a-z_]\w*", " ", s)  # drop alias declarations, any alias name
+    s = re.sub(r"\b[a-z_]\w*\.", "", s)  # drop table qualifier before a column
     s = re.sub(r"\bas\b", " ", s)
     s = re.sub(r"\binner\s+join\b", "join", s)
     s = re.sub(r"[\s();]+", " ", s)
@@ -45,14 +42,15 @@ def norm_sql(s: str) -> str:
     return re.sub(r"\s+", " ", s).strip()
 
 
-def load():
-    gold = json.loads(EVAL_FILE.read_text(encoding="utf-8"))
+def load() -> tuple[list[dict], list[dict]]:
+    """Читает вопросы оценки (только целевые базы) и обучающие пары."""
+    gold = load_json(BIRD_EVAL_FILE)
     ev = [g for g in gold if g["db_id"] in TARGET_DBS]
-    train = json.loads(TRAIN_FILE.read_text(encoding="utf-8"))
+    train = load_json(TRAIN_FILE)
     return ev, train
 
 
-def find_leaks(ev, train):
+def find_leaks(ev: list[dict], train: list[dict]) -> tuple[dict[str, list[str]], set[int]]:
     """Return {eval_qid: [train questions]} and the set of leaking train indices."""
     eval_sql_by_db = defaultdict(dict)  # db -> {norm_sql: qid}
     for g in ev:
@@ -70,30 +68,33 @@ def find_leaks(ev, train):
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description="Аудит утечки train -> eval")
+    parser.add_argument("--write-clean", action="store_true", help=f"записать {CLEAN_OUT.name} без утекших пар")
+    args = parser.parse_args()
+
     ev, train = load()
     contaminated, leak_train_idx = find_leaks(ev, train)
     ev_by_id = {str(g["question_id"]): g for g in ev}
 
     print(f"eval questions (target dbs): {len(ev)}")
     print(f"train pairs                : {len(train)}")
-    print(f"CONTAMINATED eval questions: {len(contaminated)}  "
-          f"(exact gold-SQL twin, same literals)")
+    print(f"CONTAMINATED eval questions: {len(contaminated)}  (exact gold-SQL twin, same literals)")
     for qid in sorted(contaminated, key=int):
         g = ev_by_id[qid]
         print(f"  q{qid} [{g['db_id']}] {g['question']}")
         for tq in contaminated[qid]:
             print(f"      <- train: {tq}")
 
-    if "--write-clean" in sys.argv:
+    if args.write_clean:
         clean = [t for i, t in enumerate(train) if i not in leak_train_idx]
-        CLEAN_OUT.write_text(
-            json.dumps(clean, ensure_ascii=False, indent=2), encoding="utf-8")
-        print(f"\nwrote {CLEAN_OUT.name}: {len(train)} -> {len(clean)} "
-              f"(removed {len(leak_train_idx)} leaking pairs)")
+        dump_json(CLEAN_OUT, clean)
+        print(f"\nwrote {CLEAN_OUT.name}: {len(train)} -> {len(clean)} (removed {len(leak_train_idx)} leaking pairs)")
 
     if contaminated:
-        print("\nLEAKAGE FOUND: report EX on the clean subset "
-              f"(exclude {sorted(contaminated, key=int)}) or retrain on train_clean.json")
+        print(
+            "\nLEAKAGE FOUND: report EX on the clean subset "
+            f"(exclude {sorted(contaminated, key=int)}) or retrain on train_clean.json"
+        )
         return 1
     print("\nno exact-SQL leakage")
     return 0

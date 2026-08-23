@@ -16,18 +16,17 @@ notebook does this.
 Run: PYTHONIOENCODING=utf-8 uv run --env-file .env python db2model/generate_reasoning.py
 Needs only the LLM endpoint (no DB / tunnel). ~1096 calls.
 """
+
 import asyncio
-import json
-import os
-from pathlib import Path
 
 from autogen_core.models import SystemMessage, UserMessage
-from autogen_ext.models.openai import OpenAIChatCompletionClient
 
-DATA = Path(__file__).parent / "dataset"
-OUT = DATA / "train_reasoning.json"
+from llm_client import EXTRA_BODY, make_client
+from utils import DATASET_DIR, dump_json, load_json
+
+OUT = DATASET_DIR / "train_reasoning.json"
 CONCURRENCY = 8
-EXTRA_BODY = {"chat_template_kwargs": {"enable_thinking": False}}
+TEMPERATURE = 0.3
 
 SYSTEM = (
     "You are a PostgreSQL expert writing training data. Given a question about the "
@@ -64,13 +63,9 @@ async def one(client, sem, pair):
         }
 
 
-async def main():
-    pairs = json.loads((DATA / "train.json").read_text(encoding="utf-8"))
-    client = OpenAIChatCompletionClient(
-        model=os.environ["LLM_MODEL_NAME"], base_url=os.environ["LLM_BASE_URL"],
-        api_key=os.environ["LLM_API_KEY"], temperature=0.3,
-        model_info={"json_output": False, "function_calling": False, "vision": False,
-                    "family": "unknown", "structured_output": False})
+async def main() -> None:
+    pairs = load_json(DATASET_DIR / "train.json")
+    client = make_client(temperature=TEMPERATURE)
     sem = asyncio.Semaphore(CONCURRENCY)
 
     out = []
@@ -84,7 +79,7 @@ async def main():
         if done % 100 == 0:
             print(f"  {done}/{len(pairs)} (собрано {len(out)})")
 
-    OUT.write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")
+    dump_json(OUT, out)
     print(f"\nreasoning-пар: {len(out)}/{len(pairs)} -> {OUT}")
     if out:
         print("пример reasoning:\n", out[0]["reasoning"][:200])

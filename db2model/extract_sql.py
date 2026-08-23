@@ -12,10 +12,11 @@ Usage:
     uv run python db2model/extract_sql.py db2model/results/query_results_baseline.json
 """
 
-import json
+import argparse
 import re
-import sys
 from pathlib import Path
+
+from utils import dump_json, load_json
 
 FENCED = re.compile(r"```(?:sql)?\s*(.*?)```", re.DOTALL | re.IGNORECASE)
 STATEMENT = re.compile(r"\b(WITH|SELECT)\b", re.IGNORECASE)
@@ -32,20 +33,23 @@ def extract_sql(text: str) -> str:
     # Prose before the query ("To find X, use:") — cut to where SQL starts.
     start = STATEMENT.search(text)
     if start:
-        text = text[start.start():]
+        text = text[start.start() :]
 
     return text.strip().rstrip(";").strip()
 
 
 def main() -> None:
-    src = Path(sys.argv[1])
-    predictions = json.loads(src.read_text(encoding="utf-8"))
+    parser = argparse.ArgumentParser(description="Вычистить SQL из ответов модели")
+    parser.add_argument("predictions", type=Path, help="файл предсказаний {question_id: ответ}")
+    args = parser.parse_args()
+
+    predictions = load_json(args.predictions)
     cleaned = {qid: extract_sql(sql) for qid, sql in predictions.items()}
 
     changed = sum(1 for qid in predictions if predictions[qid] != cleaned[qid])
-    out = src.with_name(src.stem + "_extracted.json")
-    out.write_text(json.dumps(cleaned, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"{src.name}: переписано {changed} из {len(predictions)} -> {out.name}")
+    out = args.predictions.with_name(args.predictions.stem + "_extracted.json")
+    dump_json(out, cleaned)
+    print(f"{args.predictions.name}: переписано {changed} из {len(predictions)} -> {out.name}")
 
 
 if __name__ == "__main__":

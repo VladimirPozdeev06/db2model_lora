@@ -13,19 +13,17 @@ Usage:
 """
 
 import asyncio
-import json
-import os
 import random
 import re
 import sys
-from pathlib import Path
 
 from autogen_core.models import SystemMessage, UserMessage
-from autogen_ext.models.openai import OpenAIChatCompletionClient
-from sqlalchemy import create_engine, text
+from sqlalchemy import text
 
-PROFILES = Path(__file__).parent / "profiles"
-TRAIN_QUERIES = Path("data/train_queries.json")
+from llm_client import make_client
+from utils import DATA_DIR, PROFILES_DIR, load_json, make_engine
+
+TRAIN_QUERIES = DATA_DIR / "train_queries.json"
 
 SYSTEM = """You are a PostgreSQL expert. Below is a complete profile of a database:
 schema, foreign keys, statistics and real values.
@@ -44,33 +42,20 @@ async def main() -> None:
     n = int(sys.argv[2]) if len(sys.argv) > 2 else 6
     random.seed(0)
 
-    profile = (PROFILES / f"{db_id}.json").read_text(encoding="utf-8")
-    pairs = [i for i in json.loads(TRAIN_QUERIES.read_text(encoding="utf-8"))
-             if i["db_id"] == db_id]
+    profile = (PROFILES_DIR / f"{db_id}.json").read_text(encoding="utf-8")
+    pairs = [i for i in load_json(TRAIN_QUERIES) if i["db_id"] == db_id]
     sample = random.sample(pairs, min(n, len(pairs)))
 
-    client = OpenAIChatCompletionClient(
-        model=os.environ["LLM_MODEL_NAME"],
-        base_url=os.environ["LLM_BASE_URL"],
-        api_key=os.environ["LLM_API_KEY"],
-        temperature=0,
-        model_info={"json_output": False, "function_calling": False, "vision": False,
-                    "family": "unknown", "structured_output": False},
-    )
+    client = make_client()
 
-    user, password = os.environ["DB_USER"], os.environ["DB_PASS"]
-    host = os.getenv("BENCHMARK_DB_URL", "localhost:5444")
-    engine = create_engine(f"postgresql+psycopg://{user}:{password}@{host}/{db_id}")
+    engine = make_engine(db_id)
 
     system = SYSTEM.format(profile=profile)
     ok = 0
     with engine.connect() as conn:
         for item in sample:
             question = f"question: {item['question']}, evidence: {item['evidence']}"
-            result = await client.create(
-                [SystemMessage(content=system),
-                 UserMessage(source="user", content=question)]
-            )
+            result = await client.create([SystemMessage(content=system), UserMessage(source="user", content=question)])
             sql = _clean(result.content)
             try:
                 rows = conn.execute(text(sql)).fetchall()

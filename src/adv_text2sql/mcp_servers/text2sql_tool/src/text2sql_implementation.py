@@ -20,11 +20,26 @@ from .prompts import (
 )
 from .utils import print_result
 
-# Load environment variables for the main block
 MAX_RETRIES = int(os.getenv("MAX_RETRIES", 7))
-
+# БД видна только через ssh-туннель. Без connect_timeout обрыв туннеля не роняет
+# процесс, а вешает его навсегда на установленном сокете (TCP keepalive — 2 часа):
+# сервер молча висит в build(), порт не слушается. Тот же фикс, что в оценщике.
+CONNECT_TIMEOUT_SEC = 15
+STATEMENT_TIMEOUT_MS = 30000
 
 logger = logging.getLogger("text2sql_tool")
+
+
+def _make_engine(db_uri: str) -> Engine:
+    """Подключение к БД с таймаутами: и на коннект, и на отдельный запрос."""
+    return create_engine(
+        db_uri,
+        connect_args={
+            "options": f"-c statement_timeout={STATEMENT_TIMEOUT_MS}",
+            "connect_timeout": CONNECT_TIMEOUT_SEC,
+        },
+        pool_pre_ping=True,
+    )
 
 
 class Text2SQLGenerator:
@@ -46,10 +61,7 @@ class Text2SQLGenerator:
                 weights" arm) — this is what keeps the LoRA arm's token budget small.
         """
         self.db_uri = db_uri
-        self.engine: Engine = create_engine(
-            db_uri,
-            pool_pre_ping=True,
-        )
+        self.engine: Engine = _make_engine(db_uri)
 
         self.llm_client = llm_client
         self.with_schema = with_schema
@@ -67,7 +79,7 @@ class Text2SQLGenerator:
     def _update_db_schema(self, db_uri):
         self.db_uri = db_uri
         self.engine.dispose()
-        self.engine = create_engine(db_uri, pool_pre_ping=True)
+        self.engine = _make_engine(db_uri)
         self.build()
 
     def _get_db_schema_heavy(
@@ -150,9 +162,7 @@ class Text2SQLGenerator:
 
                         if 0 < len(values) <= unique_threshold:
                             formatted = ", ".join(repr(v) for v in values)
-                            unique_values_parts.append(
-                                f'Possible values for "{table}.{col_name}": [{formatted}]'
-                            )
+                            unique_values_parts.append(f'Possible values for "{table}.{col_name}": [{formatted}]')
 
                     except Exception:
                         # silently skip problematic columns (JSON, arrays, etc.)
@@ -202,12 +212,8 @@ class Text2SQLGenerator:
     def _create_system_prompt(self) -> str:
         """Системный промпт: со схемой (baseline) или без неё (арм весов)."""
         if self.with_schema:
-            return SYSTEM_PROMPT_TEMPLATE.format(
-                db_schema=self.db_schema, sql_dialect="PostgreSQL"
-            )
-        return SYSTEM_PROMPT_NOSCHEMA_TEMPLATE.format(
-            sql_dialect="PostgreSQL", db_name=self._db_name()
-        )
+            return SYSTEM_PROMPT_TEMPLATE.format(db_schema=self.db_schema, sql_dialect="PostgreSQL")
+        return SYSTEM_PROMPT_NOSCHEMA_TEMPLATE.format(sql_dialect="PostgreSQL", db_name=self._db_name())
 
     async def _check_ambiguity(self, user_query: str) -> dict[str, Any]:
         """
@@ -249,7 +255,7 @@ class Text2SQLGenerator:
                     "clarification_needed": response_text,
                 }
 
-        except Exception as e:
+        except Exception:
             logger.exception(f"Failed to check ambiguity for query: {user_query}")
             return {"status": "error"}
 
@@ -331,13 +337,9 @@ class Text2SQLGenerator:
             """.strip()
 
         # Replace CAST(... AS REAL) if inside math operations
-        sql = re.sub(
-            r"CAST\((.*?)\s+AS\s+REAL\)", r"\1::REAL", sql, flags=re.IGNORECASE
-        )
+        sql = re.sub(r"CAST\((.*?)\s+AS\s+REAL\)", r"\1::REAL", sql, flags=re.IGNORECASE)
         # Remove invalid nested NULLIF patterns like NULLIF(NULLIF,0)(x)
-        sql = re.sub(
-            r"NULLIF\(NULLIF,0\)\((.*?)\)", r"NULLIF(\1,0)", sql, flags=re.IGNORECASE
-        )
+        sql = re.sub(r"NULLIF\(NULLIF,0\)\((.*?)\)", r"NULLIF(\1,0)", sql, flags=re.IGNORECASE)
 
         # remove multiple newlines
         sql = re.sub(r"\n\s*\n", "\n", sql)
@@ -355,11 +357,7 @@ class Text2SQLGenerator:
             Dict[str, Any]: Результат в формате Model Context Protocol
         """
         if self.with_schema:
-            user_content = dedent(
-                SQL_PROMPT_TEMPLATE.format(
-                    user_query=user_query, sql_dialect="PostgreSQL"
-                )
-            )
+            user_content = dedent(SQL_PROMPT_TEMPLATE.format(user_query=user_query, sql_dialect="PostgreSQL"))
         else:
             # Schema-less арм: в обучении пользовательское сообщение — голый вопрос,
             # без обёртки с требованиями. Обёртка сбивает адаптер (см. prompts.py).
@@ -448,9 +446,7 @@ class Text2SQLGenerator:
                 "sql_attempted": sql,
             }
 
-    async def _verify_sql_against_query(
-        self, user_query: str, sql_query: str
-    ) -> dict[str, Any]:
+    async def _verify_sql_against_query(self, user_query: str, sql_query: str) -> dict[str, Any]:
         """
         Проверяет, соответствует ли сгенерированный SQL-запрос оригинальному запросу пользователя.
         """
@@ -474,9 +470,7 @@ class Text2SQLGenerator:
                     "reason": response_text,
                 }
         except Exception as e:
-            logger.exception(
-                f"Failed to verify generated query matches user query: {sql_query=} {user_query=}"
-            )
+            logger.exception(f"Failed to verify generated query matches user query: {sql_query=} {user_query=}")
             return {"status": "error", "error": str(e)}
 
     @print_result()
@@ -521,9 +515,7 @@ class Text2SQLGenerator:
         raw_sql = ""
 
         while not success and retries < MAX_RETRIES:
-            logger.info(
-                f"Попытка {retries + 1}/{MAX_RETRIES}. Генерирую валидный SQL-запрос... "
-            )
+            logger.info(f"Попытка {retries + 1}/{MAX_RETRIES}. Генерирую валидный SQL-запрос... ")
             generation_result = await self.generate_sql(user_query)
 
             if generation_result["status"] != "success":
@@ -546,9 +538,7 @@ class Text2SQLGenerator:
 
         if check_sql_query:
             verification = await self._verify_sql_against_query(user_query, raw_sql)
-            if verification.get("status") == "success" and not verification.get(
-                "is_correct", True
-            ):
+            if verification.get("status") == "success" and not verification.get("is_correct", True):
                 logger.info("Верификация не прошла: %s", verification.get("reason"))
 
         execution = self.execute_safe(raw_sql)

@@ -10,19 +10,18 @@ Usage:
 Needs the ssh tunnel to the benchmark database to be up.
 """
 
-import json
-import os
 import sys
-from pathlib import Path
 from typing import Any
 
 import tiktoken
-from sqlalchemy import create_engine, inspect, text
+from sqlalchemy import inspect, text
 from sqlalchemy.engine import Engine
+
+from utils import PROFILES_DIR, make_engine, to_json_text
 
 TARGET_DBS = ["financial", "toxicology", "codebase_community"]
 
-OUT_DIR = Path(__file__).parent / "profiles"
+OUT_DIR = PROFILES_DIR
 SAMPLE_ROWS = 5
 MAX_VALUE_LEN = 120
 """Long free text (forum posts, comments) would blow up the profile."""
@@ -37,12 +36,7 @@ def _truncate(value: Any) -> Any:
 
 
 def _engine(db_id: str) -> Engine:
-    user = os.environ["DB_USER"]
-    password = os.environ["DB_PASS"]
-    host = os.getenv("BENCHMARK_DB_URL", "localhost:5444")
-    return create_engine(
-        f"postgresql+psycopg://{user}:{password}@{host}/{db_id}", pool_pre_ping=True
-    )
+    return make_engine(db_id)
 
 
 def _row_estimate(conn, table: str) -> int:
@@ -62,9 +56,7 @@ def _row_estimate(conn, table: str) -> int:
 
 
 def _table_comment(conn, table: str) -> str | None:
-    return conn.execute(
-        text("SELECT obj_description(CAST(:t AS regclass), 'pg_class')"), {"t": table}
-    ).scalar()
+    return conn.execute(text("SELECT obj_description(CAST(:t AS regclass), 'pg_class')"), {"t": table}).scalar()
 
 
 def _column_stats(conn, table: str) -> dict[str, dict]:
@@ -88,10 +80,7 @@ def _column_values(conn, table: str, column: str) -> dict[str, Any]:
     not in the database and every generated query dies on the execution filter."""
     try:
         distinct = conn.execute(
-            text(
-                f'SELECT DISTINCT "{column}" FROM "{table}" '
-                f'WHERE "{column}" IS NOT NULL LIMIT :lim'
-            ),
+            text(f'SELECT DISTINCT "{column}" FROM "{table}" WHERE "{column}" IS NOT NULL LIMIT :lim'),
             {"lim": LOW_CARDINALITY_MAX + 1},
         ).fetchall()
     except Exception as exc:
@@ -176,7 +165,7 @@ def main() -> None:
     for db_id in dbs:
         profile = collect(db_id)
         out = OUT_DIR / f"{db_id}.json"
-        payload = json.dumps(profile, ensure_ascii=False, indent=2, default=str)
+        payload = to_json_text(profile)
         out.write_text(payload, encoding="utf-8")
 
         n_fk = len(profile["foreign_keys"])

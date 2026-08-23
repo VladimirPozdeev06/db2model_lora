@@ -10,56 +10,36 @@ effect, which holds regardless of the served model.
 Run: PYTHONIOENCODING=utf-8 uv run --env-file .env python db2model/measure_latency.py
 Needs the ssh tunnel (schema build) and the LLM endpoint.
 """
+
 import asyncio
-import json
-import os
 import statistics
 import time
-
-from autogen_ext.models.openai import OpenAIChatCompletionClient
 
 from adv_text2sql.mcp_servers.text2sql_tool.src.text2sql_implementation import (
     Text2SQLGenerator,
 )
 
+from llm_client import make_client
+from utils import DB2MODEL_DIR, RESULTS_DIR, build_db_uri, dump_json, load_json
+
 DB = "financial"
 N = 15  # sample of eval questions
-db_uri = (f"postgresql+psycopg://{os.environ['DB_USER']}:{os.environ['DB_PASS']}"
-          f"@{os.getenv('BENCHMARK_DB_URL', 'localhost:5444')}/{DB}")
-
-
-def make_client():
-    c = OpenAIChatCompletionClient(
-        model=os.environ["LLM_MODEL_NAME"], base_url=os.environ["LLM_BASE_URL"],
-        api_key=os.environ["LLM_API_KEY"], temperature=0.0,
-        model_info={"json_output": False, "function_calling": True, "vision": False,
-                    "family": "unknown", "structured_output": False})
-    _orig = c.create
-
-    async def _create(messages, **kw):
-        ec = dict(kw.get("extra_create_args") or {})
-        ec.setdefault("extra_body", {"chat_template_kwargs": {"enable_thinking": False}})
-        kw["extra_create_args"] = ec
-        return await _orig(messages, **kw)
-
-    c.create = _create
-    return c
 
 
 async def measure(agent, questions) -> list[float]:
     times = []
     for q in questions:
         t = time.perf_counter()
-        await agent.generate_sql(q)          # LLM call + local sanitize/validate
+        await agent.generate_sql(q)  # LLM call + local sanitize/validate
         times.append(time.perf_counter() - t)
     return times
 
 
-async def main():
-    bird = json.loads((__import__("pathlib").Path(__file__).parent
-                       / "kaggle_input" / "bird_large.json").read_text(encoding="utf-8"))
+async def main() -> None:
+    bird = load_json(DB2MODEL_DIR / "kaggle_input" / "bird_large.json")
     questions = [q["question"] for q in bird if q["db_id"] == DB][:N]
     client = make_client()
+    db_uri = build_db_uri(DB)
 
     out = {}
     for with_schema in (True, False):
@@ -67,17 +47,15 @@ async def main():
         agent.build()
         ts = await measure(agent, questions)
         arm = "baseline (схема в контексте)" if with_schema else "lora (знание в весах)"
-        out[arm] = {"mean_s": round(statistics.mean(ts), 2),
-                    "median_s": round(statistics.median(ts), 2),
-                    "n": len(ts)}
+        out[arm] = {"mean_s": round(statistics.mean(ts), 2), "median_s": round(statistics.median(ts), 2), "n": len(ts)}
         print(f"{arm}: mean {out[arm]['mean_s']}s | median {out[arm]['median_s']}s (n={len(ts)})")
 
-    b = out["baseline (схема в контексте)"]["median_s"]
-    l = out["lora (знание в весах)"]["median_s"]
-    if l:
-        print(f"\nschema-less быстрее в {b / l:.2f}× по медиане ({b}s -> {l}s)")
-    (__import__("pathlib").Path(__file__).parent / "results" / "latency.json").write_text(
-        json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")
+    baseline_median = out["baseline (схема в контексте)"]["median_s"]
+    lora_median = out["lora (знание в весах)"]["median_s"]
+    if lora_median:
+        speedup = baseline_median / lora_median
+        print(f"\nschema-less быстрее в {speedup:.2f}× по медиане ({baseline_median}s -> {lora_median}s)")
+    dump_json(RESULTS_DIR / "latency.json", out)
 
 
 if __name__ == "__main__":

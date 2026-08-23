@@ -13,19 +13,17 @@ Usage:
     uv run python db2model/build_ablation.py
 """
 
-import json
 import random
 from collections import Counter
 from pathlib import Path
 
 from sqlglot import transpile
 
-HERE = Path(__file__).parent
-CLEAN_DIR = HERE / "clean"
-RAW_DIR = HERE / "raw"
-OUT_DIR = HERE / "dataset"
-TRAIN_QUERIES = Path("data/train_queries.json")
-TARGET_DBS = ["financial", "toxicology", "codebase_community"]
+from utils import CLEAN_DIR, DATA_DIR, DATASET_DIR, DB2MODEL_DIR, TARGET_DBS, dump_json, load_json
+
+RAW_DIR = DB2MODEL_DIR / "raw"
+OUT_DIR = DATASET_DIR
+TRAIN_QUERIES = DATA_DIR / "train_queries.json"
 SEED = 0
 
 SYNTH_SIZES = [50, 143, 347]
@@ -35,14 +33,16 @@ def _load(directory: Path, source: str) -> list[dict]:
     records = []
     for db_id in TARGET_DBS:
         path = directory / f"{db_id}.json"
-        for pair in json.loads(path.read_text(encoding="utf-8")):
-            records.append({
-                "db_id": db_id,
-                "question": pair["question"],
-                "sql": pair["sql"],
-                "difficulty": pair.get("difficulty", "unknown"),
-                "source": source,
-            })
+        for pair in load_json(path):
+            records.append(
+                {
+                    "db_id": db_id,
+                    "question": pair["question"],
+                    "sql": pair["sql"],
+                    "difficulty": pair.get("difficulty", "unknown"),
+                    "source": source,
+                }
+            )
     return records
 
 
@@ -52,7 +52,7 @@ def real_pairs() -> list[dict]:
     Disjoint from bird_large/bird_small — checked, no leakage into the metric."""
     records = []
     dropped = 0
-    for item in json.loads(TRAIN_QUERIES.read_text(encoding="utf-8")):
+    for item in load_json(TRAIN_QUERIES):
         if item["db_id"] not in TARGET_DBS:
             continue
         try:
@@ -60,13 +60,15 @@ def real_pairs() -> list[dict]:
         except Exception:
             dropped += 1
             continue
-        records.append({
-            "db_id": item["db_id"],
-            "question": item["question"],
-            "sql": sql,
-            "difficulty": item.get("difficulty", "unknown"),
-            "source": "real",
-        })
+        records.append(
+            {
+                "db_id": item["db_id"],
+                "question": item["question"],
+                "sql": sql,
+                "difficulty": item.get("difficulty", "unknown"),
+                "source": "real",
+            }
+        )
     if dropped:
         print(f"  real: {dropped} пар не транспилировались, выкинуты")
     return records
@@ -74,7 +76,7 @@ def real_pairs() -> list[dict]:
 
 def write(name: str, rows: list[dict]) -> None:
     path = OUT_DIR / f"train_{name}.json"
-    path.write_text(json.dumps(rows, ensure_ascii=False, indent=2), encoding="utf-8")
+    dump_json(path, rows)
     by_db = Counter(r["db_id"] for r in rows)
     print(f"{name:<16} {len(rows):>4} пар | {dict(by_db)} -> {path.name}")
 
@@ -101,13 +103,9 @@ def main() -> None:
 
     manifest = {
         "seed": SEED,
-        "variants": {
-            p.stem: len(json.loads(p.read_text(encoding="utf-8")))
-            for p in sorted(OUT_DIR.glob("train_*.json"))
-        },
+        "variants": {p.stem: len(load_json(p)) for p in sorted(OUT_DIR.glob("train_*.json"))},
     }
-    (OUT_DIR / "ablation_manifest.json").write_text(
-        json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+    dump_json(OUT_DIR / "ablation_manifest.json", manifest)
     print(f"\n-> {OUT_DIR / 'ablation_manifest.json'}")
 
 

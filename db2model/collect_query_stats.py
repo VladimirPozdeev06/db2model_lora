@@ -25,27 +25,24 @@ Needs the ssh tunnel to the benchmark database to be up.
 """
 
 import json
-import os
 import sys
 from collections import Counter
-from pathlib import Path
 from typing import Any
 
 import sqlglot
-from sqlglot import expressions as exp
-from sqlalchemy import create_engine, text
+from sqlalchemy import text
 from sqlalchemy.engine import Engine
+from sqlglot import expressions as exp
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from utils import BIRD_EVAL_FILE, DATA_DIR, PROFILES_DIR, REPO_ROOT, TARGET_DBS, dump_json, load_json, make_engine
+
+sys.path.insert(0, str(REPO_ROOT))
 from benchmarks.evaluate_bird import sqlite_to_postgres  # noqa: E402
 
-TARGET_DBS = ["financial", "toxicology", "codebase_community"]
-
-ROOT = Path(__file__).resolve().parents[1]
-OUT_DIR = Path(__file__).parent / "profiles"
+OUT_DIR = PROFILES_DIR
 CORPUS_FILES = [
-    ROOT / "data" / "train_queries.json",
-    ROOT / "data" / "bird_large.json",
+    DATA_DIR / "train_queries.json",
+    BIRD_EVAL_FILE,
 ]
 STATEMENT_TIMEOUT_MS = 15000
 
@@ -55,14 +52,7 @@ JOIN_NODES = {"Nested Loop", "Hash Join", "Merge Join"}
 def _engine(db_id: str) -> Engine:
     """One engine per database — creating it inside a loop opens a TCP connection
     per query and kills the ssh forwarding."""
-    user = os.environ["DB_USER"]
-    password = os.environ["DB_PASS"]
-    host = os.getenv("BENCHMARK_DB_URL", "localhost:5444")
-    return create_engine(
-        f"postgresql+psycopg://{user}:{password}@{host}/{db_id}",
-        pool_pre_ping=True,
-        connect_args={"connect_timeout": 15},
-    )
+    return make_engine(db_id, statement_timeout_ms=STATEMENT_TIMEOUT_MS)
 
 
 # --------------------------------------------------------------------------- #
@@ -87,9 +77,7 @@ def table_access_counters(conn) -> list[dict]:
 
 
 def stats_reset_at(conn) -> str | None:
-    value = conn.execute(
-        text("SELECT stats_reset FROM pg_stat_database WHERE datname = current_database()")
-    ).scalar()
+    value = conn.execute(text("SELECT stats_reset FROM pg_stat_database WHERE datname = current_database()")).scalar()
     return str(value) if value else None
 
 
@@ -101,8 +89,7 @@ def pg_stat_statements_status(conn) -> dict[str, Any]:
         ("shared_preload_libraries", "SHOW shared_preload_libraries"),
         (
             "available",
-            "SELECT installed_version FROM pg_available_extensions "
-            "WHERE name = 'pg_stat_statements'",
+            "SELECT installed_version FROM pg_available_extensions WHERE name = 'pg_stat_statements'",
         ),
         ("is_superuser", "SELECT current_setting('is_superuser')"),
         (
@@ -117,9 +104,7 @@ def pg_stat_statements_status(conn) -> dict[str, Any]:
             status[key] = f"error: {str(exc)[:80]}"
 
     try:
-        status["rows_visible"] = conn.execute(
-            text("SELECT count(*) FROM pg_stat_statements")
-        ).scalar()
+        status["rows_visible"] = conn.execute(text("SELECT count(*) FROM pg_stat_statements")).scalar()
     except Exception as exc:
         conn.rollback()
         status["rows_visible"] = f"error: {str(exc)[:80]}"
@@ -222,7 +207,7 @@ def load_corpus(db_id: str) -> list[dict]:
     for path in CORPUS_FILES:
         if not path.exists():
             continue
-        for item in json.loads(path.read_text(encoding="utf-8")):
+        for item in load_json(path):
             if item.get("db_id") == db_id and item.get("SQL"):
                 corpus.append({"source": path.name, "sql": item["SQL"]})
     return corpus
@@ -292,9 +277,7 @@ def main() -> None:
     for db_id in dbs:
         stats = collect(db_id)
         out = OUT_DIR / f"{db_id}.plans.json"
-        out.write_text(
-            json.dumps(stats, ensure_ascii=False, indent=2, default=str), encoding="utf-8"
-        )
+        dump_json(out, stats)
 
         c = stats["corpus"]
         top_table = next(iter(stats["table_frequency"].items()), ("-", 0))
@@ -304,8 +287,7 @@ def main() -> None:
             f"(ошибок {c['failed']})  таблиц: {len(stats['table_frequency']):>2}  "
             f"join-рёбер: {len(stats['join_paths']):>2}  -> {out}"
         )
-        print(f"{'':22} чаще всего: {top_table[0]} ({top_table[1]}), "
-              f"связка {top_join[0]} ({top_join[1]})")
+        print(f"{'':22} чаще всего: {top_table[0]} ({top_table[1]}), связка {top_join[0]} ({top_join[1]})")
 
 
 if __name__ == "__main__":

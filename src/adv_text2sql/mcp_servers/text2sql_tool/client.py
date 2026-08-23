@@ -1,6 +1,7 @@
 import asyncio
-import os
 import logging
+import os
+from typing import Any
 
 # import pprint
 from autogen_agentchat.agents import AssistantAgent
@@ -9,7 +10,6 @@ from autogen_core import CancellationToken
 from autogen_ext.models.openai import OpenAIChatCompletionClient
 from autogen_ext.tools.mcp import StreamableHttpServerParams, mcp_server_tools
 from dotenv import load_dotenv
-from typing import Any
 
 load_dotenv()
 
@@ -61,9 +61,7 @@ async def main():
     if True:  # :)
         while True:
             request = input(">> ")
-            await Console(
-                agent.run_stream(task=request, cancellation_token=CancellationToken())
-            )
+            await Console(agent.run_stream(task=request, cancellation_token=CancellationToken()))
     else:
         await Console(agent.run_stream(task=DEFAULT_TASK))
 

@@ -10,18 +10,17 @@ Usage:
     uv run --env-file .env python db2model/filter_pairs.py toxicology
 """
 
-import json
-import os
 import re
 import sys
 from collections import Counter
-from pathlib import Path
 
-from sqlalchemy import create_engine, text
+from sqlalchemy import text
 from sqlglot import Dialects, exp, parse_one
 
-RAW_DIR = Path(__file__).parent / "raw"
-OUT_DIR = Path(__file__).parent / "clean"
+from utils import CLEAN_DIR, DB2MODEL_DIR, dump_json, load_json, make_engine
+
+RAW_DIR = DB2MODEL_DIR / "raw"
+OUT_DIR = CLEAN_DIR
 STATEMENT_TIMEOUT_MS = 15000
 """A generated query can be accidentally quadratic; do not hang the whole run."""
 
@@ -38,10 +37,7 @@ def _is_trivial(sql: str) -> bool:
     except Exception:
         return False
     has_star = any(isinstance(n, exp.Star) for n in parsed.walk())
-    has_logic = any(
-        isinstance(n, (exp.Where, exp.Group, exp.Join, exp.Order, exp.AggFunc))
-        for n in parsed.walk()
-    )
+    has_logic = any(isinstance(n, (exp.Where, exp.Group, exp.Join, exp.Order, exp.AggFunc)) for n in parsed.walk())
     return has_star and not has_logic
 
 
@@ -50,16 +46,8 @@ def _fingerprint(sql: str) -> str:
 
 
 def filter_db(db_id: str) -> tuple[list[dict], list[dict], Counter]:
-    pairs = json.loads((RAW_DIR / f"{db_id}.json").read_text(encoding="utf-8"))
-    user, password = os.environ["DB_USER"], os.environ["DB_PASS"]
-    host = os.getenv("BENCHMARK_DB_URL", "localhost:5444")
-    engine = create_engine(
-        f"postgresql+psycopg://{user}:{password}@{host}/{db_id}",
-        # Set on the connection, not with a SET statement: every failed query needs
-        # a rollback, and a rollback would undo an in-transaction SET, leaving the
-        # rest of the run with no timeout at all.
-        connect_args={"options": f"-c statement_timeout={STATEMENT_TIMEOUT_MS}"},
-    )
+    pairs = load_json(RAW_DIR / f"{db_id}.json")
+    engine = make_engine(db_id, statement_timeout_ms=STATEMENT_TIMEOUT_MS)
 
     kept: list[dict] = []
     rejected: list[dict] = []
@@ -118,14 +106,15 @@ def main() -> None:
         print(f"{db_id}: в {RAW_DIR / f'{db_id}.json'} нет пар — сначала generate_pairs.py")
         return
 
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
     out = OUT_DIR / f"{db_id}.json"
-    out.write_text(json.dumps(kept, ensure_ascii=False, indent=2), encoding="utf-8")
+    dump_json(out, kept)
     rej = OUT_DIR / f"{db_id}.rejected.json"
-    rej.write_text(json.dumps(rejected, ensure_ascii=False, indent=2), encoding="utf-8")
+    dump_json(rej, rejected)
 
-    print(f"{db_id}: оставлено {total}/{raw_total} "
-          f"({100 * total / raw_total:.0f}%), брак {100 - 100 * total / raw_total:.0f}%")
+    print(
+        f"{db_id}: оставлено {total}/{raw_total} "
+        f"({100 * total / raw_total:.0f}%), брак {100 - 100 * total / raw_total:.0f}%"
+    )
     for reason, n in reasons.most_common():
         print(f"    {reason:<20} {n:>3}")
     print(f"  по сложности: {dict(Counter(p.get('difficulty') for p in kept))}")

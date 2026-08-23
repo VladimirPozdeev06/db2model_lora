@@ -132,6 +132,4 @@ SYSTEM_PROMPT_TEMPLATE = """
 # Проверено: с прежним русским промптом из 12 правил модель возвращала только
 # `/* комментарий */` и обрывала генерацию, а MCP падал с «Incomplete SQL generated».
 # Менять эту строку можно только вместе с переобучением адаптера.
-SYSTEM_PROMPT_NOSCHEMA_TEMPLATE = (
-    "You are a {sql_dialect} expert for the database `{db_name}`. Return only SQL."
-)
+SYSTEM_PROMPT_NOSCHEMA_TEMPLATE = "You are a {sql_dialect} expert for the database `{db_name}`. Return only SQL."

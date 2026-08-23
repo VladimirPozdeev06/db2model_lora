@@ -9,29 +9,21 @@ Usage:
 
 import asyncio
 import json
-import os
 import random
-import re
 import sys
-from pathlib import Path
 
 from autogen_core.models import SystemMessage, UserMessage
-from autogen_ext.models.openai import OpenAIChatCompletionClient
 from sqlglot import transpile
 
-PROFILES = Path(__file__).parent / "profiles"
-OUT_DIR = Path(__file__).parent / "raw"
+from llm_client import EXTRA_BODY, make_client
+from utils import DATA_DIR, DB2MODEL_DIR, PROFILES_DIR, dump_json, load_json
+
+OUT_DIR = DB2MODEL_DIR / "raw"
 PAIRS_PER_CALL = 8
 N_FEWSHOT = 3
 TEMPERATURE = 0.8
 """Diversity matters more than precision here: bad pairs get filtered out later,
 but pairs that are all variations of one query cannot be recovered."""
-
-# The teacher is a Qwen3-series model (Qwen3.6-27B), which reasons by default and
-# would otherwise burn the whole reply on a <think> block and return empty content.
-# enable_thinking=false is Qwen3's own switch; other models on the gateway ignore
-# the flag rather than error, so it is safe to send unconditionally.
-EXTRA_BODY = {"chat_template_kwargs": {"enable_thinking": False}}
 
 FLAVOURS = [
     "simple lookups with a WHERE filter",
@@ -107,10 +99,7 @@ def _implied_edges(profile: dict) -> list[str]:
         if len(pk) == 1:
             pk_owner[pk[0]] = table
 
-    declared = {
-        (fk["from_table"], tuple(fk["from_columns"]))
-        for fk in profile["foreign_keys"]
-    }
+    declared = {(fk["from_table"], tuple(fk["from_columns"])) for fk in profile["foreign_keys"]}
 
     implied = []
     for table, info in profile["tables"].items():
@@ -132,7 +121,7 @@ def _fewshot(db_id: str) -> str:
     They are stored in SQLite dialect and the teacher copies whatever it sees, so
     they have to be transpiled first — otherwise it emits SQLite-isms such as an
     unaliased subquery in FROM, which PostgreSQL rejects."""
-    pairs = [i for i in json.load(open("data/train_queries.json")) if i["db_id"] == db_id]
+    pairs = [i for i in load_json(DATA_DIR / "train_queries.json") if i["db_id"] == db_id]
     if not pairs:
         return ""
     picked = random.sample(pairs, min(N_FEWSHOT, len(pairs)))
@@ -142,7 +131,7 @@ def _fewshot(db_id: str) -> str:
             sql = transpile(p["SQL"], read="sqlite", write="postgres")[0]
         except Exception:
             continue
-        lines.append(f'  Q: {p["question"]}\n  SQL: {sql}')
+        lines.append(f"  Q: {p['question']}\n  SQL: {sql}")
     if not lines:
         return ""
     return "Examples of the style expected:\n" + "\n".join(lines) + "\n"
@@ -159,26 +148,16 @@ def _parse(text: str) -> list[dict]:
         except json.JSONDecodeError:
             continue
         if isinstance(items, list):
-            return [
-                it for it in items
-                if isinstance(it, dict) and it.get("question") and it.get("sql")
-            ]
+            return [it for it in items if isinstance(it, dict) and it.get("question") and it.get("sql")]
     return []
 
 
 async def generate(db_id: str, target: int) -> list[dict]:
-    profile = (PROFILES / f"{db_id}.json").read_text(encoding="utf-8")
+    profile = (PROFILES_DIR / f"{db_id}.json").read_text(encoding="utf-8")
     parsed = json.loads(profile)
     tables = list(parsed["tables"])
 
-    client = OpenAIChatCompletionClient(
-        model=os.environ["LLM_MODEL_NAME"],
-        base_url=os.environ["LLM_BASE_URL"],
-        api_key=os.environ["LLM_API_KEY"],
-        temperature=TEMPERATURE,
-        model_info={"json_output": False, "function_calling": False, "vision": False,
-                    "family": "unknown", "structured_output": False},
-    )
+    client = make_client(temperature=TEMPERATURE)
     system = SYSTEM.format(db_id=db_id, profile=profile, summary=_summary(parsed))
 
     pairs: list[dict] = []
@@ -187,8 +166,11 @@ async def generate(db_id: str, target: int) -> list[dict]:
         flavour = FLAVOURS[i % len(FLAVOURS)]
         focus = random.sample(tables, min(3, len(tables)))
         user = USER.format(
-            n=PAIRS_PER_CALL, db_id=db_id, flavour=flavour,
-            tables=", ".join(focus), fewshot=_fewshot(db_id),
+            n=PAIRS_PER_CALL,
+            db_id=db_id,
+            flavour=flavour,
+            tables=", ".join(focus),
+            fewshot=_fewshot(db_id),
         )
         result = await client.create(
             [SystemMessage(content=system), UserMessage(source="user", content=user)],
@@ -213,7 +195,7 @@ async def main() -> None:
     pairs = await generate(db_id, target)
 
     out = OUT_DIR / f"{db_id}.json"
-    out.write_text(json.dumps(pairs, ensure_ascii=False, indent=2), encoding="utf-8")
+    dump_json(out, pairs)
     print(f"\n{db_id}: {len(pairs)} сырых пар -> {out}")
 
 
