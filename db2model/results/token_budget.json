@@ -1,0 +1,31 @@
+{
+  "model_tokenizer": "Qwen/Qwen2.5-Coder-7B-Instruct",
+  "definition": "prompt tokens of the single SQL-generation call, target-model tokenizer, apply_chat_template(add_generation_prompt=True)",
+  "n_questions": 91,
+  "arms": {
+    "schema_less (lora / zeroshot)": {
+      "mean": 90.6,
+      "median": 79,
+      "sd": 34.8,
+      "min": 49,
+      "max": 206,
+      "per_db_mean": {
+        "financial": 81.6,
+        "toxicology": 100.9,
+        "codebase_community": 87.1
+      }
+    },
+    "baseline (schema in context)": {
+      "mean": 288.2,
+      "median": 316,
+      "sd": 117.3,
+      "min": 109,
+      "max": 492,
+      "per_db_mean": {
+        "financial": 330.6,
+        "toxicology": 152.9,
+        "codebase_community": 418.1
+      }
+    }
+  }
+}
