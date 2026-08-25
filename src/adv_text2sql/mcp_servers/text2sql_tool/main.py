@@ -97,12 +97,16 @@ def format_result(result: dict) -> str:
     if result.get("status") != "success":
         return f"_Ошибка_: {result.get('message', 'Выполнение запроса неуспешно')}"
 
+    sql = result.get("query", "")
+    sql_block = f"```sql\n{sql}\n```\n\n" if sql else ""
+
     execution = result.get("execution", {})
     if execution.get("status") != "success":
-        return f"_Ошибка выполнения_: {execution.get('error', 'запрос не выполнен')}"
+        return f"{sql_block}_Ошибка выполнения_: {execution.get('error', 'запрос не выполнен')}"
 
     rows = execution.get("results", [])
-    return tabulate(rows, headers="keys", tablefmt="pipe") if rows else "Нет данных"
+    table = tabulate(rows, headers="keys", tablefmt="pipe") if rows else "Нет данных"
+    return f"{sql_block}{table}"
 
 
 @server.tool(description=TOOL_DESCRIPTION)
